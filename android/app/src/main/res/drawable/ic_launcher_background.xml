@@ -1,7 +1,0 @@
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:drawable="@color/splashscreen_background"/>
-  <!-- Remove or replace the following item if splashscreen_logo is not available -->
-  <!-- <item>
-    <bitmap android:gravity="center" android:src="@drawable/splashscreen_logo"/>
-  </item> -->
-</layer-list>
