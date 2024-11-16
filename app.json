@@ -2,6 +2,14 @@
   "expo": {
     "name": "Bimar",
     "slug": "Bimar",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "android": {
+      "package": "com.kareem061.Bimar"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "64485872-86ce-4247-bb26-20e386de1f0b"
+      }
+    }
   }
 }

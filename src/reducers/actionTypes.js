@@ -1,0 +1,7 @@
+const ACTION_TYPES = {
+    UPDATE_PROP: 'UPDATE_PROP',
+    MERGE_PROP: 'MERGE_PROP',
+    DELETE_PROP: 'DELETE_PROP',
+};
+
+export default ACTION_TYPES;
