@@ -1,12 +1,18 @@
-import createDataContext from './createDataContext';
-import {reducer} from '../reducers/reducer';
+import createDataContext from "./createDataContext";
+import { reducer } from "../reducers/reducer";
 
-const INITIAL_STATE = {userData: {}};
-
-const updateState = dispatch => {
-    return payload => {
-        dispatch({payload});
-    };
+const INITIAL_STATE = {
+  userData: {},
 };
 
-export const {Context, Provider} = createDataContext(reducer, {updateState}, INITIAL_STATE);
+const updateState = (dispatch) => {
+  return (payload) => {
+    dispatch({ payload });
+  };
+};
+
+export const { Context, Provider } = createDataContext(
+  reducer,
+  { updateState },
+  INITIAL_STATE
+);
