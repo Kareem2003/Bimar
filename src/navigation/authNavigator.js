@@ -11,11 +11,11 @@ export const navigationRef = createNavigationContainerRef();
 const AuthNavigator = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Splash"
         component={Splash}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Stack.Screen
         name="Login"
         component={Login}

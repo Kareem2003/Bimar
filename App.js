@@ -5,20 +5,19 @@
  * @format
  * @flow strict-local
  */
-
 import React from "react";
-import { SafeAreaView, StyleSheet, Text, useColorScheme } from "react-native";
 import { Provider } from "./src/contexts/appContext";
 import NavContainer from "./src/navigation/navContainer";
+import ThemeProvider from "./src/contexts/themeContext";
 
 const App = () => {
   return (
     <Provider>
-      <NavContainer></NavContainer>
+      <ThemeProvider>
+        <NavContainer />
+      </ThemeProvider>
     </Provider>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default App;
