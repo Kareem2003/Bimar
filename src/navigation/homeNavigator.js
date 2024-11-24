@@ -1,12 +1,12 @@
 import React, { useContext } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Home from "../screens/home";
-import MenuButton from "../components/general/menuButton";
 import { softPurpleColor } from "../styles/colors";
 import { Button, Pressable, Text, TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../helpers/constants/staticKeys";
 import { Context } from "../contexts/appContext";
+import Home from "../screens/home";
+import MenuButton from "../components/menuButton";
 
 const Stack = createNativeStackNavigator();
 const HomeNavigator = () => {

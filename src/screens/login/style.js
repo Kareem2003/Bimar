@@ -2,13 +2,30 @@ import { Dimensions } from "react-native";
 import { primary } from "../../styles/colors";
 export const styles = {
   container: {
-    backgroundColor: primary,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 16,
+    backgroundColor: "#fff",
   },
-  logo: {
-    width: Dimensions.get("window").width * 0.5,
-    height: Dimensions.get("window").width * 1,
+  title: {
+    fontSize: 24,
+    marginBottom: 24,
+    textAlign: "center",
+  },
+  input: {
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 10,
+  },
+  linksContainer: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  link: {
+    color: "#007BFF",
+    marginVertical: 5,
   },
 };

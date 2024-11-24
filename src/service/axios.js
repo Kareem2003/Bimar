@@ -9,20 +9,18 @@ import { navigationRef } from "../navigation/authNavigator";
 export const unsecured = axios.create({
   baseURL: BASE_URL,
   headers: {
-    common: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
+  withCredentials: true,
 });
 export const secured = axios.create({
   baseURL: BASE_URL,
   headers: {
-    common: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
+  withCredentials: true,
 });
 
 const requestHandler = async (request) => {
@@ -124,7 +122,7 @@ export const unsecurePost = (
   onComplete = (f) => {}
 ) => {
   unsecured
-    .post(url, body, { "Content-Type": "application/x-www-form-urlencoded" })
+    .post(url, body)
     .then((response) => {
       onSuccess(response);
     })

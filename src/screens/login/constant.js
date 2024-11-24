@@ -1,1 +1,5 @@
-export const INITIAL_STATE = {};
+export const INITIAL_STATE = {
+  email: "",
+  password: "",
+  loading: false,
+};
