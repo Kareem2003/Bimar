@@ -69,6 +69,10 @@ export const styles = {
   width: "20%",
   margin: "auto",
 },
+label:{
+  margin: 10,
+  marginTop: 5,
+},
 
 
 };

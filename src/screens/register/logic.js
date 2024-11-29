@@ -40,6 +40,10 @@ const Logic = (navigation) => {
     setCurrentStep(prev); // Return to the first section
   };
 
+  const handleRegister = () => {
+    //////////////////////////////////////////////////////////////////////
+  };
+
   const updateFormData = (field, value) => {
     setFormData({ ...formData, [field]: value });
   };
@@ -48,6 +52,7 @@ const Logic = (navigation) => {
     updateFormData,
     handleNext,
     handleBack,
+    handleRegister,
     currentStep,
     formData,
   };

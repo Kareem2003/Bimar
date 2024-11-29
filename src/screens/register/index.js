@@ -4,10 +4,10 @@ import { ThemeContext } from "../../contexts/themeContext";
 import { styles } from "./style";
 import AppInput from "../../components/AppInput";
 import AppButton from "../../components/AppButton";
+import AppRadioButton from "../../components/AppRadioButton";
 import AuthTitles from "../../components/AuthTitles";
 import { primaryDark, primaryLight } from "../../styles/colors";
 import Logic from "./logic";
-
 
 const Register = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -15,6 +15,7 @@ const Register = ({ navigation }) => {
     updateFormData,
     handleNext,
     handleBack,
+    handleRegister,
     currentStep,
     formData,
   } = Logic(navigation);
@@ -35,7 +36,7 @@ const Register = ({ navigation }) => {
       />
 
       {currentStep === 1 && (
-        <View>
+        <View style={{ padding: 20 }}>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
@@ -93,7 +94,7 @@ const Register = ({ navigation }) => {
       )}
 
       {currentStep === 2 && (
-        <View>
+        <View style={{ padding: 20 }}>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
@@ -137,7 +138,8 @@ const Register = ({ navigation }) => {
               marginTop: 20,
             }}
           >
-            <Text style={styles.text}>Gender</Text>
+            <Text style={styles.label}>Gender</Text>
+            <AppRadioButton />
           </View>
 
           <View
@@ -180,7 +182,7 @@ const Register = ({ navigation }) => {
         </View>
       )}
       {currentStep === 3 && (
-        <View>
+        <View style={{ padding: 20 }}>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
@@ -199,45 +201,45 @@ const Register = ({ navigation }) => {
               source={require("./../../assets/images/step3Image.png")}
             />
           </View>
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <AppInput
-              term={formData.city}
-              onChangeText={(text) => updateFormData("city", text)}
-              placeholder="City"
-              backgroundStyle={{ marginTop: 20, width: 150 }}
-            />
-            <AppInput
-              term={formData.area}
-              onChangeText={(text) => updateFormData("area", text)}
-              placeholder="Area"
-              backgroundStyle={{ marginTop: 20, width: 150 }}
-            />
-          </View>
+
           <AppInput
-            term={formData.weight}
-            onChangeText={(text) => updateFormData("weight", text)}
-            placeholder="Weight"
+            term={formData.BloodType}
+            onChangeText={(text) => updateFormData("BloodType", text)}
+            placeholder="Blood Type"
             backgroundStyle={{ marginTop: 20 }}
           />
           <AppInput
-            term={formData.hight}
-            onChangeText={(text) => updateFormData("hight ", text)}
-            placeholder="Hight "
+            term={formData.allergy}
+            onChangeText={(text) => updateFormData("allergy", text)}
+            placeholder="Allergy"
             backgroundStyle={{ marginTop: 20 }}
           />
+          <AppInput
+            term={formData.ReEnterYourPassword}
+            onChangeText={(text) =>
+              updateFormData("ReEnterYourPassword ", text)
+            }
+            placeholder="Re-Enter Your Password "
+            backgroundStyle={{ marginTop: 20 }}
+          />
+          <AppInput
+            term={formData.EnteryourPhone}
+            onChangeText={(text) => updateFormData("EnteryourPhone ", text)}
+            placeholder="Enter your Phone "
+            backgroundStyle={{ marginTop: 20 }}
+          />
+
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <AppButton
-              title="Back"
+              title="BACK"
               onPress={handleBack}
               buttonStyle={{ marginTop: 25, margin: "auto", width: 150 }}
             />
             <AppButton
-              title="Next"
-              onPress={handleNext}
+              title="Register"
+              onPress={handleRegister}
               buttonStyle={{ marginTop: 25, margin: "auto", width: 150 }}
             />
           </View>
