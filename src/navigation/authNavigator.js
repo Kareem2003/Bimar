@@ -5,6 +5,7 @@ import Login from "../screens/login";
 import StarterTheme from "../screens/starterTheme";
 import { createNavigationContainerRef } from "@react-navigation/native";
 import HomeNavigator from "./homeNavigator";
+import Register from "../screens/register";
 // import { createNavigationContainerRef } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator();
@@ -26,6 +27,11 @@ const AuthNavigator = () => {
       <Stack.Screen
         name="Login"
         component={Login}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="register"
+        component={Register}
         options={{ headerShown: false }}
       />
       <Stack.Screen

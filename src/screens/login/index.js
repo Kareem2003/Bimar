@@ -93,7 +93,7 @@ const Login = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
           <Text style={styles.link}>Forgot Password?</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Registration")}>
+        <TouchableOpacity onPress={() => navigation.navigate("register")}>
           <Text style={styles.link}>Register</Text>
         </TouchableOpacity>
       </View>
