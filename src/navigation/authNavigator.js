@@ -6,6 +6,7 @@ import StarterTheme from "../screens/starterTheme";
 import { createNavigationContainerRef } from "@react-navigation/native";
 import HomeNavigator from "./homeNavigator";
 import Register from "../screens/register";
+
 // import { createNavigationContainerRef } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator();

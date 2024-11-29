@@ -6,36 +6,18 @@ import AppInput from "../../components/AppInput";
 import AppButton from "../../components/AppButton";
 import AuthTitles from "../../components/AuthTitles";
 import { primaryDark, primaryLight } from "../../styles/colors";
+import Logic from "./logic";
 
-const Register = () => {
+
+const Register = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const [currentStep, setCurrentStep] = useState(1); // Step indicator: 1 or 2
-  const [formData, setFormData] = useState({
-    fullname: "",
-    phone: "",
-    email: "",
-    dateOfBirth: "",
-    city: "",
-    area: "",
-    gender: "",
-    weight: "",
-    hight: "",
-    BloodType: "",
-  });
-
-  const handleNext = () => {
-    const next = currentStep + 1;
-    setCurrentStep(next); // Move to the next section
-  };
-
-  const handleBack = () => {
-    const prev = currentStep - 1;
-    setCurrentStep(prev); // Return to the first section
-  };
-
-  const updateFormData = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-  };
+  const {
+    updateFormData,
+    handleNext,
+    handleBack,
+    currentStep,
+    formData,
+  } = Logic(navigation);
 
   return (
     <View
@@ -263,7 +245,7 @@ const Register = () => {
       )}
 
       <View style={styles.linksContainer}>
-        <TouchableOpacity onPress={() => console.log("Navigate to Login")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text>
             Have an account? <Text style={styles.link}>LOGIN</Text>
           </Text>

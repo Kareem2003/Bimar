@@ -16,83 +16,40 @@ import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import { patientLogin } from "../../service/AuthServices";
 const Logic = (navigation) => {
-  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
-  const { updateState: updateCtxState } = useContext(Context);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1); // Step indicator: 1 or 2
+  const [formData, setFormData] = useState({
+    fullname: "",
+    phone: "",
+    email: "",
+    dateOfBirth: "",
+    city: "",
+    area: "",
+    gender: "",
+    weight: "",
+    hight: "",
+    BloodType: "",
+  });
 
-  const updateState = (payload) => {
-    dispatch({ payload });
+  const handleNext = () => {
+    const next = currentStep + 1;
+    setCurrentStep(next); // Move to the next section
   };
 
-  const handleLogin = () => {
-    dispatch({
-      payload: [
-        {
-          type: ACTION_TYPES.UPDATE_PROP,
-          prop: `loading`,
-          value: true,
-        },
-      ],
-    });
-    
-
-    const payload = {
-      userEmail: state.email,
-      userPassword: state.password,
-    };
-
-    patientLogin(
-      payload,
-      async (res) => {
-        if (res.data.status === "success") {
-          const cookies = res.headers["set-cookie"];
-          const token = extractTokenFromCookies(cookies);
-          // Store token in AsyncStorage
-          if (token) {
-            await AsyncStorage.setItem(AUTHENTICATION_TOKEN, token);
-            await AsyncStorage.setItem(
-              USERINFO,
-              JSON.stringify(res.data.patient)
-            );
-          }
-          navigation.replace("HomeNav");
-        } else {
-          console.log("Login failed");
-        }
-      },
-      (e) => {
-        console.error("Error:", e);
-        dispatch({
-          payload: [
-            {
-              type: ACTION_TYPES.UPDATE_PROP,
-              prop: `loading`,
-              value: false,
-            },
-          ],
-        });
-      },
-      () => {}
-    );
+  const handleBack = () => {
+    const prev = currentStep - 1;
+    setCurrentStep(prev); // Return to the first section
   };
 
-  // Helper function to extract token from cookies
-  const extractTokenFromCookies = (cookies) => {
-    if (!cookies) return null;
-    const jwtCookie = cookies.find((cookie) => cookie.startsWith("jwt="));
-    return jwtCookie ? jwtCookie.split("=")[1].split(";")[0] : null;
-  };
-
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible((prev) => !prev);
+  const updateFormData = (field, value) => {
+    setFormData({ ...formData, [field]: value });
   };
 
   return {
-    state,
-    updateState,
-    handleLogin,
-    isPasswordVisible,
-    togglePasswordVisibility,
+    updateFormData,
+    handleNext,
+    handleBack,
+    currentStep,
+    formData,
   };
 };
 
