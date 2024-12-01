@@ -32,14 +32,13 @@ export const styles = {
   img: {
     width: 55,
     height: 55,
-    
   },
-  imageFill:{
+  imageFill: {
     width: 55,
     height: 55,
     borderRadius: 50,
-  
-    margin: 5
+
+    margin: 5,
   },
   imgActive: {
     width: 55,
@@ -47,32 +46,29 @@ export const styles = {
     borderRadius: 50,
     backgroundColor: "#FD9B63",
     margin: "auto",
-    
   },
   circle: {
     width: 55,
     height: 55,
     borderWidth: 1,
-    borderColor: '#FD9B63',
+    borderColor: "#FD9B63",
     borderRadius: 50,
     margin: "auto",
   },
- line: {
+  line: {
     height: 2,
     backgroundColor: "#000",
     width: "20%",
     margin: "auto",
- },
- lineActive: {
-  height: 2,
-  backgroundColor: "#FD9B63",
-  width: "20%",
-  margin: "auto",
-},
-label:{
-  margin: 10,
-  marginTop: 5,
-},
-
-
+  },
+  lineActive: {
+    height: 2,
+    backgroundColor: "#FD9B63",
+    width: "20%",
+    margin: "auto",
+  },
+  label: {
+    margin: 10,
+    marginTop: 5,
+  },
 };

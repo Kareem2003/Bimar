@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Text,
 } from "react-native";
 import FontAwsome from "react-native-vector-icons/FontAwesome";
 import { ThemeContext } from "../contexts/themeContext";
@@ -16,104 +17,121 @@ const AppInput = ({
   onSubmitEditing,
   secureTextEntry,
   iconName,
-  iconSize,
   onIconPress,
   incomPressible,
   placeholder = "",
+  inputWrapperStyle = {},
   backgroundStyle = {},
   inputStyle = {},
   iconStyle = {},
+  validationText = "",
+  iconSize = 20,
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
-    <View
-      style={[
-        isDarkTheme ? styles.darkBackgroundStyle : styles.lightBackgroundStyle,
-        backgroundStyle,
-      ]}
-    >
-      <TextInput
-        autoCapitalize="none"
-        autoCorrect={false}
+    <View style={[styles.container, backgroundStyle]}>
+      <View
         style={[
-          isDarkTheme ? styles.darkInputStyle : styles.lightInputStyle,
-          inputStyle,
+          styles.inputWrapper,
+          isDarkTheme ? styles.darkBackground : styles.lightBackground,
+          inputWrapperStyle,
         ]}
-        placeholder={placeholder}
-        value={term}
-        onChangeText={onChangeText}
-        onSubmitEditing={onSubmitEditing}
-        placeholderTextColor={"#A09CAB"}
-        secureTextEntry={secureTextEntry}
-      />
-
-      {incomPressible ? (
-        <TouchableOpacity onPress={onIconPress}>
-          <FontAwsome
-            name={iconName}
-            size={iconSize}
-            style={[
-              isDarkTheme ? styles.darkIconStyle : styles.lightIconStyle,
-              iconStyle,
-            ]}
-          />
-        </TouchableOpacity>
-      ) : (
-        <FontAwsome
-          name={iconName}
-          size={iconSize}
+      >
+        <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
           style={[
-            isDarkTheme ? styles.darkIconStyle : styles.lightIconStyle,
-            iconStyle,
+            styles.input,
+            isDarkTheme ? styles.darkInput : styles.lightInput,
+            inputStyle,
           ]}
+          placeholder={placeholder}
+          value={term}
+          onChangeText={onChangeText}
+          onSubmitEditing={onSubmitEditing}
+          placeholderTextColor={"#A09CAB"}
+          secureTextEntry={secureTextEntry}
         />
-      )}
+        {iconName && (
+          <TouchableOpacity
+            onPress={onIconPress}
+            disabled={!incomPressible}
+            style={styles.iconWrapper}
+          >
+            <FontAwsome
+              name={iconName}
+              size={iconSize}
+              style={[
+                styles.icon,
+                isDarkTheme ? styles.darkIcon : styles.lightIcon,
+                iconStyle,
+              ]}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+      {validationText ? (
+        <Text style={styles.validationText}>{validationText}</Text>
+      ) : null}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  darkBackgroundStyle: {
-    width: Dimensions.get("window").width * 0.8,
-    borderRadius: 12,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingLeft: 10,
-    backgroundColor: greyColorLight,
-  },
-  lightBackgroundStyle: {
-    width: Dimensions.get("window").width * 0.8,
-    borderRadius: 12,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingLeft: 10,
-    paddingVertical: 5,
-    backgroundColor: greyColorDark,
-  },
-  darkInputStyle: {
-    flex: 1,
-    fontSize: 15,
-    color: "#000",
-  },
-  lightInputStyle: {
-    flex: 1,
-    fontSize: 15,
-    color: "#000000",
-  },
-  darkIconStyle: {
-    fontSize: 15,
+  container: {
+    width: "90%",
     alignSelf: "center",
-    padding: 15,
-    color: "#000",
+    marginVertical: 8,
   },
-  lightIconStyle: {
-    fontSize: 15,
+  inputWrapper: {
+    width: Dimensions.get("window").width * 0.7,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  lightBackground: {
+    backgroundColor: "#F2F2F2",
+  },
+  darkBackground: {
+    backgroundColor: "#333",
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 4,
+  },
+  lightInput: {
+    color: "#333",
+  },
+  darkInput: {
+    color: "#FFF",
+  },
+  iconWrapper: {
+    marginLeft: 8,
+  },
+  icon: {
     alignSelf: "center",
-    padding: 15,
-    color: "#000",
+  },
+  lightIcon: {
+    color: "#555",
+  },
+  darkIcon: {
+    color: "#FFF",
+  },
+  validationText: {
+    marginTop: 4,
+    fontSize: 12,
+    color: "red",
+    opacity: 0.8,
+    alignSelf: "flex-end",
   },
 });
 

@@ -1,5 +1,12 @@
 import React, { useContext, useState } from "react";
-import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import { ThemeContext } from "../../contexts/themeContext";
 import { styles } from "./style";
 import AppInput from "../../components/AppInput";
@@ -8,16 +15,18 @@ import AppRadioButton from "../../components/AppRadioButton";
 import AuthTitles from "../../components/AuthTitles";
 import { primaryDark, primaryLight } from "../../styles/colors";
 import Logic from "./logic";
+import ACTION_TYPES from "../../reducers/actionTypes";
+import FontAwsome from "react-native-vector-icons/FontAwesome";
 
 const Register = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
   const {
+    state,
+    updateState,
     updateFormData,
     handleNext,
     handleBack,
     handleRegister,
-    currentStep,
-    formData,
   } = Logic(navigation);
 
   return (
@@ -35,56 +44,58 @@ const Register = ({ navigation }) => {
         descriptionText="Register Now"
       />
 
-      {currentStep === 1 && (
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <FontAwsome name="circle" size={24} />
+        <View style={styles.lineActive} />
+        <FontAwsome name="circle" size={24} />
+        <View style={styles.lineActive} />
+        <FontAwsome name="circle" size={24} />
+      </View>
+
+      {state.currentStep === 1 && (
         <View style={{ padding: 20 }}>
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Image
-              style={styles.img}
-              source={require("./../../assets/images/step1ActiveImage.png")}
-            />
-            <Image
-              style={styles.line}
-              source={require("./../../assets/images/lineImage.png")}
-            />
-            <Image
-              style={styles.img}
-              source={require("./../../assets/images/step2Image.png")}
-            />
-            <Image
-              style={styles.line}
-              source={require("./../../assets/images/lineImage.png")}
-            />
-            <Image
-              style={styles.img}
-              source={require("./../../assets/images/step3Image.png")}
-            />
-          </View>
           <AppInput
-            term={formData.fullname}
-            onChangeText={(text) => updateFormData("fullname", text)}
+            term={state.formData.userName}
+            onChangeText={(text) => updateFormData("userName", text)}
             placeholder="Full Name"
             backgroundStyle={{ marginTop: 20 }}
+            validationText={state.formData.userNameValidationText}
           />
           <AppInput
-            term={formData.phone}
-            onChangeText={(text) => updateFormData("phone", text)}
-            placeholder="Phone"
-            backgroundStyle={{ marginTop: 20 }}
-          />
-          <AppInput
-            term={formData.email}
-            onChangeText={(text) => updateFormData("email", text)}
+            term={state.formData.userEmail}
+            onChangeText={(text) => updateFormData("userEmail", text)}
             placeholder="Email"
             backgroundStyle={{ marginTop: 20 }}
+            validationText={state.formData.userEmailValidationText}
           />
           <AppInput
-            term={formData.DateOfBerth}
-            onChangeText={(text) => updateFormData("DateOfBerth ", text)}
-            placeholder="Date of berth "
+            term={state.formData.userPassword}
+            onChangeText={(text) => updateFormData("userPassword", text)}
+            placeholder="Enter Your Password"
             backgroundStyle={{ marginTop: 20 }}
+            validationText={state.formData.userPasswordValidationText}
           />
+          <AppInput
+            term={state.reEnterYourPassword}
+            onChangeText={(text) =>
+              updateState([
+                {
+                  type: ACTION_TYPES.UPDATE_PROP,
+                  prop: `reEnterYourPassword`,
+                  value: text,
+                },
+              ])
+            }
+            placeholder="Re-Enter Your Password"
+            backgroundStyle={{ marginTop: 20 }}
+            validationText={state.reEnterYourPasswordValidationText}
+          />
+          {/* <AppInput
+            term={state.formData.dateOfBirth}
+            onChangeText={(text) => updateFormData("dateOfBirth", text)}
+            placeholder="Date of Birth"
+            backgroundStyle={{ marginTop: 20 }}
+          /> */}
           <AppButton
             title="Next"
             onPress={handleNext}
@@ -93,78 +104,68 @@ const Register = ({ navigation }) => {
         </View>
       )}
 
-      {currentStep === 2 && (
-        <View style={{ padding: 20 }}>
+      {state.currentStep === 2 && (
+        <View
+          style={{
+            padding: 20,
+            backgroundColor: isDarkTheme ? primaryDark : primaryLight,
+          }}
+        >
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Image
-              style={styles.imgActive}
-              source={require("./../../assets/images/step1ActiveImage.png")}
-            />
-            <View style={styles.lineActive} />
-            <Image
-              style={styles.circle}
-              source={require("./../../assets/images/step2Image.png")}
-            />
-            <View style={styles.line} />
-            <Image
-              style={styles.img}
-              source={require("./../../assets/images/step3Image.png")}
-            />
-          </View>
-
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 10,
+            }}
           >
             <AppInput
-              term={formData.city}
-              onChangeText={(text) => updateFormData("city", text)}
+              term={state.formData.City}
+              onChangeText={(text) => updateFormData("City", text)}
               placeholder="City"
-              backgroundStyle={{ marginTop: 20, width: 150 }}
+              inputWrapperStyle={{
+                width: Dimensions.get("window").width * 0.35,
+              }}
+              backgroundStyle={{ flex: 1 }}
+              validationText={state.formData.CityValidationText}
             />
             <AppInput
-              term={formData.area}
-              onChangeText={(text) => updateFormData("area", text)}
+              term={state.formData.Area}
+              onChangeText={(text) => updateFormData("Area", text)}
               placeholder="Area"
-              backgroundStyle={{ marginTop: 20, width: 150 }}
+              inputWrapperStyle={{
+                width: Dimensions.get("window").width * 0.35,
+              }}
+              backgroundStyle={{ flex: 1 }}
+              validationText={state.formData.AreaValidationText}
             />
           </View>
 
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "space-between",
               marginTop: 20,
+              alignItems: "center",
             }}
           >
             <Text style={styles.label}>Gender</Text>
             <AppRadioButton />
           </View>
 
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <AppInput
-              term={formData.weight}
-              onChangeText={(text) => updateFormData("weight", text)}
-              placeholder="Weight"
-              backgroundStyle={{ marginTop: 20, width: 150 }}
-            />
-            <AppInput
-              term={formData.hight}
-              onChangeText={(text) => updateFormData("hight", text)}
-              placeholder="Hight"
-              backgroundStyle={{ marginTop: 20, width: 150 }}
-            />
-          </View>
-
           <AppInput
-            term={formData.BloodType}
-            onChangeText={(text) => updateFormData("BloodType", text)}
-            placeholder="Blood Type"
+            term={state.formData.DateofBirth}
+            onChangeText={(text) => updateFormData("DateofBirth", text)}
+            placeholder="Date of Birth"
             backgroundStyle={{ marginTop: 20 }}
+            validationText={state.formData.DateofBirthValidationText}
           />
+          <AppInput
+            term={state.formData.userPhone}
+            onChangeText={(text) => updateFormData("userPhone", text)}
+            placeholder="Enter your Phone"
+            backgroundStyle={{ marginTop: 20 }}
+            validationText={state.formData.userPhoneValidationText}
+          />
+
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
@@ -181,53 +182,41 @@ const Register = ({ navigation }) => {
           </View>
         </View>
       )}
-      {currentStep === 3 && (
+      {state.currentStep === 3 && (
         <View style={{ padding: 20 }}>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Image
-              style={styles.imgActive}
-              source={require("./../../assets/images/step1ActiveImage.png")}
+            <AppInput
+              term={state.formData.userWeight}
+              onChangeText={(text) => updateFormData("userWeight", text)}
+              placeholder="Weight"
+              backgroundStyle={{ marginTop: 20, flex: 1, marginRight: 10 }}
+              validationText={state.formData.userWeightValidationText}
             />
-            <View style={styles.lineActive} />
-            <Image
-              style={styles.imgActive}
-              source={require("./../../assets/images/step2Image.png")}
-            />
-            <View style={styles.lineActive} />
-            <Image
-              style={styles.circle}
-              source={require("./../../assets/images/step3Image.png")}
+            <AppInput
+              term={state.formData.userHeight}
+              onChangeText={(text) => updateFormData("userHeight", text)}
+              placeholder="Height"
+              backgroundStyle={{ marginTop: 20, flex: 1 }}
+              validationText={state.formData.userHeightValidationText}
             />
           </View>
 
           <AppInput
-            term={formData.BloodType}
-            onChangeText={(text) => updateFormData("BloodType", text)}
+            term={state.formData.BooldType}
+            onChangeText={(text) => updateFormData("BooldType", text)}
             placeholder="Blood Type"
             backgroundStyle={{ marginTop: 20 }}
+            validationText={state.formData.BooldTypeValidationText}
           />
-          <AppInput
-            term={formData.allergy}
+
+          {/* <AppInput
+            term={state.formData.allergy}
             onChangeText={(text) => updateFormData("allergy", text)}
             placeholder="Allergy"
             backgroundStyle={{ marginTop: 20 }}
-          />
-          <AppInput
-            term={formData.ReEnterYourPassword}
-            onChangeText={(text) =>
-              updateFormData("ReEnterYourPassword ", text)
-            }
-            placeholder="Re-Enter Your Password "
-            backgroundStyle={{ marginTop: 20 }}
-          />
-          <AppInput
-            term={formData.EnteryourPhone}
-            onChangeText={(text) => updateFormData("EnteryourPhone ", text)}
-            placeholder="Enter your Phone "
-            backgroundStyle={{ marginTop: 20 }}
-          />
+          /> */}
 
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}

@@ -39,16 +39,16 @@ const requestHandler = async (request) => {
 const responseHandler = (response) => {
   return response;
 };
-const errHandler = (response) => {
-  if (response.response.status == 401) {
-    AsyncStorage.clear();
-    navigationRef.reset({
-      index: 0,
-      routes: [{ name: "Login" }],
-    });
-    return Promise.reject("Please Log in Again");
+const errHandler = (error) => {
+  if (error.response) {
+    const errorData = error.response.data;
+    if (errorData.status === "fail") {
+      return Promise.reject(errorData.data);
+    }
+  } else if (error.request) {
+    return Promise.reject("No response received from server.");
   } else {
-    return Promise.reject(response);
+    return Promise.reject(error.status);
   }
 };
 
@@ -57,6 +57,11 @@ secured.interceptors.request.use((request) => requestHandler(request));
 
 // SECURED RESPONSE HANDLER
 secured.interceptors.response.use(
+  (response) => responseHandler(response),
+  (err) => errHandler(err)
+);
+
+unsecured.interceptors.response.use(
   (response) => responseHandler(response),
   (err) => errHandler(err)
 );
