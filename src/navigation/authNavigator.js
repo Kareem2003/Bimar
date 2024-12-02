@@ -6,6 +6,7 @@ import StarterTheme from "../screens/starterTheme";
 import { createNavigationContainerRef } from "@react-navigation/native";
 import HomeNavigator from "./homeNavigator";
 import Register from "../screens/register";
+import ForgetPassword from "../screens/forgetPassword";
 
 // import { createNavigationContainerRef } from '@react-navigation/native';
 
@@ -20,11 +21,11 @@ const AuthNavigator = () => {
         component={Splash}
         options={{ headerShown: false }}
       /> */}
-      <Stack.Screen
+      {/* <Stack.Screen
         name="StarterTheme"
         component={StarterTheme}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Stack.Screen
         name="Login"
         component={Login}
@@ -33,6 +34,11 @@ const AuthNavigator = () => {
       <Stack.Screen
         name="register"
         component={Register}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="forgetPassword"
+        component={ForgetPassword}
         options={{ headerShown: false }}
       />
       <Stack.Screen

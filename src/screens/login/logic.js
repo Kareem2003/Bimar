@@ -15,16 +15,42 @@ import {
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import { patientLogin } from "../../service/AuthServices";
+import { ToastManager } from "../../helpers/ToastManager";
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   const { updateState: updateCtxState } = useContext(Context);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const updateState = (payload) => {
     dispatch({ payload });
   };
 
   const handleLogin = () => {
+    let valid = true;
+
+    // Reset errors
+    updateState([
+      { type: ACTION_TYPES.UPDATE_PROP, prop: 'emailError', value: "" },
+      { type: ACTION_TYPES.UPDATE_PROP, prop: 'passwordError', value: "" },
+    ]);
+
+    // Validate inputs
+    if (!state.email) {
+      updateState([{ type: ACTION_TYPES.UPDATE_PROP, prop: 'emailError', value: "Email is required." }]);
+      valid = false;
+    } else if (!validateEmail(state.email)) {
+      updateState([{ type: ACTION_TYPES.UPDATE_PROP, prop: 'emailError', value: "Please enter a valid email address." }]);
+      valid = false;
+    }
+
+    if (!state.password) {
+      updateState([{ type: ACTION_TYPES.UPDATE_PROP, prop: 'passwordError', value: "Password is required." }]);
+      valid = false;
+    }
+
+    if (!valid) {
+      return;
+    }
+
     dispatch({
       payload: [
         {
@@ -44,6 +70,9 @@ const Logic = (navigation) => {
       payload,
       async (res) => {
         if (res.data.status === "success") {
+          ToastManager.notify("Logged in successfully!", {
+            type: "success",
+          });
           const cookies = res.headers["set-cookie"];
           const token = extractTokenFromCookies(cookies);
           // Store token in AsyncStorage
@@ -56,11 +85,15 @@ const Logic = (navigation) => {
           }
           navigation.replace("HomeNav");
         } else {
-          console.log("Login failed");
+          ToastManager.notify("Login Failed!", {
+            type: "error",
+          });
         }
       },
       (e) => {
-        console.error("Error:", e);
+        ToastManager.notify(e, {
+          type: "error",
+        });
         dispatch({
           payload: [
             {
@@ -75,6 +108,11 @@ const Logic = (navigation) => {
     );
   };
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
+
   // Helper function to extract token from cookies
   const extractTokenFromCookies = (cookies) => {
     if (!cookies) return null;
@@ -82,16 +120,12 @@ const Logic = (navigation) => {
     return jwtCookie ? jwtCookie.split("=")[1].split(";")[0] : null;
   };
 
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible((prev) => !prev);
-  };
-
   return {
     state,
     updateState,
     handleLogin,
-    isPasswordVisible,
-    togglePasswordVisibility,
+    validateEmail,
+    extractTokenFromCookies,
   };
 };
 

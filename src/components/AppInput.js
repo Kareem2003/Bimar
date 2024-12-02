@@ -15,7 +15,7 @@ const AppInput = ({
   term,
   onChangeText,
   onSubmitEditing,
-  secureTextEntry,
+  secureTextEntry = false,
   iconName,
   onIconPress,
   incomPressible,
@@ -26,6 +26,8 @@ const AppInput = ({
   iconStyle = {},
   validationText = "",
   iconSize = 20,
+  keyboardType = "default",
+  editable = true,
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
@@ -52,6 +54,8 @@ const AppInput = ({
           onSubmitEditing={onSubmitEditing}
           placeholderTextColor={"#A09CAB"}
           secureTextEntry={secureTextEntry}
+          keyboardType={keyboardType}
+          editable={editable}
         />
         {iconName && (
           <TouchableOpacity
@@ -80,12 +84,10 @@ const AppInput = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: "90%",
-    alignSelf: "center",
-    marginVertical: 8,
+    width: "100%",
   },
   inputWrapper: {
-    width: Dimensions.get("window").width * 0.7,
+    width: Dimensions.get("window").width * 0.75,
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 10,
