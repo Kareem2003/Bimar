@@ -2,6 +2,7 @@
   "expo": {
     "name": "Bimar",
     "slug": "Bimar",
+    "userInterfaceStyle": "automatic",
     "version": "1.0.0"
   }
 }

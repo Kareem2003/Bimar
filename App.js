@@ -9,11 +9,13 @@ import React from "react";
 import { Provider } from "./src/contexts/appContext";
 import NavContainer from "./src/navigation/navContainer";
 import ThemeProvider from "./src/contexts/themeContext";
+import { ToastContainer } from "./src/helpers/ToastManager";
 
 const App = () => {
   return (
     <Provider>
       <ThemeProvider>
+        <ToastContainer />
         <NavContainer />
       </ThemeProvider>
     </Provider>

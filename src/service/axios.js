@@ -43,12 +43,12 @@ const errHandler = (error) => {
   if (error.response) {
     const errorData = error.response.data;
     if (errorData.status === "fail") {
-      return Promise.reject(errorData.data);
+      return Promise.reject(errorData);
     }
   } else if (error.request) {
     return Promise.reject("No response received from server.");
   } else {
-    return Promise.reject(error.status);
+    return Promise.reject(error);
   }
 };
 

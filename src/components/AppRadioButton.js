@@ -1,30 +1,34 @@
-import * as React from 'react';
-import { View, Text } from 'react-native';
-import { RadioButton } from 'react-native-paper';
-import { styles } from '../screens/register/style';
+import * as React from "react";
+import { View, Text } from "react-native";
+import { RadioButton } from "react-native-paper";
+import { styles } from "../screens/register/style";
 
-const AppRadioButton = () => {
-  const [checked, setChecked] = React.useState('first');
+const AppRadioButton = ({ valueOption1, valueOption2, onValueChange }) => {
+  const [checked, setChecked] = React.useState(valueOption1);
+
+  const handlePress = (value) => {
+    setChecked(value);
+    onValueChange(value);
+  };
 
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
-       
-      <RadioButton 
-        value="first"
-        status={ checked === 'first' ? 'checked' : 'unchecked' }
-        onPress={() => setChecked('first')}
-        color="#FD9B63"
-      />
-      <Text style={styles.label}>Female</Text>
+    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
       <RadioButton
-        value="second"
-        status={ checked === 'second' ? 'checked' : 'unchecked' }
-        onPress={() => setChecked('second')}
+        value={valueOption1}
+        status={checked === valueOption1 ? "checked" : "unchecked"}
+        onPress={() => handlePress(valueOption1)}
         color="#FD9B63"
-        
       />
-      <Text style={styles.label}>Male</Text>
+      <Text style={styles.label}>{valueOption1}</Text>
+      <RadioButton
+        value={valueOption2}
+        status={checked === valueOption2 ? "checked" : "unchecked"}
+        onPress={() => handlePress(valueOption2)}
+        color="#FD9B63"
+      />
+      <Text style={styles.label}>{valueOption2}</Text>
     </View>
   );
 };
+
 export default AppRadioButton;

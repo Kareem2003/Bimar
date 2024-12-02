@@ -30,4 +30,5 @@ export const INITIAL_STATE = {
   reEnterYourPassword: "",
   reEnterYourPasswordValidationText: "",
   currentStep: 1,
+  isDatePickerVisible: false,
 };

@@ -38,12 +38,7 @@ const Logic = (navigation) => {
         navigation.reset({ index: 0, routes: [{ name: "Drawer" }] });
       } else {
         // Not authorized
-        if (isFirstTime === null) {
-          await AsyncStorage.setItem("isFirstTime", "false");
-          navigation.replace("StarterTheme");
-        } else {
-          navigation.replace("Login");
-        }
+        navigation.replace("Login");
       }
     }, 2000);
   }, [navigation, updateCtxState]);

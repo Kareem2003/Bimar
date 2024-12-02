@@ -21,11 +21,11 @@ const AuthNavigator = () => {
         component={Splash}
         options={{ headerShown: false }}
       /> */}
-      <Stack.Screen
+      {/* <Stack.Screen
         name="StarterTheme"
         component={StarterTheme}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Stack.Screen
         name="Login"
         component={Login}

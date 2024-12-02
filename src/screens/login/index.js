@@ -1,22 +1,17 @@
 import React, { useContext } from "react";
 import {
-  View,
   Text,
-  TextInput,
-  Button,
-  StyleSheet,
   TouchableOpacity,
+  View
 } from "react-native";
+import AppButton from "../../components/AppButton";
+import AppInput from "../../components/AppInput";
+import AuthTitles from "../../components/AuthTitles";
+import { ThemeContext } from "../../contexts/themeContext";
+import ACTION_TYPES from "../../reducers/actionTypes";
+import { primaryDark, primaryLight } from "../../styles/colors";
 import Logic from "./logic";
 import { styles } from "./style";
-import ThemeToggleButton from "../../components/ThemeToggleButton";
-import SomeComponent from "../../components/SomeComponent";
-import { ThemeContext } from "../../contexts/themeContext";
-import AppInput from "../../components/AppInput";
-import ACTION_TYPES from "../../reducers/actionTypes";
-import AppButton from "../../components/AppButton";
-import AuthTitles from "../../components/AuthTitles";
-import { primaryDark, primaryLight } from "../../styles/colors";
 
 const Login = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -24,7 +19,6 @@ const Login = ({ navigation }) => {
     state,
     updateState,
     handleLogin,
-    isPasswordVisible,
     togglePasswordVisibility,
   } = Logic(navigation);
 
@@ -60,6 +54,7 @@ const Login = ({ navigation }) => {
           iconSize={20}
           placeholder="Email"
           backgroundStyle={{ marginTop: 20 }}
+          validationText={state.emailError}
         />
       </View>
       <View>
@@ -76,12 +71,13 @@ const Login = ({ navigation }) => {
           }
           onSubmitEditing={handleLogin}
           incomPressible={true}
-          iconName={isPasswordVisible ? "eye-slash" : "eye"}
+          iconName={state.isPasswordVisible ? "eye-slash" : "eye"}
           iconSize={20}
           placeholder="Password"
           backgroundStyle={{ marginTop: 20 }}
-          secureTextEntry={!isPasswordVisible}
+          secureTextEntry={!state.isPasswordVisible}
           onIconPress={togglePasswordVisibility}
+          validationText={state.passwordError}
         />
       </View>
       <AppButton
