@@ -29,24 +29,24 @@ export default AuthTitles;
 const styles = StyleSheet.create({
   titleLight: {
     color: TextLight,
-    fontSize: 40,
+    fontSize: 33,
     fontWeight: "bold",
     paddingHorizontal: 20,
     textAlign: "center",
   },
   titleDark: {
     color: TextDark,
-    fontSize: 40,
+    fontSize: 33,
     fontWeight: "bold",
     paddingHorizontal: 20,
     textAlign: "center",
   },
   descriptionLight: {
     color: TextLight,
-    fontSize: 20,
+    fontSize: 16,
     paddingHorizontal: 20,
     textAlign: "center",
-    marginTop: 10,
+    marginTop: 20,
   },
   descriptionDark: {
     color: TextDark,

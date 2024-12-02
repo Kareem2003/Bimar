@@ -99,7 +99,7 @@ const Register = ({ navigation }) => {
           <AppButton
             title="Next"
             onPress={handleNext}
-            buttonStyle={{ marginTop: 25, margin: "auto" }}
+            buttonStyle={{ marginTop: 25, margin: "auto", width: "120" }}
           />
         </View>
       )}
@@ -166,42 +166,36 @@ const Register = ({ navigation }) => {
             validationText={state.formData.userPhoneValidationText}
           />
 
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
+          <View style={{ flexDirection: "row", margin: "auto", gap: 10 }}>
             <AppButton
               title="Back"
               onPress={handleBack}
-              buttonStyle={{ marginTop: 25, margin: "auto", width: 150 }}
+              buttonStyle={{ marginTop: 25, width: 120 }}
             />
             <AppButton
               title="Next"
               onPress={handleNext}
-              buttonStyle={{ marginTop: 25, margin: "auto", width: 150 }}
+              buttonStyle={{ marginTop: 25, width: 120 }}
             />
           </View>
         </View>
       )}
       {state.currentStep === 3 && (
         <View style={{ padding: 20 }}>
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <AppInput
-              term={state.formData.userWeight}
-              onChangeText={(text) => updateFormData("userWeight", text)}
-              placeholder="Weight"
-              backgroundStyle={{ marginTop: 20, flex: 1, marginRight: 10 }}
-              validationText={state.formData.userWeightValidationText}
-            />
-            <AppInput
-              term={state.formData.userHeight}
-              onChangeText={(text) => updateFormData("userHeight", text)}
-              placeholder="Height"
-              backgroundStyle={{ marginTop: 20, flex: 1 }}
-              validationText={state.formData.userHeightValidationText}
-            />
-          </View>
+          <AppInput
+            term={state.formData.userWeight}
+            onChangeText={(text) => updateFormData("userWeight", text)}
+            placeholder="Weight"
+            backgroundStyle={{ marginTop: 20 }}
+            validationText={state.formData.userWeightValidationText}
+          />
+          <AppInput
+            term={state.formData.userHeight}
+            onChangeText={(text) => updateFormData("userHeight", text)}
+            placeholder="Height"
+            backgroundStyle={{ marginTop: 20 }}
+            validationText={state.formData.userHeightValidationText}
+          />
 
           <AppInput
             term={state.formData.BooldType}
@@ -218,18 +212,16 @@ const Register = ({ navigation }) => {
             backgroundStyle={{ marginTop: 20 }}
           /> */}
 
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
+          <View style={{ flexDirection: "row", margin: "auto", gap: 10 }}>
             <AppButton
               title="BACK"
               onPress={handleBack}
-              buttonStyle={{ marginTop: 25, margin: "auto", width: 150 }}
+              buttonStyle={{ marginTop: 25, width: 120 }}
             />
             <AppButton
               title="Register"
-              onPress={handleRegister}
-              buttonStyle={{ marginTop: 25, margin: "auto", width: 150 }}
+              onPress={() => navigation.navigate("Login")} // onPress={handleRegister}
+              buttonStyle={{ marginTop: 25, width: 120 }}
             />
           </View>
         </View>
