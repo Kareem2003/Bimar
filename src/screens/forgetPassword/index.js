@@ -17,6 +17,7 @@ import { primaryDark, primaryLight } from "../../styles/colors";
 import Logic from "./logic";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import FontAwsome from "react-native-vector-icons/FontAwesome";
+import { AsyncStorage } from "react-native";
 
 const ForgetPassword = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -27,6 +28,10 @@ const ForgetPassword = ({ navigation }) => {
     handleBack,
     isPasswordVisible,
     togglePasswordVisibility,
+    handleEmailValidation,
+    handleVerifyOTP,
+    handleUpdatePassword,
+    updateFormData,
   } = Logic(navigation);
 
   return (
@@ -58,7 +63,7 @@ const ForgetPassword = ({ navigation }) => {
 
             <AppButton
               title="RESET PASSWORD"
-              onPress={handleNext}
+              onPress={handleEmailValidation}
               buttonStyle={{ marginTop: 50, margin: "auto" }}
             />
           </View>
@@ -74,8 +79,9 @@ const ForgetPassword = ({ navigation }) => {
             description={true}
             descriptionText="We sent a reset link to username@gmail.com enter 5 digit code that mentioned in the email"
           />
+          <Text>{state.otpAsync}</Text>
           <View style={{ marginTop: 80 }}>
-            <OTPInput onVerify={handleNext} />
+            <OTPInput onVerify={handleVerifyOTP} />
 
             {/* <AppButton
               title="VERIFY CODE"
@@ -106,18 +112,10 @@ const ForgetPassword = ({ navigation }) => {
           />
           <View style={{ marginTop: 80, margin: "auto" }}>
             <AppInput
-              term={state.password}
-              onChangeText={(text) =>
-                updateState([
-                  {
-                    type: ACTION_TYPES.UPDATE_PROP,
-                    prop: `password`,
-                    value: text,
-                  },
-                ])
-              }
+              term={state.formData.userPassword}
+              onChangeText={(text) => updateFormData("userPassword", text)}
               incomPressible={true}
-              iconName={isPasswordVisible ? "eye-slash" : "eye"}
+              iconName={isPasswordVisible ? "eye" : "eye-slash"}
               iconSize={20}
               placeholder="Enter Your New Password"
               backgroundStyle={{ marginTop: 20 }}
@@ -128,18 +126,18 @@ const ForgetPassword = ({ navigation }) => {
               }}
             />
             <AppInput
-              term={state.RreEnterPassword}
+              term={state.reEnterYourPassword}
               onChangeText={(text) =>
                 updateState([
                   {
                     type: ACTION_TYPES.UPDATE_PROP,
-                    prop: `RreEnterPassword`,
+                    prop: `reEnterYourPassword`,
                     value: text,
                   },
                 ])
               }
               incomPressible={true}
-              iconName={isPasswordVisible ? "eye-slash" : "eye"}
+              iconName={isPasswordVisible ? "eye" : "eye-slash"}
               iconSize={20}
               placeholder="Re-Enter Your Password"
               backgroundStyle={{ marginTop: 20 }}
@@ -152,7 +150,7 @@ const ForgetPassword = ({ navigation }) => {
 
             <AppButton
               title="UPDATE PASSWORD"
-              onPress={() => navigation.navigate("Login")} // onPress={handleUpdatePassword}
+              onPress={handleUpdatePassword}
               buttonStyle={{ marginTop: 50, margin: "auto" }}
             />
           </View>

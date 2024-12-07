@@ -34,3 +34,36 @@ export const patientRegister = (payload, onSuccess, onError, onComplete) => {
     onComplete
   );
 };
+export const forgotPassword = (payload, onSuccess, onError, onComplete) => {
+  unsecurePost(
+    "/patientsAuth/forgot-password",
+    {
+      userEmail: payload,
+    },
+    onSuccess,
+    onError,
+    onComplete
+  );
+};
+export const verifyOTP = (payload, onSuccess, onError, onComplete) => {
+  unsecurePost(
+    "/patientsAuth/verify-otp",
+    {
+      otp: payload,
+    },
+    onSuccess,
+    onError,
+    onComplete
+  );
+};
+export const resetPassword = (payload, onSuccess, onError, onComplete) => {
+  unsecurePost(
+    "/patientsAuth/reset-password",
+    {
+      newPassword: payload,
+    },
+    onSuccess,
+    onError,
+    onComplete
+  );
+};
