@@ -1,5 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { View, TextInput, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useRef } from "react";
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 
 const OTPInput = ({ length = 5, onVerify }) => {
   const [otp, setOtp] = useState(new Array(length).fill(""));
@@ -25,29 +31,25 @@ const OTPInput = ({ length = 5, onVerify }) => {
     }
   };
 
- 
-
   return (
-    
-      <View style={styles.inputContainer}>
-        {otp.map((_, index) => (
-          <TextInput
-            key={index}
-            style={styles.input}
-            value={otp[index]}
-            keyboardType="numeric"
-            maxLength={1}
-            ref={(ref) => (inputs.current[index] = ref)}
-            onChangeText={(value) => handleChange(value, index)}
-            onKeyPress={(event) => handleKeyPress(event, index)}
-          />
-        ))}
-      </View>
+    <View style={styles.inputContainer}>
+      {otp.map((_, index) => (
+        <TextInput
+          key={index}
+          style={styles.input}
+          value={otp[index]}
+          keyboardType="numeric"
+          maxLength={1}
+          ref={(ref) => (inputs.current[index] = ref)}
+          onChangeText={(value) => handleChange(value, index)}
+          onKeyPress={(event) => handleKeyPress(event, index)}
+        />
+      ))}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
- 
   title: {
     fontSize: 20,
     fontWeight: "bold",
