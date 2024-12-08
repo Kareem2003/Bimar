@@ -88,6 +88,7 @@ const Register = ({ navigation }) => {
               placeholder="Re-Enter Your Password"
               backgroundStyle={{ marginTop: 20 }}
               validationText={state.reEnterYourPasswordValidationText}
+              secureTextEntry={true} // Add this prop to mask the text
             />
           </View>
         )}
@@ -117,6 +118,7 @@ const Register = ({ navigation }) => {
                 placeholder="Area"
                 inputWrapperStyle={{
                   width: Dimensions.get("window").width * 0.35,
+                  marginLeft: 6,
                 }}
                 backgroundStyle={{ flex: 1 }}
                 validationText={state.formData.AreaValidationText}
@@ -220,7 +222,7 @@ const Register = ({ navigation }) => {
               style={[
                 styles.inputWrapper,
                 isDarkTheme ? styles.darkBackground : styles.lightBackground,
-                { width: Dimensions.get("window").width * 0.75, marginTop: 20 },
+                { width: Dimensions.get("window").width * 0.75, marginTop: 20 , marginBottom: 10 },
               ]}
             >
               <Picker
@@ -228,17 +230,59 @@ const Register = ({ navigation }) => {
                 onValueChange={(itemValue) =>
                   updateFormData("BooldType", itemValue)
                 }
-                style={{ flex: 1, color: isDarkTheme ? "#FFF" : "#333" }}
+                style={{
+                  flex: 1,
+                  backgroundColor: isDarkTheme
+                    ? styles.darkBackground
+                    : styles.lightBackground,
+                  borderRadius: 10,
+                }} // Set background color if needed
               >
-                <Picker.Item label="Select Blood Type" value="" />
-                <Picker.Item label="A+" value="A+" />
-                <Picker.Item label="A-" value="A-" />
-                <Picker.Item label="B+" value="B+" />
-                <Picker.Item label="B-" value="B-" />
-                <Picker.Item label="AB+" value="AB+" />
-                <Picker.Item label="AB-" value="AB-" />
-                <Picker.Item label="O+" value="O+" />
-                <Picker.Item label="O-" value="O-" />
+                <Picker.Item
+                  label="Select Blood Type"
+                  value=""
+                  color={isDarkTheme ? "#FFF" : "#000"}
+                />
+                <Picker.Item
+                  label="A+"
+                  value="A+"
+                  color={isDarkTheme ? "#FFF" : "#000"}
+                />
+                <Picker.Item
+                  label="A-"
+                  value="A-"
+                  color={isDarkTheme ? "#FFF" : "#000"}
+                />
+                <Picker.Item
+                  label="B+"
+                  value="B+"
+                  color={isDarkTheme ? "#FFF" : "#000"}
+                />
+                <Picker.Item
+                  label="B-"
+                  value="B-"
+                  color={isDarkTheme ? "#FFF" : "#000"}
+                />
+                <Picker.Item
+                  label="AB+"
+                  value="AB+"
+                  color={isDarkTheme ? "#FFF" : "#000"}
+                />
+                <Picker.Item
+                  label="AB-"
+                  value="AB-"
+                  color={isDarkTheme ? "#FFF" : "#000"}
+                />
+                <Picker.Item
+                  label="O+"
+                  value="O+"
+                  color={isDarkTheme ? "#FFF" : "#000"}
+                />
+                <Picker.Item
+                  label="O-"
+                  value="O-"
+                  color={isDarkTheme ? "#FFF" : "#000"}
+                />
               </Picker>
             </View>
 

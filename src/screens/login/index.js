@@ -11,17 +11,8 @@ import { styles } from "./style";
 
 const Login = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const { state, updateState, handleLogin } = Logic(navigation);
+  const { state, updateState, handleLogin, togglePasswordVisibility } = Logic(navigation);
 
-  const togglePasswordVisibility = () => {
-    updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: "isPasswordVisible",
-        value: !state.isPasswordVisible,
-      },
-    ]);
-  };
   return (
     <View
       style={[
