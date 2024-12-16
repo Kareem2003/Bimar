@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width * 0.75,
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
     elevation: 2,

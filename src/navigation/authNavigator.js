@@ -7,6 +7,7 @@ import { createNavigationContainerRef } from "@react-navigation/native";
 import HomeNavigator from "./homeNavigator";
 import Register from "../screens/register";
 import ForgetPassword from "../screens/forgetPassword";
+import Profile from "../screens/profile";
 
 // import { createNavigationContainerRef } from '@react-navigation/native';
 
@@ -39,6 +40,11 @@ const AuthNavigator = () => {
       <Stack.Screen
         name="forgetPassword"
         component={ForgetPassword}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="profile"
+        component={Profile}
         options={{ headerShown: false }}
       />
       <Stack.Screen

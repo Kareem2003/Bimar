@@ -92,6 +92,9 @@ const Login = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate("register")}>
           <Text style={styles.link}>Register</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("profile")}>
+          <Text style={styles.link}>Profile</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
