@@ -10,13 +10,16 @@ import { Provider } from "./src/contexts/appContext";
 import NavContainer from "./src/navigation/navContainer";
 import ThemeProvider from "./src/contexts/themeContext";
 import { ToastContainer } from "./src/helpers/ToastManager";
+import Home from "./src/screens/home";
+import HomeNavigator from "./src/navigation/homeNavigator";
 
 const App = () => {
   return (
     <Provider>
       <ThemeProvider>
         <ToastContainer />
-        <NavContainer />
+        {/* <NavContainer /> */}
+        <Home />
       </ThemeProvider>
     </Provider>
   );
