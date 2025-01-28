@@ -1,9 +1,5 @@
 import React, { useContext } from "react";
-import {
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
 import AuthTitles from "../../components/AuthTitles";
@@ -15,12 +11,7 @@ import { styles } from "./style";
 
 const Login = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const {
-    state,
-    updateState,
-    handleLogin,
-    togglePasswordVisibility,
-  } = Logic(navigation);
+  const { state, updateState, handleLogin, togglePasswordVisibility } = Logic(navigation);
 
   return (
     <View
@@ -71,15 +62,16 @@ const Login = ({ navigation }) => {
           }
           onSubmitEditing={handleLogin}
           incomPressible={true}
-          iconName={state.isPasswordVisible ? "eye-slash" : "eye"}
+          iconName={state.isPasswordVisible ? "eye" : "eye-slash"} // Ensure consistent icon toggle
           iconSize={20}
           placeholder="Password"
           backgroundStyle={{ marginTop: 20 }}
-          secureTextEntry={!state.isPasswordVisible}
-          onIconPress={togglePasswordVisibility}
+          secureTextEntry={!state.isPasswordVisible} // Toggle visibility
+          onIconPress={togglePasswordVisibility} // Function to toggle password visibility
           validationText={state.passwordError}
         />
       </View>
+
       <AppButton
         title="Login"
         onPress={handleLogin}

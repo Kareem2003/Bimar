@@ -120,12 +120,23 @@ const Logic = (navigation) => {
     return jwtCookie ? jwtCookie.split("=")[1].split(";")[0] : null;
   };
 
+  const togglePasswordVisibility = () => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "isPasswordVisible",
+        value: !state.isPasswordVisible,
+      },
+    ]);
+  };
+
   return {
     state,
     updateState,
     handleLogin,
     validateEmail,
     extractTokenFromCookies,
+    togglePasswordVisibility,
   };
 };
 

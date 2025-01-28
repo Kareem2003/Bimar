@@ -10,10 +10,17 @@ import { INITIAL_STATE } from "./constant";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   AUTHENTICATION_TOKEN,
+  OTP,
   USERINFO,
 } from "../../helpers/constants/staticKeys";
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
+import {
+  forgotPassword,
+  resetPassword,
+  verifyOTP,
+} from "../../service/AuthServices";
+import { ToastManager } from "../../helpers/ToastManager";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -21,7 +28,6 @@ const Logic = (navigation) => {
   const updateState = (payload) => {
     dispatch({ payload });
   };
-
 
   const handleNext = () => {
     const next = state.currentStep + 1;
@@ -35,7 +41,7 @@ const Logic = (navigation) => {
   };
 
   const handleBack = () => {
-    if (state.currentStep-1 < 1) {
+    if (state.currentStep - 1 < 1) {
       state.setcurrentStep = navigation.navigate("Login");
       return;
     }
@@ -49,17 +55,176 @@ const Logic = (navigation) => {
     ]);
   };
 
+  const updateFormData = (field, value) => {
+    const trimmedField = field.trim();
+    let validationText = "";
+
+    if (
+      trimmedField === "userEmail" &&
+      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value)
+    ) {
+      validationText = "Invalid email format";
+    }
+
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: `formData.${trimmedField}`,
+        value: value,
+      },
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: `formData.${trimmedField}ValidationText`,
+        value: validationText,
+      },
+    ]);
+  };
+
+  const handleEmailValidation = () => {
+    let isValid = true;
+    const newValidationMessages = {}; // Object to hold validation messages
+
+    if (
+      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+        state.formData.userEmail
+      )
+    ) {
+      isValid = false;
+      newValidationMessages.userEmailValidationText = "Invalid email format";
+    }
+
+    // Update state with validation messages
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "formData",
+        value: {
+          ...state.formData,
+          ...newValidationMessages,
+        },
+      },
+    ]);
+
+    if (isValid) {
+      forgotPassword(
+        state.formData.userEmail,
+        (res) => {
+          if (res.data.status === "success") {
+            const cookies = res.headers["set-cookie"];
+            const otp = extractOtpFromCookies(cookies);
+
+            if (otp) {
+              AsyncStorage.setItem(OTP, otp);
+              updateState([
+                {
+                  type: ACTION_TYPES.UPDATE_PROP,
+                  prop: "otpAsync",
+                  value: otp,
+                },
+              ]);
+              ToastManager.notify(
+                `OTP Sent To your Email ${state.formData.userEmail}`,
+                {
+                  type: "success",
+                }
+              );
+            }
+            handleNext();
+          } else {
+            ToastManager.notify("Unexpected response from server.", {
+              type: "error",
+            });
+          }
+        },
+        (error) => {
+          const errorMessage = error.data || "An unknown error occurred"; // Default message if error.data is undefined
+          ToastManager.notify(errorMessage, {
+            type: "error",
+          });
+        },
+        () => {}
+      );
+    } else {
+      ToastManager.notify("Please fix the errors before proceeding.", {
+        type: "error",
+      });
+    }
+  };
+
+  const handleVerifyOTP = (otp) => {
+    console.log("otp: ", otp);
+
+    verifyOTP(
+      otp,
+      (res) => {
+        console.log("Res: ", res);
+        if (res.data.status === "success") {
+          ToastManager.notify("OTP verified successfully!", {
+            type: "success",
+          });
+          handleNext();
+        } else {
+          ToastManager.notify("OTP verification failed. Please try again.", {
+            type: "error",
+          });
+        }
+      },
+      (error) => {
+        console.log("error: ", error);
+        const errorMessage = error.data || "An unknown error occurred"; // Default message if error.data is undefined
+        ToastManager.notify(errorMessage, {
+          type: "error",
+        });
+      },
+      () => {}
+    );
+  };
+
   const handleUpdatePassword = () => {
-    ////////////////////////////////////////////////////////////////
-  };
+    console.log("password: ", state.formData.userPassword);
+    console.log("reEnterYourPassword: ", state.reEnterYourPassword);
 
-  const handleVerifyCode = () => {
-    ////////////////////////////////////////////////////////////////
-  };
+    if (state.formData.userPassword !== state.reEnterYourPassword) {
+      ToastManager.notify("Passwords do not match. Please try again.", {
+        type: "error",
+      });
+      updateState([
+        {
+          type: ACTION_TYPES.UPDATE_PROP,
+          prop: "reEnterYourPasswordValidationText",
+          value: "Passwords do not match.",
+        },
+      ]);
+      return;
+    }
 
+    resetPassword(
+      state.formData.userPassword,
+      (res) => {
+        console.log("Password update response: ", res);
+        ToastManager.notify("Password updated successfully!", {
+          type: "success",
+        });
+        navigation.replace("Login");
+      },
+      (error) => {
+        console.log("Password update error: ", error);
+        ToastManager.notify("Failed to update password. Please try again.", {
+          type: "error",
+        });
+      },
+      () => {}
+    );
+  };
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible((prev) => !prev);
+  };
+
+  const extractOtpFromCookies = (cookies) => {
+    if (!cookies) return null;
+    const otpcookie = cookies.find((cookie) => cookie.startsWith("otp="));
+    return otpcookie ? otpcookie.split("=")[1].split(";")[0] : null;
   };
 
   return {
@@ -69,6 +234,10 @@ const Logic = (navigation) => {
     handleBack,
     togglePasswordVisibility,
     isPasswordVisible,
+    handleEmailValidation,
+    handleUpdatePassword,
+    handleVerifyOTP,
+    updateFormData,
   };
 };
 
