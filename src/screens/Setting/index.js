@@ -19,15 +19,21 @@ import ACTION_TYPES from "../../reducers/actionTypes";
 import FontAwsome from "react-native-vector-icons/FontAwesome";
 import ProfilePicture from "../../components/ProfilePicture";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import DropdownComponent from "../../components/DropdownComponent";
-import PhoneInputBox from "../../components/PhoneInputBox";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { USERINFO } from "../../helpers/constants/staticKeys";
+import ToggleSwitch from "toggle-switch-react-native";
 
-const Profile = ({ navigation }) => {
+const Settingsscreen = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
   const { state, updateState, handleNext, handleBack, maritalStatus } =
     Logic(navigation);
+  const [muteIsOn, setMute] = useState(false);
+  const [darkIsOn, setDark] = useState(false);
+
+  const handleMuteToggle = () => {
+    setMute(!muteIsOn);
+  };
+  const handleDarkToggle = () => {
+    setDark(!darkIsOn);
+  };
 
   return (
     <View
@@ -38,34 +44,11 @@ const Profile = ({ navigation }) => {
     >
       {state.currentStep === 1 && (
         <View style={{ marginBottom: 120 }}>
-          <View alignItems="center">
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "bold",
-                marginBottom: 40,
-                marginBlockStart: 30,
-              }}
-            >
-              My Profile
-            </Text>
-            <ProfilePicture
-              profileName= {AsyncStorage.getItem(USERINFO)}
-              profileHandle="rolandGilbert@gmail.com"
-            />
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.greeting}>Settings</Text>
           </View>
 
-          <AppButton
-            title="Show Profile"
-            onPress={handleNext}
-            buttonStyle={{
-              backgroundColor: primaryDark,
-              marginLeft: 80,
-              width: 100,
-              height: 35,
-            }}
-            textStyle={{ color: "#fff", fontSize: 10 }}
-          />
           <View
             style={{
               insetBlockStart: 20,
@@ -75,11 +58,65 @@ const Profile = ({ navigation }) => {
               marginTop: 20,
             }}
           >
-            <Image source={require("../../assets/images/calendarIcon.png")} />
+            <Image source={require("../../assets/images/dark.png")} />
             <Text>
-              <Text>Appointments</Text>
+              <Text>Dark Mode</Text>
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            {/* <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text> {">"} </Text>
+            </TouchableOpacity> */}
+
+            <ToggleSwitch
+              isOn={darkIsOn}
+              onColor="#16423C"
+              offColor="#C4DAD2"
+              onToggle={handleDarkToggle}
+              size="small"
+            />
+          </View>
+          <View
+            style={{
+              insetBlockStart: 30,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 80,
+              marginTop: 20,
+            }}
+          >
+            <Image source={require("../../assets/images/notifications.png")} />
+            <Text>
+              <Text>Mute Notification</Text>
+            </Text>
+            <ToggleSwitch
+              isOn={muteIsOn}
+              onColor="#16423C"
+              offColor="#C4DAD2"
+              onToggle={handleMuteToggle}
+              size="small"
+            />
+          </View>
+          <View style={{ marginTop: 50 }}>
+            <Image
+              style={{ width: "100%", height: 1, marginTop: 20 }}
+              source={require("../../assets/images/lineImage.png")}
+            />
+          </View>
+          <View
+            style={{
+              insetBlockStart: 20,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 80,
+              marginTop: 20,
+            }}
+          >
+            <Image source={require("../../assets/images/password.png")} />
+            <Text>
+              <Text>Change Password</Text>
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("forgetPassword")}
+            >
               <Text> {">"} </Text>
             </TouchableOpacity>
           </View>
@@ -92,13 +129,28 @@ const Profile = ({ navigation }) => {
               marginTop: 20,
             }}
           >
-            <Image
-              source={require("../../assets/images/MedicalRecordIcon.png")}
-            />
+            <Image source={require("../../assets/images/star.png")} />
             <Text>
-              <Text>My Diagnosis</Text>
+              <Text>Rate App</Text>
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <TouchableOpacity onPress={() => navigation.navigate("rate")}>
+              <Text> {">"} </Text>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              insetBlockStart: 30,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 80,
+              marginTop: 30,
+            }}
+          >
+            <Image source={require("../../assets/images/share.png")} />
+            <Text>
+              <Text>Share App</Text>
+            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("share")}>
               <Text> {">"} </Text>
             </TouchableOpacity>
           </View>
@@ -117,55 +169,15 @@ const Profile = ({ navigation }) => {
               marginTop: 20,
             }}
           >
-            <Image source={require("../../assets/images/VirusIcon.png")} />
+            <Image source={require("../../assets/images/terms.png")} />
             <Text>
-              <Text>Medical records</Text>
+              <Text>Terms & Conditions</Text>
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("terms&conditions")}
+            >
               <Text> {">"} </Text>
             </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              insetBlockStart: 30,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 80,
-              marginTop: 20,
-            }}
-          >
-            <Image
-              source={require("../../assets/images/StethoscopeIcon.png")}
-            />
-            <Text>
-              <Text>My Doctors</Text>
-            </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text> {">"} </Text>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              insetBlockStart: 30,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 80,
-              marginTop: 20,
-            }}
-          >
-            <Image source={require("../../assets/images/LocationIcon.png")} />
-            <Text>
-              <Text>Location</Text>
-            </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text> {">"} </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{ marginTop: 50 }}>
-            <Image
-              style={{ width: "100%", height: 1, marginTop: 20 }}
-              source={require("../../assets/images/lineImage.png")}
-            />
           </View>
           <View
             style={{
@@ -173,23 +185,35 @@ const Profile = ({ navigation }) => {
               flexDirection: "row",
               justifyContent: "space-between",
               gap: 80,
-              marginTop: 20,
+              marginTop: 30,
             }}
           >
-            <Image source={require("../../assets/images/SettingsIcon.png")} />
+            <Image source={require("../../assets/images/privacy.png")} />
             <Text>
-              <Text>Settings</Text>
+              <Text>Privacy & Policy</Text>
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("privacy&policy")}
+            >
               <Text> {">"} </Text>
             </TouchableOpacity>
           </View>
-          <View style={{ marginTop: 50, alignItems: "center" }}>
-            <AppButton
-              title="BACK"
-              onPress={handleBack}
-              buttonStyle={{ width: 120 }}
-            />
+          <View
+            style={{
+              insetBlockStart: 20,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 80,
+              marginTop: 30,
+            }}
+          >
+            <Image source={require("../../assets/images/logout.png")} />
+            <Text>
+              <Text>Log Out</Text>
+            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("logout")}>
+              <Text> {">"} </Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -216,7 +240,6 @@ const Profile = ({ navigation }) => {
             >
               <ProfilePicture />
             </View>
-           
           </View>
           <Text style={{ fontSize: 20, marginBottom: 20 }}>Edit Profile</Text>
           <View>
@@ -311,4 +334,4 @@ const Profile = ({ navigation }) => {
   );
 };
 
-export default Profile;
+export default Settingsscreen;

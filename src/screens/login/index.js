@@ -11,7 +11,8 @@ import { styles } from "./style";
 
 const Login = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const { state, updateState, handleLogin, togglePasswordVisibility } = Logic(navigation);
+  const { state, updateState, handleLogin, togglePasswordVisibility } =
+    Logic(navigation);
 
   return (
     <View

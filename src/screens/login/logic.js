@@ -68,22 +68,28 @@ const Logic = (navigation) => {
 
     patientLogin(
       payload,
-      async (res) => {
+      (res) => {
         if (res.data.status === "success") {
           ToastManager.notify("Logged in successfully!", {
             type: "success",
           });
           const cookies = res.headers["set-cookie"];
           const token = extractTokenFromCookies(cookies);
-          // Store token in AsyncStorage
+          // Store token in AsyncStorage using Promise chain
           if (token) {
-            await AsyncStorage.setItem(AUTHENTICATION_TOKEN, token);
-            await AsyncStorage.setItem(
-              USERINFO,
-              JSON.stringify(res.data.patient)
-            );
+            Promise.all([
+              AsyncStorage.setItem(AUTHENTICATION_TOKEN, token),
+              AsyncStorage.setItem(USERINFO, JSON.stringify(res.data.patient))
+            ])
+              .then(() => {
+                navigation.replace("HomeNav");
+              })
+              .catch(error => {
+                ToastManager.notify("Error storing credentials", {
+                  type: "error",
+                });
+              });
           }
-          navigation.replace("HomeNav");
         } else {
           ToastManager.notify("Login Failed!", {
             type: "error",

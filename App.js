@@ -12,6 +12,9 @@ import ThemeProvider from "./src/contexts/themeContext";
 import { ToastContainer } from "./src/helpers/ToastManager";
 import Home from "./src/screens/home";
 import HomeNavigator from "./src/navigation/homeNavigator";
+import Profile from "./src/screens/profile";
+import Appointments from "./src/screens/Appointments";
+import Settingsscreen from "./src/screens/Setting";
 
 const App = () => {
   return (
@@ -19,7 +22,9 @@ const App = () => {
       <ThemeProvider>
         <ToastContainer />
         {/* <NavContainer /> */}
-        <Home />
+        {/* <Home /> */}
+        {/* <Settingsscreen /> */}
+        <Profile />
       </ThemeProvider>
     </Provider>
   );

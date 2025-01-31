@@ -144,14 +144,20 @@ const Home = ({ navigation }) => {
               activeIcon === icon && styles.activeButton,
             ]}
             onPress={() => handlePress(icon)}
+            
           >
             <Icon
               name={icon}
               size={icon === "home" ? 40 : 27}
               color={icon === "home" ? "#FD9B63" : "#ffffff"}
+              
             />
+            
+            
           </TouchableOpacity>
+         
         ))}
+        
       </View>
     </View>
   );
