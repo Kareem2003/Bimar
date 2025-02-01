@@ -17,7 +17,13 @@ const Logic = (navigation) => {
     dispatch({ payload });
   };
 
-  return { state, updateState };
+  const handlePress = (iconName) => {
+    setActiveIcon(iconName); // Update the active icon
+  };
+
+  useEffect();
+
+  return { state, updateState, handlePress };
 };
 
 export default Logic;

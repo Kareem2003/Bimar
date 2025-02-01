@@ -9,13 +9,11 @@ import {
   Image,
   ScrollView,
 } from "react-native";
+import Logic from "./logic";
 
 const Home = ({ navigation }) => {
   const [activeIcon, setActiveIcon] = useState(null); // State to track active icon
-
-  const handlePress = (iconName) => {
-    setActiveIcon(iconName); // Update the active icon
-  };
+  const { state, updateState, handlePress } = Logic(navigation);
 
   const doctors = [
     {
@@ -136,28 +134,24 @@ const Home = ({ navigation }) => {
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
-        {["gear", "envelope", "home", "clipboard", "user"].map((icon, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.navButton,
-              activeIcon === icon && styles.activeButton,
-            ]}
-            onPress={() => handlePress(icon)}
-            
-          >
-            <Icon
-              name={icon}
-              size={icon === "home" ? 40 : 27}
-              color={icon === "home" ? "#FD9B63" : "#ffffff"}
-              
-            />
-            
-            
-          </TouchableOpacity>
-         
-        ))}
-        
+        {["gear", "envelope", "home", "clipboard", "user"].map(
+          (icon, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.navButton,
+                activeIcon === icon && styles.activeButton,
+              ]}
+              onPress={() => handlePress(icon)}
+            >
+              <Icon
+                name={icon}
+                size={icon === "home" ? 40 : 27}
+                color={icon === "home" ? "#FD9B63" : "#ffffff"}
+              />
+            </TouchableOpacity>
+          )
+        )}
       </View>
     </View>
   );
