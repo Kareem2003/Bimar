@@ -15,7 +15,8 @@ import HomeNavigator from "./src/navigation/homeNavigator";
 import Profile from "./src/screens/profile";
 import Appointments from "./src/screens/Appointments";
 import Settingsscreen from "./src/screens/Setting";
-
+import MyDiagnosis from "./src/screens/myDiagnosis";
+import Diagnos from "./src/screens/diagnos";
 const App = () => {
   return (
     <Provider>
@@ -24,7 +25,7 @@ const App = () => {
         {/* <NavContainer /> */}
         {/* <Home /> */}
         {/* <Settingsscreen /> */}
-        <Profile />
+        <MyDiagnosis />
       </ThemeProvider>
     </Provider>
   );

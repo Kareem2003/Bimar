@@ -8,6 +8,7 @@ import HomeNavigator from "./homeNavigator";
 import Register from "../screens/register";
 import ForgetPassword from "../screens/forgetPassword";
 import Profile from "../screens/profile";
+import Diagnos from "../screens/diagnos";
 
 // import { createNavigationContainerRef } from '@react-navigation/native';
 
@@ -45,6 +46,11 @@ const AuthNavigator = () => {
       <Stack.Screen
         name="profile"
         component={Profile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="diagnos"
+        component={Diagnos}
         options={{ headerShown: false }}
       />
       <Stack.Screen

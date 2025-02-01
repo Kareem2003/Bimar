@@ -50,7 +50,7 @@ const Profile = ({ navigation }) => {
               My Profile
             </Text>
             <ProfilePicture
-              profileName= {AsyncStorage.getItem(USERINFO)}
+              profileName= "Roland Gilbert"
               profileHandle="rolandGilbert@gmail.com"
             />
           </View>
