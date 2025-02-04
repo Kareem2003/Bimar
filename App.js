@@ -17,15 +17,19 @@ import Appointments from "./src/screens/Appointments";
 import Settingsscreen from "./src/screens/Setting";
 import MyDiagnosis from "./src/screens/myDiagnosis";
 import Diagnos from "./src/screens/diagnos";
+import Doctors from "./src/screens/doctors";
+import DoctorProfile from "./src/screens/doctorProfile";
 const App = () => {
   return (
     <Provider>
       <ThemeProvider>
         <ToastContainer />
         {/* <NavContainer /> */}
-        {/* <Home /> */}
+        <Home />
+        {/* <Doctors /> */}
         {/* <Settingsscreen /> */}
-        <MyDiagnosis />
+        {/* <MyDiagnosis /> */}
+        {/* <DoctorProfile /> */}
       </ThemeProvider>
     </Provider>
   );

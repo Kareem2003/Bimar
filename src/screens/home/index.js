@@ -8,36 +8,13 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import Logic from "./logic";
 
 const Home = ({ navigation }) => {
-  const [activeIcon, setActiveIcon] = useState(null); // State to track active icon
-  const { state, updateState, handlePress } = Logic(navigation);
-
-  const doctors = [
-    {
-      id: 1,
-      name: "DR/ Mona",
-      specialization: "Surgery",
-      location: "Hadayek-al-Ahram",
-      image: require("../../assets/images/woman-doctor-wearing-lab-coat-with-stethoscope-isolated.png"),
-    },
-    {
-      id: 2,
-      name: "DR/ Ahmed",
-      specialization: "Psychology",
-      location: "Nasr City",
-      image: require("../../assets/images/portrait-hansome-young-male-doctor-man.png"),
-    },
-    {
-      id: 3,
-      name: "DR/ Sarah",
-      specialization: "Gastroenterology",
-      location: "Dokki",
-      image: require("../../assets/images/portrait-hansome-young-male-doctor-man.png"),
-    },
-  ];
+  const [activeIcon, setActiveIcon] = useState(null);
+  const { state, updateState, handlePress, navigateToDoctors } = Logic(navigation);
 
   return (
     <View style={styles.container}>
@@ -70,7 +47,7 @@ const Home = ({ navigation }) => {
         {/* Search Bar */}
         <View style={styles.searchContainer}>
           <View style={styles.searchBarWrapper}>
-            <TextInput style={styles.searchBar} placeholder="Search" />
+            <TextInput style={styles.searchBar} placeholder="Search" placeholderTextColor="#999"/>
             <TouchableOpacity style={styles.filterIconWrapper}>
               <Icon name="filter" size={25} color="#FD9B63" />
             </TouchableOpacity>
@@ -107,27 +84,55 @@ const Home = ({ navigation }) => {
         <View style={styles.doctorSection}>
           <View style={styles.sectionTitle}>
             <Text style={styles.sectionTitle}>Our Doctors</Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Doctors")}
+            >
               <Text style={styles.showMoreText}>Show More</Text>
             </TouchableOpacity>
           </View>
           <ScrollView horizontal={true} style={styles.cardScroll}>
-            {doctors.map((doctor) => (
-              <TouchableOpacity key={doctor.id} style={styles.doctorCard}>
-                <View style={styles.circleWrapper}>
-                  <View style={styles.circleOne}></View>
-                  <View style={styles.circleTwo}></View>
-                </View>
-                <Image source={doctor.image} style={styles.doctorImage} />
-                <View style={styles.doctorInfo}>
-                  <Text style={styles.doctorName}>{doctor.name}</Text>
-                  <Text style={styles.doctorSpecialization}>
-                    {doctor.specialization}
-                  </Text>
-                  <Text style={styles.doctorLocation}>{doctor.location}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
+            {state.loading ? (
+              <ActivityIndicator size="large" color="#FD9B63" />
+            ) : state.error ? (
+              <Text style={styles.errorText}>{state.error}</Text>
+            ) : state.doctors && state.doctors.length > 0 ? (
+              state.doctors.map((doctor) => (
+                <TouchableOpacity
+                  key={doctor._id || doctor.id}
+                  style={styles.doctorCard}
+                  onPress={() => navigation.navigate("DoctorProfile")}
+                >
+                  <View style={styles.circleWrapper}>
+                    <View style={styles.circleOne}></View>
+                    <View style={styles.circleTwo}></View>
+                  </View>
+                  <Image
+                    source={
+                      doctor.doctorImage && doctor.doctorImage !== "null"
+                        ? { uri: doctor.doctorImage }
+                        : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
+                    }
+                    style={styles.doctorImage}
+                  />
+
+                  <View style={styles.doctorInfo}>
+                    <Text style={styles.doctorName}>
+                      {doctor.doctorName || "Dr. Unknown"}
+                    </Text>
+                    <Text style={styles.doctorSpecialization}>
+                      {doctor.field || "General"}
+                    </Text>
+                    <Text style={styles.doctorSpecialization}>
+                      {doctor.clinic && doctor.clinic.length > 0
+                        ? doctor.clinic[0].clinicArea
+                        : "Clinic Area Not Available"}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <Text style={styles.noDataText}>No doctors available</Text>
+            )}
           </ScrollView>
         </View>
       </ScrollView>
@@ -140,7 +145,7 @@ const Home = ({ navigation }) => {
               key={index}
               style={[
                 styles.navButton,
-                activeIcon === icon && styles.activeButton,
+                state.activeIcon === icon && styles.activeButton,
               ]}
               onPress={() => handlePress(icon)}
             >

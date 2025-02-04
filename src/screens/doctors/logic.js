@@ -1,9 +1,9 @@
 import { useContext, useEffect, useReducer } from "react";
 import { reducer } from "../../reducers/reducer";
-import { INITIAL_STATE } from "./constant";
 import { getDoctors } from "../../service/HomeServices";
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
+import { INITIAL_STATE } from "./constant";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -13,40 +13,63 @@ const Logic = (navigation) => {
     dispatch({ payload });
   };
 
-  const handlePress = (iconName) => {
+  const filterDoctors = (city, field) => {
+    let filtered = [...state.doctors];
+
+    if (city) {
+      filtered = filtered.filter(doctor => 
+        doctor.clinic?.[0]?.clinicArea?.toLowerCase().includes(city.toLowerCase())
+      );
+    }
+
+    if (field) {
+      filtered = filtered.filter(doctor => 
+        doctor.field?.toLowerCase().includes(field.toLowerCase())
+      );
+    }
+
     updateState([
       {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: 'activeIcon',
-        value: iconName
+        type: 'UPDATE_PROP',
+        prop: 'filteredDoctors',
+        value: filtered
+      },
+      {
+        type: 'UPDATE_PROP',
+        prop: 'selectedCity',
+        value: city
+      },
+      {
+        type: 'UPDATE_PROP',
+        prop: 'selectedField',
+        value: field
       }
     ]);
-
-    if (navigation) {
-      switch (iconName) {
-        case 'gear':
-          navigation.navigate('Settings');
-          break;
-        case 'envelope':
-          navigation.navigate('Messages');
-          break;
-        case 'home':
-          navigation.navigate('Home');
-          break;
-        case 'clipboard':
-          navigation.navigate('Appointments');
-          break;
-        case 'user':
-          navigation.navigate('Profile');
-          break;
-      }
-    }
   };
 
-  const navigateToDoctors = () => {
-    if (navigation) {
-      navigation.navigate('Doctors');
+  const searchDoctors = (query) => {
+    updateState([{
+      type: 'UPDATE_PROP',
+      prop: 'searchQuery',
+      value: query
+    }]);
+
+    let filtered = [...state.doctors];
+
+    if (query) {
+      const searchTerm = query.toLowerCase();
+      filtered = filtered.filter(doctor => 
+        doctor.doctorName?.toLowerCase().includes(searchTerm) ||
+        doctor.field?.toLowerCase().includes(searchTerm) ||
+        doctor.clinic?.[0]?.clinicArea?.toLowerCase().includes(searchTerm)
+      );
     }
+
+    updateState([{
+      type: 'UPDATE_PROP',
+      prop: 'filteredDoctors',
+      value: filtered
+    }]);
   };
 
   useEffect(() => {
@@ -62,7 +85,6 @@ const Logic = (navigation) => {
       getDoctors(
         {},
         (response) => {
-          console.log("Doctors data received:", response.data);
           if (response?.data?.data) {
             updateState([
               {
@@ -72,7 +94,6 @@ const Logic = (navigation) => {
               }
             ]);
           } else {
-            console.error("Invalid doctors data format:", response.data);
             updateState([
               {
                 type: ACTION_TYPES.UPDATE_PROP,
@@ -83,7 +104,6 @@ const Logic = (navigation) => {
           }
         },
         (error) => {
-          console.error("Error fetching doctors:", error);
           updateState([
             {
               type: ACTION_TYPES.UPDATE_PROP,
@@ -106,12 +126,13 @@ const Logic = (navigation) => {
 
     fetchDoctors();
   }, []);
+  
 
   return {
     state,
     updateState,
-    handlePress,
-    navigateToDoctors
+    filterDoctors,
+    searchDoctors
   };
 };
 

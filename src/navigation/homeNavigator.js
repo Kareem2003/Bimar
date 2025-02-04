@@ -6,6 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../helpers/constants/staticKeys";
 import { Context } from "../contexts/appContext";
 import Home from "../screens/home";
+import Doctors from "../screens/doctors";
+import DoctorProfile from "../screens/doctorProfile";
 import MenuButton from "../components/menuButton";
 
 const Stack = createNativeStackNavigator();
@@ -25,6 +27,32 @@ const HomeNavigator = () => {
       <Stack.Screen
         name="Home"
         component={Home}
+        options={({ navigation }) => {
+          return {
+            headerLeft: () => {
+              return <MenuButton navigation={navigation} />;
+            },
+            title: ctx.userData.companyName,
+          };
+        }}
+      ></Stack.Screen>
+
+      <Stack.Screen
+        name="Doctors"
+        component={Doctors}
+        options={({ navigation }) => {
+          return {
+            headerLeft: () => {
+              return <MenuButton navigation={navigation} />;
+            },
+            title: ctx.userData.companyName,
+          };
+        }}
+      ></Stack.Screen>
+
+      <Stack.Screen
+        name="DoctorProfile"
+        component={DoctorProfile}
         options={({ navigation }) => {
           return {
             headerLeft: () => {

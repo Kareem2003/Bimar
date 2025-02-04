@@ -7,12 +7,11 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { navigationRef } from "../navigation/authNavigator";
 export const unsecured = axios.create({
-  baseURL: BASE_URL,
+  timeout: 10000, // 10 second timeout
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-  },
-  withCredentials: true,
+  }
 });
 export const secured = axios.create({
   baseURL: BASE_URL,
@@ -100,23 +99,33 @@ export const securePost = (
       onComplete(f);
     });
 };
-export const unsecureGet = (
-  url,
-  onSuccess,
-  onError,
-  onComplete = (f) => {}
-) => {
+export const unsecureGet = (url, onSuccess, onError, onComplete = () => {}) => {
   unsecured
-    .get(url, { "Content-Type": "application/raw" })
-
+    .get(url)
     .then((response) => {
+      console.log("API Response:", response);
       onSuccess(response);
     })
     .catch((error) => {
-      onError(error);
+      console.error("API Error Details:", {
+        message: error.message,
+        response: error.response,
+        request: error.request
+      });
+      
+      if (error.response) {
+        // Server responded with error
+        onError(error.response.data);
+      } else if (error.request) {
+        // Request made but no response
+        onError("Server is not responding. Please check your connection.");
+      } else {
+        // Request setup error
+        onError(error.message);
+      }
     })
-    .finally((f) => {
-      onComplete(f);
+    .finally(() => {
+      onComplete();
     });
 };
 export const unsecurePost = (
