@@ -20,11 +20,9 @@ const maritalStatus = [
   { label: "Married", value: "1" },
 ];
 
-
-
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
- 
+
   const updateState = (payload) => {
     dispatch({ payload });
   };
@@ -41,10 +39,6 @@ const Logic = (navigation) => {
   };
 
   const handleBack = () => {
-    if (state.currentStep-1 < 1) {
-      state.setcurrentStep = navigation.navigate("Login");
-      return;
-    }
     const prev = state.currentStep - 1;
     updateState([
       {
@@ -54,8 +48,6 @@ const Logic = (navigation) => {
       },
     ]);
   };
-
-
 
   return {
     state,

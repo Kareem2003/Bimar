@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-// import { CountryPicker } from "react-native-country-codes-picker";
+import { CountryPicker } from "react-native-country-codes-picker";
 
 const PhoneInputBox = () => {
   const [show, setShow] = useState(false);

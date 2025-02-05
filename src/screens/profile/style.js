@@ -1,7 +1,39 @@
 import { Dimensions } from "react-native";
-import { primary } from "../../styles/colors";
+import { primary, primaryDark } from "../../styles/colors";
 
 export const styles = {
+  scrollContainer: {
+    flexGrow: 1,
+    padding: 16, // Adjust padding as needed
+    paddingBottom: 50, // extra space at the bottom
+  },
+  profileContainer: {
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  editTitle: {
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  formContainer: {
+    // Add any additional styling if needed
+  },
+  label: {
+    marginBottom: 8,
+    fontSize: 14,
+    color: "#333",
+  },
+  buttonStyle: {
+    backgroundColor: primaryDark,
+    width: "100%",
+    height: 50,
+    marginTop: 50,
+  },
+  buttonTextStyle: {
+    color: "#fff",
+    fontSize: 16,
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -71,5 +103,4 @@ export const styles = {
     marginTop: 8,
     color: "#555",
   },
-  
 };

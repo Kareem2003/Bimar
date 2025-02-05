@@ -24,8 +24,8 @@ const App = () => {
     <Provider>
       <ThemeProvider>
         <ToastContainer />
-        {/* <NavContainer /> */}
-        <Home />
+        <NavContainer />
+        {/* <Home /> */}
         {/* <Doctors /> */}
         {/* <Settingsscreen /> */}
         {/* <MyDiagnosis /> */}

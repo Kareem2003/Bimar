@@ -7,10 +7,12 @@ import { ThemeContext } from "../../contexts/themeContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import { primaryDark, primaryLight } from "../../styles/colors";
 import { styles } from "./style";
+import Logic from "./logic";
 
 const Login = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-
+  const { state, updateState, handleLogin, togglePasswordVisibility } =
+    Logic(navigation);
 
   return (
     <View
@@ -82,9 +84,6 @@ const Login = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("register")}>
           <Text style={styles.link}>Register</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("profile")}>
-          <Text style={styles.link}>Profile</Text>
         </TouchableOpacity>
       </View>
     </View>

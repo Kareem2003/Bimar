@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { Button } from "react-native-paper";
 import AppButton from "../../components/AppButton";
+import Header from "../../components/Header";
 
 const Appointments = ({ navigation }) => {
   const [activeIcon, setActiveIcon] = useState(null); // State to track active icon
@@ -88,9 +89,11 @@ const Appointments = ({ navigation }) => {
     <View style={styles.container}>
       <ScrollView style={styles.container}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text>Appointments</Text>
-        </View>
+        <Header
+          marginTop={50}
+          header={"Appointments"}
+          onPress={() => navigation.navigate("Home")}
+        />
 
         {/* Search Bar */}
         {/* <View style={styles.searchContainer}>
@@ -222,28 +225,6 @@ const Appointments = ({ navigation }) => {
           </ScrollView>
         </View>
       </ScrollView>
-
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        {["gear", "envelope", "home", "clipboard", "user"].map(
-          (icon, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.navButton,
-                activeIcon === icon && styles.activeButton,
-              ]}
-              onPress={() => handlePress(icon)}
-            >
-              <Icon
-                name={icon}
-                size={icon === "clipboard" ? 40 : 27}
-                color={icon === "clipboard" ? "#FD9B63" : "#ffffff"}
-              />
-            </TouchableOpacity>
-          )
-        )}
-      </View>
     </View>
   );
 };

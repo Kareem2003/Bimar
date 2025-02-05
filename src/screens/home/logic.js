@@ -4,6 +4,7 @@ import { INITIAL_STATE } from "./constant";
 import { getDoctors } from "../../service/HomeServices";
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
+import { ToastManager } from "../../helpers/ToastManager";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -17,27 +18,27 @@ const Logic = (navigation) => {
     updateState([
       {
         type: ACTION_TYPES.UPDATE_PROP,
-        prop: 'activeIcon',
-        value: iconName
-      }
+        prop: "activeIcon",
+        value: iconName,
+      },
     ]);
 
     if (navigation) {
       switch (iconName) {
-        case 'gear':
-          navigation.navigate('Settings');
+        case "gear":
+          navigation.replace("Settings");
           break;
-        case 'envelope':
-          navigation.navigate('Messages');
+        case "envelope":
+          navigation.replace("Messages");
           break;
-        case 'home':
-          navigation.navigate('Home');
+        case "home":
+          navigation.replace("Home");
           break;
-        case 'clipboard':
-          navigation.navigate('Appointments');
+        case "clipboard":
+          navigation.replace("Appointments");
           break;
-        case 'user':
-          navigation.navigate('Profile');
+        case "user":
+          navigation.replace("Profile");
           break;
       }
     }
@@ -45,65 +46,64 @@ const Logic = (navigation) => {
 
   const navigateToDoctors = () => {
     if (navigation) {
-      navigation.navigate('Doctors');
+      navigation.navigate("Doctors");
     }
+  };
+  const fetchDoctors = () => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "loading",
+        value: true,
+      },
+    ]);
+
+    getDoctors(
+      {},
+      (response) => {
+        if (response?.data?.data) {
+          updateState([
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "doctors",
+              value: response.data.data,
+            },
+          ]);
+        } else {
+          updateState([
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "error",
+              value: "Invalid data format received",
+            },
+          ]);
+        }
+      },
+      (error) => {
+        ToastManager.notify("Error fetching doctors", {
+          type: "error",
+        });
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "error",
+            value: error?.message || "Failed to fetch doctors",
+          },
+        ]);
+      },
+      () => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "loading",
+            value: false,
+          },
+        ]);
+      }
+    );
   };
 
   useEffect(() => {
-    const fetchDoctors = () => {
-      updateState([
-        {
-          type: ACTION_TYPES.UPDATE_PROP,
-          prop: 'loading',
-          value: true
-        }
-      ]);
-
-      getDoctors(
-        {},
-        (response) => {
-          console.log("Doctors data received:", response.data);
-          if (response?.data?.data) {
-            updateState([
-              {
-                type: ACTION_TYPES.UPDATE_PROP,
-                prop: 'doctors',
-                value: response.data.data
-              }
-            ]);
-          } else {
-            console.error("Invalid doctors data format:", response.data);
-            updateState([
-              {
-                type: ACTION_TYPES.UPDATE_PROP,
-                prop: 'error',
-                value: "Invalid data format received"
-              }
-            ]);
-          }
-        },
-        (error) => {
-          console.error("Error fetching doctors:", error);
-          updateState([
-            {
-              type: ACTION_TYPES.UPDATE_PROP,
-              prop: 'error',
-              value: error?.message || "Failed to fetch doctors"
-            }
-          ]);
-        },
-        () => {
-          updateState([
-            {
-              type: ACTION_TYPES.UPDATE_PROP,
-              prop: 'loading',
-              value: false
-            }
-          ]);
-        }
-      );
-    };
-
     fetchDoctors();
   }, []);
 
@@ -111,7 +111,7 @@ const Logic = (navigation) => {
     state,
     updateState,
     handlePress,
-    navigateToDoctors
+    navigateToDoctors,
   };
 };
 

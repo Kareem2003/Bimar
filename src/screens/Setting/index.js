@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemeContext } from "../../contexts/themeContext";
 import { styles } from "./style";
 import AppInput from "../../components/AppInput";
@@ -20,6 +21,7 @@ import FontAwsome from "react-native-vector-icons/FontAwesome";
 import ProfilePicture from "../../components/ProfilePicture";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import ToggleSwitch from "toggle-switch-react-native";
+import Header from "../../components/Header";
 
 const Settingsscreen = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -45,9 +47,11 @@ const Settingsscreen = ({ navigation }) => {
       {state.currentStep === 1 && (
         <View style={{ marginBottom: 120 }}>
           {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.greeting}>Settings</Text>
-          </View>
+          <Header
+            marginTop={50}
+            header={"Settings"}
+            onPress={() => navigation.navigate("Home")}
+          />
 
           <View
             style={{
@@ -211,7 +215,12 @@ const Settingsscreen = ({ navigation }) => {
             <Text>
               <Text>Log Out</Text>
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("logout")}>
+            <TouchableOpacity
+              onPress={() => {
+                AsyncStorage.clear();
+                navigation.navigate("login");
+              }}
+            >
               <Text> {">"} </Text>
             </TouchableOpacity>
           </View>

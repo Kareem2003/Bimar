@@ -16,6 +16,10 @@ import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import { patientLogin, patientRegister } from "../../service/AuthServices";
 import { ToastManager } from "../../helpers/ToastManager";
+import { useRef } from "react";
+import { Animated } from "react-native";
+import { BackHandler } from "react-native";
+import { Dimensions } from "react-native";
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
@@ -23,226 +27,214 @@ const Logic = (navigation) => {
     dispatch({ payload });
   };
 
-  const handleNext = () => {
-    const next = state.currentStep + 1;
-    updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: `currentStep`,
-        value: next,
-      },
-    ]);
-  };
-
-  const handleBack = () => {
-    const prev = state.currentStep - 1;
-    updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: `currentStep`,
-        value: prev,
-      },
-    ]);
-  };
-
   const handleRegister = () => {
-    let isValid = true; // Flag to track overall form validity
-    const newValidationMessages = {}; // Object to hold validation messages
-
-    // Validate each field
-    if (!state.formData.userName) {
+    let isValid = true;
+    let validationText = "";
+    // Validate form data
+    if (state.formData.userName.trim() === "") {
+      validationText = "Name is required";
       isValid = false;
-      newValidationMessages.userNameValidationText = "Name is required";
-    }
-    if (
+    } else if (
       !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
         state.formData.userEmail
       )
     ) {
+      validationText = "Invalid email format";
       isValid = false;
-      newValidationMessages.userEmailValidationText = "Invalid email format";
-    }
-    if (state.formData.userPassword.length < 8) {
+    } else if (state.formData.userPassword.length < 8) {
+      validationText = "Password must be at least 8 characters";
       isValid = false;
-      newValidationMessages.userPasswordValidationText =
-        "Password must be at least 8 characters";
-    }
-    if (!state.formData.City) {
+    } else if (state.formData.userPhone.trim() === "") {
+      validationText = "Phone number is required";
       isValid = false;
-      newValidationMessages.CityValidationText = "City is required";
-    }
-    if (!state.formData.Area) {
+    } else if (state.formData.personalRecords.City.trim() === "") {
+      validationText = "City is required";
       isValid = false;
-      newValidationMessages.AreaValidationText = "Area is required";
-    }
-    if (!state.formData.Gender) {
+    } else if (state.formData.personalRecords.Area.trim() === "") {
+      validationText = "Area is required";
       isValid = false;
-      newValidationMessages.GenderValidationText = "Gender is required";
-    }
-    if (!state.formData.userPhone) {
-      isValid = false;
-      newValidationMessages.userPhoneValidationText =
-        "Phone number is required";
-    } else if (!/^\d{10}$/.test(state.formData.userPhone)) {
-      isValid = false;
-      newValidationMessages.userPhoneValidationText =
-        "Phone number must be 10 digits";
-    }
-    if (!state.formData.DateofBirth) {
-      isValid = false;
-      newValidationMessages.DateofBirthValidationText =
-        "Date of Birth is required";
-    }
-    if (!state.formData.userWeight) {
-      isValid = false;
-      newValidationMessages.userWeightValidationText = "Weight is required";
     } else if (
-      isNaN(state.formData.userWeight) ||
-      state.formData.userWeight <= 0
+      isNaN(state.formData.personalRecords.userWeight) ||
+      state.formData.personalRecords.userWeight <= 0
     ) {
+      validationText = "Weight must be a positive number";
       isValid = false;
-      newValidationMessages.userWeightValidationText =
-        "Weight must be a positive number";
-    }
-    if (!state.formData.userHeight) {
-      isValid = false;
-      newValidationMessages.userHeightValidationText = "Height is required";
     } else if (
-      isNaN(state.formData.userHeight) ||
-      state.formData.userHeight <= 0
+      isNaN(state.formData.personalRecords.userHeight) ||
+      state.formData.personalRecords.userHeight <= 0
     ) {
+      validationText = "Height must be a positive number";
       isValid = false;
-      newValidationMessages.userHeightValidationText =
-        "Height must be a positive number";
-    }
-    if (!state.formData.BooldType) {
+    } else if (state.formData.personalRecords.emergencyContact.trim() === "") {
+      validationText = "Emergency contact is required";
       isValid = false;
-      newValidationMessages.BooldTypeValidationText = "Blood type is required";
     }
 
-    // Update state with validation messages
-    updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: "formData",
-        value: {
-          ...state.formData,
-          ...newValidationMessages,
-        },
-      },
-    ]);
+    // // If invalid, update state and show validation error
+    // if (!isValid) {
+    //   updateState([
+    //     {
+    //       type: ACTION_TYPES.UPDATE_PROP,
+    //       prop: `formData.validationText`,
+    //       value: validationText,
+    //     },
+    //   ]);
+    //   ToastManager.notify(validationText, { type: "error" });
+    //   return;
+    // }
 
     // If valid, proceed with registration
-    if (isValid) {
-      // Call the registration service
-      patientRegister(
-        state.formData,
-        (res) => {
-          ToastManager.notify(res.data, { type: res.status });
-          updateState([
-            {
-              type: ACTION_TYPES.UPDATE_PROP,
-              prop: "formData",
-              value: INITIAL_STATE.formData,
+    patientRegister(
+      state.formData,
+      (res) => {
+        ToastManager.notify("User Created successfully", { type: "success" });
+        navigation.navigate("Login");
+      },
+      (error) => {
+        if (error.data) {
+          const errorMessage = error.data.join("\n");
+          ToastManager.notify(errorMessage, { type: "error" });
+        } else {
+          ToastManager.notify("An unknown error occurred", {
+            type: "error",
+          });
+        }
+        const errorMessages = error.reduce((acc, message) => {
+          if (message.includes("Name")) {
+            acc.userNameValidationText = message;
+          } else if (message.includes("Password")) {
+            acc.userPasswordValidationText = message;
+          } else if (message.includes("Email")) {
+            acc.userEmailValidationText = message;
+          } // Handle all error messages...
+          return acc;
+        }, {});
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "formData",
+            value: {
+              ...state.formData,
+              ...errorMessages,
             },
-          ]);
-          navigation.navigate("Login");
-        },
-        (error) => {
-          if (error.data) {
-            const errorMessage = error.data.join("\n");
-            ToastManager.notify(errorMessage, { type: "error" });
-          } else {
-            ToastManager.notify("An unknown error occurred", {
-              type: "error",
-            });
-          }
-          const errorMessages = error.reduce((acc, message) => {
-            if (message.includes("Name")) {
-              acc.userNameValidationText = message;
-            } else if (message.includes("Password")) {
-              acc.userPasswordValidationText = message;
-            } else if (message.includes("Email")) {
-              acc.userEmailValidationText = message;
-            } else if (message.includes("Phone")) {
-              acc.userPhoneValidationText = message;
-            } else if (message.includes("City")) {
-              acc.CityValidationText = message;
-            } else if (message.includes("Gender")) {
-              acc.GenderValidationText = message;
-            } else if (message.includes("Area")) {
-              acc.AreaValidationText = message;
-            } else if (message.includes("Weight")) {
-              acc.userWeightValidationText = message;
-            } else if (message.includes("Height")) {
-              acc.userHeightValidationText = message;
-            } else if (message.includes("DateofBirth")) {
-              acc.DateofBirthValidationText = message;
-            } else if (message.includes("BooldType")) {
-              acc.BooldTypeValidationText = message;
-            }
-            return acc;
-          }, {});
-          updateState([
-            {
-              type: ACTION_TYPES.UPDATE_PROP,
-              prop: "formData",
-              value: {
-                ...state.formData,
-                ...errorMessages,
-              },
-            },
-          ]);
-        },
-        () => {}
-      );
-    } else {
-      ToastManager.notify("Please fix the errors before proceeding.", {
-        type: "error",
-      });
-    }
+          },
+        ]);
+        ToastManager.notify("Please fix the errors before proceeding.", {
+          type: "error",
+        });
+      }
+    );
   };
 
-  const updateFormData = (field, value) => {
-    const trimmedField = field.trim();
-    let validationText = "";
+  const progressBarWidth = useRef(
+    new Animated.Value((state.step / 5) * 100)
+  ).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
-    if (trimmedField === "userName" && value.trim() === "") {
-      validationText = "Name is required";
-    } else if (
-      trimmedField === "userEmail" &&
-      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value)
-    ) {
-      validationText = "Invalid email format";
-    } else if (trimmedField === "userPassword" && value.length < 8) {
-      validationText = "Password must be at least 8 characters";
-    } else if (trimmedField === "City" && value.trim() === "") {
-      validationText = "City is required";
-    } else if (trimmedField === "Area" && value.trim() === "") {
-      validationText = "Area is required";
-    } else if (trimmedField === "DateofBirth" && !(value instanceof Date)) {
-      validationText = "Invalid date format";
-    } else if (trimmedField === "userPhone" && value.trim() === "") {
-      validationText = "Phone number is required";
+  useEffect(() => {
+    Animated.timing(progressBarWidth, {
+      toValue: (state.step / 5) * 100,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  }, [state.step]);
+
+  const handleNext = () => {
+    Animated.timing(slideAnim, {
+      toValue: -Dimensions.get("window").width,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      updateState([
+        {
+          type: ACTION_TYPES.UPDATE_PROP,
+          prop: "step",
+          value: state.step + 1,
+        },
+      ]);
+      slideAnim.setValue(Dimensions.get("window").width);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
+
+  const handleBack = () => {
+    if (state.step === 1) {
+      return;
     }
+    Animated.timing(slideAnim, {
+      toValue: Dimensions.get("window").width,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      updateState([
+        {
+          type: ACTION_TYPES.UPDATE_PROP,
+          prop: "step",
+          value: state.step - 1,
+        },
+      ]);
+      slideAnim.setValue(-Dimensions.get("window").width);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
 
+  useEffect(() => {
+    const backAction = () => {
+      if (state.step > 1) {
+        handleBack();
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [state.step]);
+
+  const handleChange = (field, value) => {
+    const fieldParts = field.split(".");
+    // Update state with the new value and validation text
     updateState([
       {
         type: ACTION_TYPES.UPDATE_PROP,
-        prop: `formData.${trimmedField}`,
+        prop: `formData.${field}`,
         value: value,
-      },
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: `formData.${trimmedField}ValidationText`,
-        value: validationText,
       },
     ]);
   };
 
-  const handleDateConfirm = (selectedDate) => {
+  const togglePasswordVisibility = () => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "isPasswordVisible",
+        value: !state.isPasswordVisible,
+      },
+    ]);
+  };
+
+  const handleDateOfBirthConfirm = (selectedDate) => {
     const formattedDate = selectedDate.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
-    updateFormData("DateofBirth", formattedDate);
+
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "formData.personalRecords.DateOfBirth",
+        value: formattedDate,
+      },
+    ]);
     updateState([
       {
         type: ACTION_TYPES.UPDATE_PROP,
@@ -251,15 +243,37 @@ const Logic = (navigation) => {
       },
     ]);
   };
+  const handleDateOfFirstChildConfirm = (selectedDate) => {
+    const formattedDate = selectedDate.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
+
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "formData.personalRecords.birthDateOfFirstChild",
+        value: formattedDate,
+      },
+    ]);
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "isDateOfChildPickerVisible",
+        value: false,
+      },
+    ]);
+  };
 
   return {
     state,
     updateState,
-    updateFormData,
     handleNext,
     handleBack,
+    handleChange,
+    togglePasswordVisibility,
+    handleDateOfBirthConfirm,
+    handleDateOfFirstChildConfirm,
+    progressBarWidth,
+    slideAnim,
     handleRegister,
-    handleDateConfirm,
   };
 };
 

@@ -14,7 +14,8 @@ import Logic from "./logic";
 
 const Home = ({ navigation }) => {
   const [activeIcon, setActiveIcon] = useState(null);
-  const { state, updateState, handlePress, navigateToDoctors } = Logic(navigation);
+  const { state, updateState, handlePress, navigateToDoctors } =
+    Logic(navigation);
 
   return (
     <View style={styles.container}>
@@ -47,7 +48,11 @@ const Home = ({ navigation }) => {
         {/* Search Bar */}
         <View style={styles.searchContainer}>
           <View style={styles.searchBarWrapper}>
-            <TextInput style={styles.searchBar} placeholder="Search" placeholderTextColor="#999"/>
+            <TextInput
+              style={styles.searchBar}
+              placeholder="Search"
+              placeholderTextColor="#999"
+            />
             <TouchableOpacity style={styles.filterIconWrapper}>
               <Icon name="filter" size={25} color="#FD9B63" />
             </TouchableOpacity>
@@ -84,9 +89,7 @@ const Home = ({ navigation }) => {
         <View style={styles.doctorSection}>
           <View style={styles.sectionTitle}>
             <Text style={styles.sectionTitle}>Our Doctors</Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Doctors")}
-            >
+            <TouchableOpacity onPress={() => navigation.replace("Doctors")}>
               <Text style={styles.showMoreText}>Show More</Text>
             </TouchableOpacity>
           </View>

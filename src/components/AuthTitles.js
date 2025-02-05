@@ -13,7 +13,7 @@ const AuthTitles = ({ isDarkTheme, text, description, descriptionText }) => {
       <Text style={isDarkTheme ? styles.titleDark : styles.titleLight}>
         {text}
       </Text>
-      {description && (
+      {descriptionText && (
         <Text
           style={isDarkTheme ? styles.descriptionDark : styles.descriptionLight}
         >

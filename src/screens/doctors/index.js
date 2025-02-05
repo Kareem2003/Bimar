@@ -13,14 +13,23 @@ import {
 } from "react-native";
 import Logic from "./logic";
 
-
 const Doctors = ({ navigation }) => {
   const { state, filterDoctors, searchDoctors } = Logic(navigation);
   const [showCityModal, setShowCityModal] = useState(false);
   const [showFieldModal, setShowFieldModal] = useState(false);
 
-  const cities = ["All", ...new Set(state.doctors.map(doctor => doctor.clinic?.[0]?.clinicArea).filter(Boolean))];
-  const fields = ["All", ...new Set(state.doctors.map(doctor => doctor.field).filter(Boolean))];
+  const cities = [
+    "All",
+    ...new Set(
+      state.doctors
+        .map((doctor) => doctor.clinic?.[0]?.clinicArea)
+        .filter(Boolean)
+    ),
+  ];
+  const fields = [
+    "All",
+    ...new Set(state.doctors.map((doctor) => doctor.field).filter(Boolean)),
+  ];
 
   const handleFilterSelect = (value, type) => {
     if (value === "All") {
@@ -42,7 +51,14 @@ const Doctors = ({ navigation }) => {
     searchDoctors(text);
   };
 
-  const renderFilterModal = (items, isVisible, onClose, onSelect, title, type) => (
+  const renderFilterModal = (
+    items,
+    isVisible,
+    onClose,
+    onSelect,
+    title,
+    type
+  ) => (
     <Modal
       visible={isVisible}
       transparent={true}
@@ -81,7 +97,7 @@ const Doctors = ({ navigation }) => {
         style={[styles.header, { flexDirection: "row", alignItems: "center" }]}
       >
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate("Home")}
           style={{ padding: 10 }}
         >
           <Icon name="chevron-back" size={24} color="#000" />
@@ -105,7 +121,7 @@ const Doctors = ({ navigation }) => {
 
       {/* Filter Options */}
       <View style={styles.filterContainer}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.filterButton}
           onPress={() => setShowCityModal(true)}
         >
@@ -115,7 +131,7 @@ const Doctors = ({ navigation }) => {
           <Icon name="chevron-down" size={20} color="#FD9B63" />
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.filterButton}
           onPress={() => setShowFieldModal(true)}
         >
@@ -125,9 +141,9 @@ const Doctors = ({ navigation }) => {
           <Icon name="chevron-down" size={20} color="#FD9B63" />
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.filterIconButton}
-          onPress={() => filterDoctors('', '')}
+          onPress={() => filterDoctors("", "")}
         >
           <Icon name="funnel" size={20} color="#FD9B63" />
         </TouchableOpacity>
@@ -157,42 +173,49 @@ const Doctors = ({ navigation }) => {
           <ActivityIndicator size="large" color="#FD9B63" />
         ) : state.error ? (
           <Text style={styles.errorText}>{state.error}</Text>
-        ) : (state.filteredDoctors.length > 0 ? state.filteredDoctors : state.doctors).map((doctor) => (
-          <TouchableOpacity
-            key={doctor._id || doctor.id}
-            style={styles.doctorCard}
-            onPress={() => navigation.navigate("DoctorProfile")}
-          >
-            <Image
-              source={
-                doctor.doctorImage && doctor.doctorImage !== "null"
-                  ? { uri: doctor.doctorImage }
-                  : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
-              }
-              style={styles.doctorImage}
-            />
-            <View style={styles.doctorInfo}>
-              <Text style={styles.serviceTitle}>
-                {doctor.doctorName || "Dr. Unknown"}
-              </Text>
-              <Text style={styles.specialization}>
-                {doctor.field || "General"}
-              </Text>
-              <Text style={styles.location}>
-                {doctor.clinic && doctor.clinic.length > 0
-                  ? doctor.clinic[0].clinicArea
-                  : "Clinic Area Not Available"}
-              </Text>
-              <Text style={styles.location}>
-              {doctor.yearsOfExprience || "General"} Years Of Experience
-              </Text>
-            </View>
-            <View style={styles.ratingContainer}>
-              <Text style={styles.ratingScore}>4.5 <Icon name="star" size={16} color="#FD9B63" /></Text> 
-              <Text style={styles.reviewCount}>100 Reviews</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        ) : (
+          (state.filteredDoctors.length > 0
+            ? state.filteredDoctors
+            : state.doctors
+          ).map((doctor) => (
+            <TouchableOpacity
+              key={doctor._id || doctor.id}
+              style={styles.doctorCard}
+              onPress={() => navigation.navigate("DoctorProfile")}
+            >
+              <Image
+                source={
+                  doctor.doctorImage && doctor.doctorImage !== "null"
+                    ? { uri: doctor.doctorImage }
+                    : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
+                }
+                style={styles.doctorImage}
+              />
+              <View style={styles.doctorInfo}>
+                <Text style={styles.serviceTitle}>
+                  {doctor.doctorName || "Dr. Unknown"}
+                </Text>
+                <Text style={styles.specialization}>
+                  {doctor.field || "General"}
+                </Text>
+                <Text style={styles.location}>
+                  {doctor.clinic && doctor.clinic.length > 0
+                    ? doctor.clinic[0].clinicArea
+                    : "Clinic Area Not Available"}
+                </Text>
+                <Text style={styles.location}>
+                  {doctor.yearsOfExprience || "General"} Years Of Experience
+                </Text>
+              </View>
+              <View style={styles.ratingContainer}>
+                <Text style={styles.ratingScore}>
+                  4.5 <Icon name="star" size={16} color="#FD9B63" />
+                </Text>
+                <Text style={styles.reviewCount}>100 Reviews</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
     </View>
   );

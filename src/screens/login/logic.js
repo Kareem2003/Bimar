@@ -25,29 +25,16 @@ const Logic = (navigation) => {
   };
 
   const handleLogin = () => {
-    let valid = true;
+    const payload = {
+      userEmail: state.email,
+      userPassword: state.password,
+    };
 
-    // Reset errors
-    updateState([
-      { type: ACTION_TYPES.UPDATE_PROP, prop: 'emailError', value: "" },
-      { type: ACTION_TYPES.UPDATE_PROP, prop: 'passwordError', value: "" },
-    ]);
-
-    // Validate inputs
-    if (!state.email) {
-      updateState([{ type: ACTION_TYPES.UPDATE_PROP, prop: 'emailError', value: "Email is required." }]);
-      valid = false;
-    } else if (!validateEmail(state.email)) {
-      updateState([{ type: ACTION_TYPES.UPDATE_PROP, prop: 'emailError', value: "Please enter a valid email address." }]);
-      valid = false;
-    }
-
-    if (!state.password) {
-      updateState([{ type: ACTION_TYPES.UPDATE_PROP, prop: 'passwordError', value: "Password is required." }]);
-      valid = false;
-    }
-
-    if (!valid) {
+    // Check if email and password are defined
+    if (!payload.userEmail || !payload.userPassword) {
+      ToastManager.notify("Email and password are required.", {
+        type: "error",
+      });
       return;
     }
 
@@ -61,14 +48,10 @@ const Logic = (navigation) => {
       ],
     });
 
-    const payload = {
-      userEmail: state.email,
-      userPassword: state.password,
-    };
-
     patientLogin(
       payload,
       (res) => {
+        console.log(res);
         if (res.data.status === "success") {
           ToastManager.notify("Logged in successfully!", {
             type: "success",
@@ -79,12 +62,12 @@ const Logic = (navigation) => {
           if (token) {
             Promise.all([
               AsyncStorage.setItem(AUTHENTICATION_TOKEN, token),
-              AsyncStorage.setItem(USERINFO, JSON.stringify(res.data.patient))
+              AsyncStorage.setItem(USERINFO, JSON.stringify(res.data.patient)),
             ])
               .then(() => {
                 navigation.replace("HomeNav");
               })
-              .catch(error => {
+              .catch((error) => {
                 ToastManager.notify("Error storing credentials", {
                   type: "error",
                 });
@@ -96,8 +79,8 @@ const Logic = (navigation) => {
           });
         }
       },
-      (e) => {
-        ToastManager.notify(e, {
+      (errorMessage) => {
+        ToastManager.notify(errorMessage, {
           type: "error",
         });
         dispatch({

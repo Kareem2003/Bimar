@@ -9,59 +9,31 @@ import Home from "../screens/home";
 import Doctors from "../screens/doctors";
 import DoctorProfile from "../screens/doctorProfile";
 import MenuButton from "../components/menuButton";
+import Profile from "../screens/profile";
+import Settingsscreen from "../screens/Setting";
+import Appointments from "../screens/Appointments";
+import AuthNavigator from "./authNavigator";
 
 const Stack = createNativeStackNavigator();
 const HomeNavigator = () => {
-  const { state: ctx } = useContext(Context);
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTitleAlign: "center",
-        headerStyle: {
-          backgroundColor: softPurpleColor,
-        },
         headerShadowVisible: false,
-        headerTintColor: "white",
+        headerShown: false,
       }}
     >
-      <Stack.Screen
-        name="Home"
-        component={Home}
-        options={({ navigation }) => {
-          return {
-            headerLeft: () => {
-              return <MenuButton navigation={navigation} />;
-            },
-            title: ctx.userData.companyName,
-          };
-        }}
-      ></Stack.Screen>
-
-      <Stack.Screen
-        name="Doctors"
-        component={Doctors}
-        options={({ navigation }) => {
-          return {
-            headerLeft: () => {
-              return <MenuButton navigation={navigation} />;
-            },
-            title: ctx.userData.companyName,
-          };
-        }}
-      ></Stack.Screen>
-
+      <Stack.Screen name="Home" component={Home}></Stack.Screen>
+      <Stack.Screen name="Profile" component={Profile}></Stack.Screen>
+      <Stack.Screen name="Settings" component={Settingsscreen}></Stack.Screen>
+      <Stack.Screen name="Doctors" component={Doctors}></Stack.Screen>
+      {/* <Stack.Screen name="Messages" component={DoctorProfile}></Stack.Screen> */}
+      <Stack.Screen name="Appointments" component={Appointments}></Stack.Screen>
       <Stack.Screen
         name="DoctorProfile"
         component={DoctorProfile}
-        options={({ navigation }) => {
-          return {
-            headerLeft: () => {
-              return <MenuButton navigation={navigation} />;
-            },
-            title: ctx.userData.companyName,
-          };
-        }}
       ></Stack.Screen>
+      <Stack.Screen name="login" component={AuthNavigator}></Stack.Screen>
     </Stack.Navigator>
   );
 };

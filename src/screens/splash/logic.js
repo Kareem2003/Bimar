@@ -35,7 +35,7 @@ const Logic = (navigation) => {
             },
           },
         ]);
-        navigation.reset({ index: 0, routes: [{ name: "Drawer" }] });
+        navigation.reset({ index: 0, routes: [{ name: "HomeNav" }] });
       } else {
         // Not authorized
         navigation.replace("Login");
