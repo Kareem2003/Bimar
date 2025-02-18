@@ -6,7 +6,7 @@ import Logic from './logic';
 import AppButton from '../../components/AppButton';
 
 const DoctorProfile = ({ navigation, route }) => {
-  const doctor = route?.params?.doctor || {};
+  const doctor = route.params.doctor;
   const { state } = Logic(navigation);
 
   return (

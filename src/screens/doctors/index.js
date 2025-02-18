@@ -181,7 +181,7 @@ const Doctors = ({ navigation }) => {
             <TouchableOpacity
               key={doctor._id || doctor.id}
               style={styles.doctorCard}
-              onPress={() => navigation.navigate("DoctorProfile")}
+              onPress={() => navigation.navigate("DoctorProfile", { doctor })}
             >
               <Image
                 source={

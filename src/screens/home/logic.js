@@ -5,6 +5,8 @@ import { getDoctors } from "../../service/HomeServices";
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import { ToastManager } from "../../helpers/ToastManager";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { USERINFO } from "../../helpers/constants/staticKeys";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -12,6 +14,17 @@ const Logic = (navigation) => {
 
   const updateState = (payload) => {
     dispatch({ payload });
+  };
+
+  const fetchUserInfo = async () => {
+      const userInfo = JSON.parse(await AsyncStorage.getItem(USERINFO));
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "userName",
+            value: userInfo.name,
+          },
+        ]);
   };
 
   const handlePress = (iconName) => {
@@ -41,12 +54,6 @@ const Logic = (navigation) => {
           navigation.replace("Profile");
           break;
       }
-    }
-  };
-
-  const navigateToDoctors = () => {
-    if (navigation) {
-      navigation.navigate("Doctors");
     }
   };
   const fetchDoctors = () => {
@@ -105,13 +112,13 @@ const Logic = (navigation) => {
 
   useEffect(() => {
     fetchDoctors();
+    fetchUserInfo();
   }, []);
 
   return {
     state,
     updateState,
     handlePress,
-    navigateToDoctors,
   };
 };
 

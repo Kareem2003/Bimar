@@ -14,15 +14,14 @@ import Logic from "./logic";
 
 const Home = ({ navigation }) => {
   const [activeIcon, setActiveIcon] = useState(null);
-  const { state, updateState, handlePress, navigateToDoctors } =
+  const { state, updateState, handlePress } =
     Logic(navigation);
-
   return (
     <View style={styles.container}>
       <ScrollView style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>Hi, Abdalla</Text>
+          <Text style={styles.greeting}>Hi, {state.userName || "User"}</Text>
           <Text style={styles.subGreeting}>How are you feeling today!</Text>
         </View>
 
@@ -103,7 +102,7 @@ const Home = ({ navigation }) => {
                 <TouchableOpacity
                   key={doctor._id || doctor.id}
                   style={styles.doctorCard}
-                  onPress={() => navigation.navigate("DoctorProfile")}
+                  onPress={() => navigation.navigate("DoctorProfile", { doctor })}
                 >
                   <View style={styles.circleWrapper}>
                     <View style={styles.circleOne}></View>
@@ -117,7 +116,6 @@ const Home = ({ navigation }) => {
                     }
                     style={styles.doctorImage}
                   />
-
                   <View style={styles.doctorInfo}>
                     <Text style={styles.doctorName}>
                       {doctor.doctorName || "Dr. Unknown"}
