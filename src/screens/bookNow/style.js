@@ -72,4 +72,56 @@ export const styles = {
     color: "#555",
   },
   
+  profile: {
+    marginTop: 15,
+    padding: 0,
+    margin: "auto",
+    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  profileAvatar: {
+    width: '50%',
+    height: 200,
+    borderRadius: 9999,
+    marginRight: 12,
+  },
+  profileName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#292929",
+  },
+  profileHandle: {
+    marginTop: 2,
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#858585",
+  },
+ 
+    container: {
+      flex: 1,
+      backgroundColor: "#f5f5f5",
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: "#eee",
+      
+    },
+    headerTitle: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: "#333",
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 };

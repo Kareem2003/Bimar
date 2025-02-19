@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemeContext } from "../../contexts/themeContext";
 import { styles } from "./style";
 import AppInput from "../../components/AppInput";
@@ -21,7 +20,6 @@ import FontAwsome from "react-native-vector-icons/FontAwesome";
 import ProfilePicture from "../../components/ProfilePicture";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import ToggleSwitch from "toggle-switch-react-native";
-import Header from "../../components/Header";
 
 const Settingsscreen = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -47,11 +45,9 @@ const Settingsscreen = ({ navigation }) => {
       {state.currentStep === 1 && (
         <View style={{ marginBottom: 120 }}>
           {/* Header */}
-          <Header
-            marginTop={50}
-            header={"Settings"}
-            onPress={() => navigation.navigate("Home")}
-          />
+          <View style={styles.header}>
+            <Text style={styles.greeting}>Settings</Text>
+          </View>
 
           <View
             style={{
@@ -66,9 +62,6 @@ const Settingsscreen = ({ navigation }) => {
             <Text>
               <Text>Dark Mode</Text>
             </Text>
-            {/* <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text> {">"} </Text>
-            </TouchableOpacity> */}
 
             <ToggleSwitch
               isOn={darkIsOn}
@@ -105,26 +98,24 @@ const Settingsscreen = ({ navigation }) => {
               source={require("../../assets/images/lineImage.png")}
             />
           </View>
-          <View
+          <TouchableOpacity
             style={{
-              insetBlockStart: 20,
+              insetBlockStart: 30,
               flexDirection: "row",
               justifyContent: "space-between",
               gap: 80,
               marginTop: 20,
             }}
+            onPress={() => navigation.navigate("Login")}
           >
             <Image source={require("../../assets/images/password.png")} />
             <Text>
               <Text>Change Password</Text>
             </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("forgetPassword")}
-            >
-              <Text> {">"} </Text>
-            </TouchableOpacity>
-          </View>
-          <View
+
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={{
               insetBlockStart: 30,
               flexDirection: "row",
@@ -132,98 +123,90 @@ const Settingsscreen = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
+            onPress={() => navigation.navigate("Login")}
           >
             <Image source={require("../../assets/images/star.png")} />
             <Text>
               <Text>Rate App</Text>
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("rate")}>
-              <Text> {">"} </Text>
-            </TouchableOpacity>
-          </View>
-          <View
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={{
               insetBlockStart: 30,
               flexDirection: "row",
               justifyContent: "space-between",
               gap: 80,
-              marginTop: 30,
+              marginTop: 20,
             }}
+            onPress={() => navigation.navigate("Login")}
           >
             <Image source={require("../../assets/images/share.png")} />
             <Text>
               <Text>Share App</Text>
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("share")}>
-              <Text> {">"} </Text>
-            </TouchableOpacity>
-          </View>
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+
           <View style={{ marginTop: 50 }}>
             <Image
               style={{ width: "100%", height: 1, marginTop: 20 }}
               source={require("../../assets/images/lineImage.png")}
             />
           </View>
-          <View
+          <TouchableOpacity
             style={{
-              insetBlockStart: 20,
+              insetBlockStart: 30,
               flexDirection: "row",
               justifyContent: "space-between",
               gap: 80,
               marginTop: 20,
             }}
+            onPress={() => navigation.navigate("Login")}
           >
             <Image source={require("../../assets/images/terms.png")} />
             <Text>
               <Text>Terms & Conditions</Text>
             </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("terms&conditions")}
-            >
-              <Text> {">"} </Text>
-            </TouchableOpacity>
-          </View>
-          <View
+
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={{
-              insetBlockStart: 20,
+              insetBlockStart: 30,
               flexDirection: "row",
               justifyContent: "space-between",
               gap: 80,
-              marginTop: 30,
+              marginTop: 20,
             }}
+            onPress={() => navigation.navigate("Login")}
           >
             <Image source={require("../../assets/images/privacy.png")} />
             <Text>
               <Text>Privacy & Policy</Text>
             </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("privacy&policy")}
-            >
-              <Text> {">"} </Text>
-            </TouchableOpacity>
-          </View>
-          <View
+
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={{
-              insetBlockStart: 20,
+              insetBlockStart: 30,
               flexDirection: "row",
               justifyContent: "space-between",
               gap: 80,
-              marginTop: 30,
+              marginTop: 20,
             }}
+            onPress={() => navigation.navigate("Login")}
           >
             <Image source={require("../../assets/images/logout.png")} />
             <Text>
               <Text>Log Out</Text>
             </Text>
-            <TouchableOpacity
-              onPress={() => {
-                AsyncStorage.clear();
-                navigation.navigate("login");
-              }}
-            >
-              <Text> {">"} </Text>
-            </TouchableOpacity>
-          </View>
+            <Text> {">"} </Text>
+          </TouchableOpacity>
         </View>
       )}
 

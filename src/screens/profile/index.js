@@ -1,22 +1,28 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
+  View,
   Image,
-  ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  StyleSheet,
+  Dimensions,
 } from "react-native";
-import AppButton from "../../components/AppButton";
-import AppInput from "../../components/AppInput";
-import DropdownComponent from "../../components/DropdownComponent";
-import PhoneInputBox from "../../components/PhoneInputBox";
-import ProfilePicture from "../../components/ProfilePicture";
 import { ThemeContext } from "../../contexts/themeContext";
+import { styles } from "./style";
+import AppInput from "../../components/AppInput";
+import AppButton from "../../components/AppButton";
+import OTPInput from "../../components/OTPInput";
+import AuthTitles from "../../components/AuthTitles";
 import { primaryDark, primaryLight } from "../../styles/colors";
 import Logic from "./logic";
-import { styles } from "./style";
-import Header from "../../components/Header";
+import ACTION_TYPES from "../../reducers/actionTypes";
+import FontAwsome from "react-native-vector-icons/FontAwesome";
+import ProfilePicture from "../../components/ProfilePicture";
+import { Colors } from "react-native/Libraries/NewAppScreen";
+import DropdownComponent from "../../components/DropdownComponent";
+import PhoneInputBox from "../../components/PhoneInputBox";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { USERINFO } from "../../helpers/constants/staticKeys";
 
 const Profile = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -30,170 +36,193 @@ const Profile = ({ navigation }) => {
         { backgroundColor: isDarkTheme ? primaryDark : primaryLight },
       ]}
     >
-      <Header
-        marginTop={state.currentStep === 2 ? 40 : 0}
-        header={"My Profile"}
-        onPress={
-          state.currentStep === 2
-            ? handleBack
-            : () => navigation.navigate("Home")
-        }
-      />
-
       {state.currentStep === 1 && (
-        <>
-          {/* <Header onPress={() => navigation.navigate("Home")} /> */}
-          <View style={{ marginBottom: 120 }}>
+        <View style={{ marginBottom: 120 }}>
+          <View alignItems="center">
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "bold",
+                marginBottom: 40,
+                marginBlockStart: 30,
+              }}
+            >
+              My Profile
+            </Text>
             <ProfilePicture
               profileName="Roland Gilbert"
               profileHandle="rolandGilbert@gmail.com"
             />
-            <AppButton
-              title="Show Profile"
-              onPress={handleNext}
-              buttonStyle={{
-                backgroundColor: primaryDark,
-                marginLeft: 80,
-                width: 100,
-                height: 35,
-              }}
-              textStyle={{ color: "#fff", fontSize: 10 }}
-            />
-            <View
-              style={{
-                insetBlockStart: 20,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 80,
-                marginTop: 20,
-              }}
-            >
-              <Image source={require("../../assets/images/calendarIcon.png")} />
-              <Text>
-                <Text>Appointments</Text>
-              </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("Appointments")}
-              >
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                insetBlockStart: 30,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 80,
-                marginTop: 20,
-              }}
-            >
-              <Image
-                source={require("../../assets/images/MedicalRecordIcon.png")}
-              />
-              <Text>
-                <Text>My Diagnosis</Text>
-              </Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ marginTop: 50 }}>
-              <Image
-                style={{ width: "100%", height: 1, marginTop: 20 }}
-                source={require("../../assets/images/lineImage.png")}
-              />
-            </View>
-            <View
-              style={{
-                insetBlockStart: 20,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 80,
-                marginTop: 20,
-              }}
-            >
-              <Image source={require("../../assets/images/VirusIcon.png")} />
-              <Text>
-                <Text>Medical records</Text>
-              </Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                insetBlockStart: 30,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 80,
-                marginTop: 20,
-              }}
-            >
-              <Image
-                source={require("../../assets/images/StethoscopeIcon.png")}
-              />
-              <Text>
-                <Text>My Doctors</Text>
-              </Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Doctors")}>
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                insetBlockStart: 30,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 80,
-                marginTop: 20,
-              }}
-            >
-              <Image source={require("../../assets/images/LocationIcon.png")} />
-              <Text>
-                <Text>Location</Text>
-              </Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ marginTop: 50 }}>
-              <Image
-                style={{ width: "100%", height: 1, marginTop: 20 }}
-                source={require("../../assets/images/lineImage.png")}
-              />
-            </View>
-            <View
-              style={{
-                insetBlockStart: 20,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 80,
-                marginTop: 20,
-              }}
-            >
-              <Image source={require("../../assets/images/SettingsIcon.png")} />
-              <Text>
-                <Text>Settings</Text>
-              </Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-            </View>
           </View>
-        </>
+
+          <AppButton
+            title="Show Profile"
+            onPress={handleNext}
+            buttonStyle={{
+              backgroundColor: primaryDark,
+              marginLeft: 80,
+              width: 100,
+              height: 35,
+            }}
+            textStyle={{ color: "#fff", fontSize: 10 }}
+          />
+          <TouchableOpacity
+            style={{
+              insetBlockStart: 30,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 80,
+              marginTop: 20,
+            }}
+            onPress={() => navigation.navigate("Login")}
+          >
+            <Image source={require("../../assets/images/calendarIcon.png")} />
+            <Text>
+              <Text>Appointments</Text>
+            </Text>
+
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              insetBlockStart: 30,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 80,
+              marginTop: 20,
+            }}
+            onPress={() => navigation.navigate("Login")}
+          >
+            <Image
+              source={require("../../assets/images/MedicalRecordIcon.png")}
+            />
+            <Text>
+              <Text>My Diagnosis</Text>
+            </Text>
+
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+
+          <View style={{ marginTop: 50 }}>
+            <Image
+              style={{ width: "100%", height: 1, marginTop: 20 }}
+              source={require("../../assets/images/lineImage.png")}
+            />
+          </View>
+          <TouchableOpacity
+            style={{
+              insetBlockStart: 30,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 80,
+              marginTop: 20,
+            }}
+            onPress={() => navigation.navigate("Login")}
+          >
+            <Image source={require("../../assets/images/VirusIcon.png")} />
+            <Text>
+              <Text>Medical records</Text>
+            </Text>
+
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              insetBlockStart: 30,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 80,
+              marginTop: 20,
+            }}
+            onPress={() => navigation.navigate("Login")}
+          >
+            <Image
+              source={require("../../assets/images/StethoscopeIcon.png")}
+            />
+            <Text>
+              <Text>My Doctors</Text>
+            </Text>
+
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              insetBlockStart: 30,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 80,
+              marginTop: 20,
+            }}
+            onPress={() => navigation.navigate("Login")}
+          >
+            <Image source={require("../../assets/images/LocationIcon.png")} />
+            <Text>
+              <Text>Location</Text>
+            </Text>
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+
+          <View style={{ marginTop: 50 }}>
+            <Image
+              style={{ width: "100%", height: 1, marginTop: 20 }}
+              source={require("../../assets/images/lineImage.png")}
+            />
+          </View>
+          <TouchableOpacity
+            style={{
+              insetBlockStart: 30,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 80,
+              marginTop: 20,
+            }}
+            onPress={() => navigation.navigate("Login")}
+          >
+            <Image source={require("../../assets/images/SettingsIcon.png")} />
+            <Text>
+              <Text>Settings</Text>
+            </Text>
+            <Text> {">"} </Text>
+          </TouchableOpacity>
+
+          <View style={{ marginTop: 50, alignItems: "center" }}>
+            <AppButton
+              title="BACK"
+              onPress={handleBack}
+              buttonStyle={{ width: 120 }}
+            />
+          </View>
+        </View>
       )}
 
       {state.currentStep === 2 && (
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* <Header onPress={handleBack} /> */}
-          <View style={styles.profileContainer}>
-            <ProfilePicture />
+        <View>
+          <View style={{ alignItems: "center" }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "bold",
+                marginBottom: 30,
+                marginBlockStart: 0,
+              }}
+            >
+              My Profile
+            </Text>
+            <View
+              style={{
+                alignItems: "center",
+                marginBottom: 30,
+                marginBlockStart: 0,
+              }}
+            >
+              <ProfilePicture />
+            </View>
           </View>
-          <Text style={styles.editTitle}>Edit Profile</Text>
-          <View style={styles.formContainer}>
+          <Text style={{ fontSize: 20, marginBottom: 20 }}>Edit Profile</Text>
+          <View>
             <Text style={styles.label}>Name</Text>
             <AppInput
               term={state.userName}
@@ -217,6 +246,46 @@ const Profile = ({ navigation }) => {
             <Text style={styles.label}>Phone</Text>
             <PhoneInputBox />
 
+            <AppButton
+              title="Next"
+              onPress={handleNext}
+              buttonStyle={{
+                backgroundColor: primaryDark,
+                width: "100%",
+                height: 50,
+                marginTop: 50,
+                marginBottom: 100,
+              }}
+              textStyle={{ color: "#fff", fontSize: 16 }}
+            />
+          </View>
+        </View>
+      )}
+      {state.currentStep === 3 && (
+        <View>
+          <View style={{ alignItems: "center" }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "bold",
+                marginBottom: 10,
+                marginBlockStart: 0,
+              }}
+            >
+              My Profile
+            </Text>
+            <View
+              style={{
+                alignItems: "center",
+                marginBottom: 60,
+                marginBlockStart: 20,
+              }}
+            >
+              <ProfilePicture />
+            </View>
+          </View>
+          <Text style={{ fontSize: 20, marginBottom: 20 }}>Edit Profile</Text>
+          <View>
             <Text style={styles.label}>Marital status</Text>
             <DropdownComponent data={maritalStatus} />
             <Text style={styles.label}>Number of children</Text>
@@ -229,11 +298,17 @@ const Profile = ({ navigation }) => {
             <AppButton
               title="Save"
               onPress={() => navigation.navigate("Login")}
-              buttonStyle={styles.buttonStyle}
-              textStyle={styles.buttonTextStyle}
+              buttonStyle={{
+                backgroundColor: primaryDark,
+                width: "100%",
+                height: 50,
+                marginTop: 50,
+                marginBottom: 100,
+              }}
+              textStyle={{ color: "#fff", fontSize: 16 }}
             />
           </View>
-        </ScrollView>
+        </View>
       )}
     </View>
   );
