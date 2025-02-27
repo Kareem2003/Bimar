@@ -23,6 +23,7 @@ import DropdownComponent from "../../components/DropdownComponent";
 import PhoneInputBox from "../../components/PhoneInputBox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../../helpers/constants/staticKeys";
+import Header from "../../components/Header";
 
 const Profile = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -37,18 +38,13 @@ const Profile = ({ navigation }) => {
       ]}
     >
       {state.currentStep === 1 && (
-        <View style={{ marginBottom: 120 }}>
+        <View>
+          <Header
+            marginTop={50}
+            header={"Profile"}
+            onPress={() => navigation.navigate("Home")}
+          />
           <View alignItems="center">
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "bold",
-                marginBottom: 40,
-                marginBlockStart: 30,
-              }}
-            >
-              My Profile
-            </Text>
             <ProfilePicture
               profileName="Roland Gilbert"
               profileHandle="rolandGilbert@gmail.com"
@@ -74,7 +70,7 @@ const Profile = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate("Appointments")}
           >
             <Image source={require("../../assets/images/calendarIcon.png")} />
             <Text>
@@ -92,7 +88,7 @@ const Profile = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate("Diagnos")}
           >
             <Image
               source={require("../../assets/images/MedicalRecordIcon.png")}
@@ -118,7 +114,7 @@ const Profile = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => console.log("Medical records")}
           >
             <Image source={require("../../assets/images/VirusIcon.png")} />
             <Text>
@@ -136,7 +132,7 @@ const Profile = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => console.log("My Doctors")}
           >
             <Image
               source={require("../../assets/images/StethoscopeIcon.png")}
@@ -156,7 +152,7 @@ const Profile = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => console.log("Location")}
           >
             <Image source={require("../../assets/images/LocationIcon.png")} />
             <Text>
@@ -179,7 +175,7 @@ const Profile = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate("Settings")}
           >
             <Image source={require("../../assets/images/SettingsIcon.png")} />
             <Text>
@@ -187,14 +183,6 @@ const Profile = ({ navigation }) => {
             </Text>
             <Text> {">"} </Text>
           </TouchableOpacity>
-
-          <View style={{ marginTop: 50, alignItems: "center" }}>
-            <AppButton
-              title="BACK"
-              onPress={handleBack}
-              buttonStyle={{ width: 120 }}
-            />
-          </View>
         </View>
       )}
 

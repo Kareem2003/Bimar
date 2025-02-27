@@ -13,6 +13,8 @@ import Profile from "../screens/profile";
 import Settingsscreen from "../screens/Setting";
 import Appointments from "../screens/Appointments";
 import AuthNavigator from "./authNavigator";
+import AiChatScreen from "../screens/AiChat";
+import Diagnos from "../screens/diagnos";
 
 const Stack = createNativeStackNavigator();
 const HomeNavigator = () => {
@@ -29,6 +31,8 @@ const HomeNavigator = () => {
       <Stack.Screen name="Doctors" component={Doctors}></Stack.Screen>
       {/* <Stack.Screen name="Messages" component={DoctorProfile}></Stack.Screen> */}
       <Stack.Screen name="Appointments" component={Appointments}></Stack.Screen>
+      <Stack.Screen name="Diagnos" component={Diagnos}></Stack.Screen>
+      <Stack.Screen name="AiChatScreen" component={AiChatScreen}></Stack.Screen>
       <Stack.Screen
         name="DoctorProfile"
         component={DoctorProfile}

@@ -17,14 +17,14 @@ const Logic = (navigation) => {
   };
 
   const fetchUserInfo = async () => {
-      const userInfo = JSON.parse(await AsyncStorage.getItem(USERINFO));
-        updateState([
-          {
-            type: ACTION_TYPES.UPDATE_PROP,
-            prop: "userName",
-            value: userInfo.name,
-          },
-        ]);
+    const userInfo = JSON.parse(await AsyncStorage.getItem(USERINFO));
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "userName",
+        value: userInfo.name,
+      },
+    ]);
   };
 
   const handlePress = (iconName) => {
@@ -39,19 +39,19 @@ const Logic = (navigation) => {
     if (navigation) {
       switch (iconName) {
         case "gear":
-          navigation.replace("Settings");
+          navigation.navigate("Settings");
           break;
         case "envelope":
-          navigation.replace("Messages");
+          navigation.navigate("Messages");
           break;
         case "home":
-          navigation.replace("Home");
+          navigation.navigate("Home");
           break;
         case "clipboard":
-          navigation.replace("Appointments");
+          navigation.navigate("Appointments");
           break;
         case "user":
-          navigation.replace("Profile");
+          navigation.navigate("Profile");
           break;
       }
     }

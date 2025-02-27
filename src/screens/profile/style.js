@@ -3,10 +3,8 @@ import { primary } from "../../styles/colors";
 
 export const styles = {
   container: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
     backgroundColor: "#fff",
   },
   title: {
@@ -71,5 +69,4 @@ export const styles = {
     marginTop: 8,
     color: "#555",
   },
-  
 };

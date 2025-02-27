@@ -34,17 +34,33 @@ export const styles = {
     borderRadius: 20,
     height: 130,
     overflow: "hidden",
+    flexDirection: "row", // Align image and text side by side
+    alignItems: "center", // Center items vertically
+    paddingHorizontal: 20, // Add some padding
   },
-  banner: {
-    flex: 1,
+  bannerImageContainer: {
+    width: 100, // Adjust width for the image container
+    height: 100, // Adjust height for the image container
     justifyContent: "center",
-    // iOS shadow properties
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 9 },
-    shadowOpacity: 0.5,
-    shadowRadius: 7,
-    // Android shadow property
-    //elevation: 5,
+    alignItems: "center",
+  },
+  bannerImage: {
+    width: 130, // Adjust image size
+    height: 130,
+  },
+  bannerTextContainer: {
+    flex: 1, // Take remaining space
+    marginLeft: 20, // Add spacing between image and text
+  },
+  bannerText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FFF",
+  },
+  bannerSubText: {
+    fontSize: 14,
+    color: "#FD9B63",
+    marginTop: 5,
   },
   CircleBackground: {
     backgroundColor: "#6A9C89",
@@ -53,31 +69,9 @@ export const styles = {
     height: 110,
     position: "absolute",
     top: -1,
-    left: 5,
+    left: 25,
     justifyContent: "center",
     alignItems: "center",
-  },
-  bannerImage: {
-    width: 120,
-    height: 120,
-    position: "absolute",
-    bottom: -1,
-  },
-  bannerAllText: {
-    flex: 1,
-    marginLeft: 80,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bannerText: {
-    fontSize: 13,
-    fontWeight: "bold",
-    color: "#FFF",
-  },
-  bannerSubText: {
-    fontSize: 14,
-    color: "#FD9B63",
-    marginTop: 5,
   },
   // Search Bar
   searchContainer: {
@@ -117,8 +111,8 @@ export const styles = {
     fontWeight: "bold",
     marginBottom: 10,
     flexDirection: "row",
-    justifyContent: "space-between", 
-    alignItems: "center", 
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   showMoreText: {
     color: "#FD9B63",
@@ -231,42 +225,42 @@ export const styles = {
   },
 
   // Modal Styles
-modalOverlay: {
-  flex: 1,
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
-  justifyContent: "center",
-  alignItems: "center",
-},
-modalContainer: {
-  width: "80%",
-  backgroundColor: "#FFF",
-  borderRadius: 10,
-  padding: 20,
-  alignItems: "center",
-},
-modalTitle: {
-  fontSize: 18,
-  fontWeight: "bold",
-  marginBottom: 15,
-},
-filterOption: {
-  padding: 10,
-  width: "100%",
-  borderBottomWidth: 1,
-  borderBottomColor: "#E9EFEC",
-},
-filterText: {
-  fontSize: 16,
-  color: "#333",
-},
-closeButton: {
-  marginTop: 15,
-  padding: 10,
-  backgroundColor: "#FD9B63",
-  borderRadius: 5,
-},
-closeButtonText: {
-  color: "#FFF",
-  fontSize: 16,
-},
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  filterOption: {
+    padding: 10,
+    width: "100%",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E9EFEC",
+  },
+  filterText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  closeButton: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: "#FD9B63",
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+  },
 };
