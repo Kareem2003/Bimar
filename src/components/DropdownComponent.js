@@ -3,11 +3,9 @@ import { StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
-
-
 const DropdownComponent = (props) => {
   const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(true);
+  const [isFocus, setIsFocus] = useState(false);
 
   const renderLabel = () => {
     if (!value) {
@@ -34,15 +32,12 @@ const DropdownComponent = (props) => {
         maxHeight={300}
         labelField="label"
         valueField="value"
-        placeholder={!isFocus ? "" : ""}
+        placeholder={props.placeholder || "Select an option"}
         searchPlaceholder="Search..."
-        value={value}
+        value={props.value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={(item) => {
-          setValue(item.value);
-          setIsFocus(false);
-        }}
+        onChange={props.onChange}
         // renderLeftIcon={() => (
         //   <AntDesign
         //     style={styles.icon}
@@ -81,6 +76,7 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontSize: 16,
+    color: '#9EA0A4'
   },
   selectedTextStyle: {
     fontSize: 16,

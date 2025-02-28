@@ -42,7 +42,7 @@ const Logic = (navigation) => {
 
   const handleBack = () => {
     if (state.currentStep-1 < 1) {
-      state.setcurrentStep = navigation.navigate("Login");
+      state.setcurrentStep = navigation.navigate("Home");
       return;
     }
     const prev = state.currentStep - 1;

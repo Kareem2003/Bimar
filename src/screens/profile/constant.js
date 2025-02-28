@@ -1,34 +1,37 @@
+export const GENDER_OPTIONS = [
+  { label: "Male", value: "Male" },
+  { label: "Female", value: "Female" }
+];
+
+export const BLOOD_TYPE_OPTIONS = [
+  { label: "AB+", value: "AB+" },
+  { label: "A+", value: "A+" },
+  { label: "B+", value: "B+" },
+  { label: "O+", value: "O+" },
+  { label: "AB-", value: "AB-" },
+  { label: "A-", value: "A-" },
+  { label: "B-", value: "B-" },
+  { label: "O-", value: "O-" }
+];
+
 export const INITIAL_STATE = {
-  email: "",
-  password: "",
-  loading: false,
-  formData: {
-    userName: "",
-    userNameValidationText: "",
-    userPhone: "",
-    userPhoneValidationText: "",
-    userEmail: "",
-    userEmailValidationText: "",
-    userPassword: "",
-    userPasswordValidationText: "",
-    City: "",
-    CityValidationText: "",
-    Area: "",
-    AreaValidationText: "",
-    Gender: "",
-    GenderValidationText: "",
-    userWeight: "",
-    userWeightValidationText: "",
-    userHeight: "",
-    userHeightValidationText: "",
-    DateofBirth: "",
-    DateofBirthValidationText: "",
-    BooldType: "",
-    BooldTypeValidationText: "",
-    // allergy: "",
-  },
-  reEnterYourPassword: "",
-  reEnterYourPasswordValidationText: "",
   currentStep: 1,
   isDatePickerVisible: false,
+  id: "",
+  userName: "",
+  userEmail: "",
+  userPhone: "",
+  formData: {
+    medicalRecord: {
+      bloodType: ""
+    },
+    personalRecords: {
+      City: "",
+      Area: "",
+      userWeight: "",
+      userHeight: "",
+      DateOfBirth: "",
+      Gender: "",
+    }
+  }
 };

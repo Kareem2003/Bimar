@@ -9,11 +9,6 @@ export const styles = {
     padding: 16,
     backgroundColor: "#fff",
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 24,
-    textAlign: "center",
-  },
   input: {
     height: 40,
     borderColor: "#ccc",

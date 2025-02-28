@@ -82,3 +82,51 @@ export const resetPassword = (payload, onSuccess, onError, onComplete) => {
     onComplete
   );
 };
+export const updatePatient = (id, payload, onSuccess, onError, onComplete) => {
+
+  const requestData = {
+    userName: payload.userName,
+    userEmail: payload.userEmail,
+    userPhone: payload.userPhone,
+    personalRecords: {
+      userHeight: parseInt(payload.personalRecords?.userHeight || '0'),
+      userWeight: parseInt(payload.personalRecords?.userWeight || '0'),
+      DateOfBirth: payload.personalRecords?.DateOfBirth || '',
+      Gender: payload.personalRecords?.Gender || '',
+      City: payload.personalRecords?.City || '',
+      Area: payload.personalRecords?.Area || ''
+    },
+    medicalRecord: {
+      bloodType: payload.medicalRecord?.bloodType || ''
+    }
+  };
+
+  $axios
+    .patch(`/patientsAuth/${id}`, requestData)
+    .then((response) => {
+      if (response.data && response.data.data === "Updated Successfulyy") {
+        $axios.get(`/patientsAuth/${id}`)
+          .then((userResponse) => {
+            onSuccess({
+              data: {
+                ...userResponse.data,
+                id: id
+              }
+            });
+          })
+          .catch(() => {
+
+            onSuccess(response);
+          });
+      } else {
+        onSuccess(response);
+      }
+    })
+    .catch((error) => {
+      const errorMessage = error.response?.data?.message || error.message || "An error occurred during update";
+      onError(errorMessage);
+    })
+    .finally(() => {
+      if (onComplete) onComplete();
+    });
+};
