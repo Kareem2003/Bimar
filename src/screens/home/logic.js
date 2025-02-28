@@ -22,7 +22,7 @@ const Logic = (navigation) => {
       {
         type: ACTION_TYPES.UPDATE_PROP,
         prop: "userName",
-        value: userInfo.name,
+        value: userInfo.userName,
       },
     ]);
   };
