@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { CountryPicker } from "react-native-country-codes-picker";
 
-const PhoneInputBox = () => {
+const PhoneInputBox = ({ value = '', onChangeText }) => {
   const [show, setShow] = useState(false);
   const [countryCode, setCountryCode] = useState('+20'); // Egypt's dial code is +20
-  const [phoneNumber, setPhoneNumber] = useState('');
 
   const handlePickerButtonPress = (item) => {
     if (item.name !== 'Israel') {
@@ -31,8 +30,8 @@ const PhoneInputBox = () => {
         style={styles.phoneInput}
         placeholder="Enter phone number"
         keyboardType="phone-pad"
-        value={phoneNumber}
-        onChangeText={setPhoneNumber}
+        value={value}
+        onChangeText={onChangeText}
       />
 
       {/* Country Picker */}
@@ -49,7 +48,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-
   },
   codeSelector: {
     width: '20%',
