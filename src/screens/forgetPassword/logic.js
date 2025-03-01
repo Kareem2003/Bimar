@@ -152,12 +152,9 @@ const Logic = (navigation) => {
   };
 
   const handleVerifyOTP = (otp) => {
-    console.log("otp: ", otp);
-
     verifyOTP(
       otp,
       (res) => {
-        console.log("Res: ", res);
         if (res.data.status === "success") {
           ToastManager.notify("OTP verified successfully!", {
             type: "success",
@@ -170,7 +167,6 @@ const Logic = (navigation) => {
         }
       },
       (error) => {
-        console.log("error: ", error);
         const errorMessage = error.data || "An unknown error occurred"; // Default message if error.data is undefined
         ToastManager.notify(errorMessage, {
           type: "error",
@@ -181,8 +177,6 @@ const Logic = (navigation) => {
   };
 
   const handleUpdatePassword = () => {
-    console.log("password: ", state.formData.userPassword);
-    console.log("reEnterYourPassword: ", state.reEnterYourPassword);
 
     if (state.formData.userPassword !== state.reEnterYourPassword) {
       ToastManager.notify("Passwords do not match. Please try again.", {
@@ -201,14 +195,12 @@ const Logic = (navigation) => {
     resetPassword(
       state.formData.userPassword,
       (res) => {
-        console.log("Password update response: ", res);
         ToastManager.notify("Password updated successfully!", {
           type: "success",
         });
         navigation.replace("Login");
       },
       (error) => {
-        console.log("Password update error: ", error);
         ToastManager.notify("Failed to update password. Please try again.", {
           type: "error",
         });

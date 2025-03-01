@@ -53,7 +53,7 @@ export const styles = {
     marginLeft: 20, // Add spacing between image and text
   },
   bannerText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "bold",
     color: "#FFF",
   },

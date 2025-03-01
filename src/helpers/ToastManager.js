@@ -8,7 +8,6 @@ const ToastManager = (() => {
 
   const notify = (message, options) => {
     const id = Math.random().toString(36).substr(2, 9);
-    console.log("Toast Notification:", { id, message, ...options });
     toasts.push({ id, message, ...options });
     listeners.forEach((listener) => listener([...toasts]));
     setTimeout(() => dismiss(id), options?.duration || 3000);

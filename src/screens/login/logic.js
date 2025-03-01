@@ -51,7 +51,6 @@ const Logic = (navigation) => {
     patientLogin(
       payload,
       (res) => {
-        console.log(res);
         if (res.data.status === "success") {
           ToastManager.notify("Logged in successfully!", {
             type: "success",

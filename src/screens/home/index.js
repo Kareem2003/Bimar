@@ -14,11 +14,13 @@ import {
 } from "react-native";
 import Logic from "./logic";
 import LottieView from "lottie-react-native";
+import TypeWriterEffect from "react-native-typewriter-effect";
+import TypeWriter from "react-native-typewriter";
 import MenuButton from "../../components/menuButton";
 
 const Home = ({ navigation }) => {
-  const [activeIcon, setActiveIcon] = useState(null);
   const { state, updateState, handlePress } = Logic(navigation);
+  const [activeIcon, setActiveIcon] = useState(null);
   const translateY = useRef(new Animated.Value(0)).current;
   const translateX = useRef(new Animated.Value(0)).current;
 
@@ -116,9 +118,14 @@ const Home = ({ navigation }) => {
           {/* Text Container */}
           <View style={styles.bannerTextContainer}>
             <Text style={styles.bannerText}>Don't know where to go?</Text>
-            <Text style={styles.bannerSubText}>
-              Bimar, your friend will help!
-            </Text>
+            {/* <TypeWriterEffect
+              style={styles.bannerText}
+              content="Don't know where to go?"
+            /> */}
+            <TypeWriterEffect
+              style={styles.bannerSubText}
+              content="Your friend Bimar will help!"
+            />
           </View>
         </TouchableOpacity>
 

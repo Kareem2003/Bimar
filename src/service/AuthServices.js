@@ -9,7 +9,6 @@ export const patientLogin = (payload, onSuccess, onError, onComplete) => {
     })
     .then(onSuccess)
     .catch((error) => {
-      console.log("error", error);
       // Extract the error message
       const errorMessage =
         error.data?.[0] || "An error occurred"; // Access the first item in the data array
