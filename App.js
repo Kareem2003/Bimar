@@ -19,6 +19,9 @@ import MyDiagnosis from "./src/screens/myDiagnosis";
 import Diagnos from "./src/screens/diagnos";
 import Doctors from "./src/screens/doctors";
 import DoctorProfile from "./src/screens/doctorProfile";
+import MedicalRecords from "./src/screens/medicalRecords";
+import ViewScreen from "./src/screens/medicalRecords/viewScreen";
+import { View } from "react-native";
 const App = () => {
   return (
     <Provider>
