@@ -8,7 +8,15 @@
       "visible": "immersive"
     },
     "ios": {
-      "requireFullScreen": true
+      "requireFullScreen": true,
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "This app reads your step count data.",
+        "NSHealthUpdateUsageDescription": "This app updates your step count data."
+      },
+      "usesHealthKit": true
+    },
+    "android": {
+      "package": "com.anonymous.Bimar"
     }
   }
 }

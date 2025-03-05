@@ -17,6 +17,7 @@ import LottieView from "lottie-react-native";
 import TypeWriterEffect from "react-native-typewriter-effect";
 import TypeWriter from "react-native-typewriter";
 import MenuButton from "../../components/menuButton";
+import StepCounter from "../../service/stepCounter";
 
 const Home = ({ navigation }) => {
   const { state, updateState, handlePress } = Logic(navigation);
@@ -131,29 +132,9 @@ const Home = ({ navigation }) => {
 
         {/* Services Section */}
         <View style={styles.servicesSection}>
-          <View style={styles.sectionTitle}>
-            <Text style={styles.sectionTitle}>Our Services</Text>
-            <TouchableOpacity>
-              <Text style={styles.showMoreText}>Show More</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.serviceCards}>
-            <TouchableOpacity style={styles.serviceCard}>
-              <Image
-                source={require("../../assets/images/stethoscope (3).png")}
-                style={styles.icon}
-              />
-              <Text style={styles.cardText}>Doctors</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.serviceCard}>
-              <Image
-                source={require("../../assets/images/hospital (1).png")}
-                style={styles.icon}
-              />
-              <Text style={styles.cardText}>Clinics</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+  <Text style={styles.sectionTitle}>Health Tracking</Text>
+  <StepCounter />
+</View>
 
         {/* Doctor Cards (Horizontal Scroll) */}
         <View style={styles.doctorSection}>
