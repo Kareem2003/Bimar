@@ -150,9 +150,10 @@ const AiChatScreen = ({ navigation }) => {
                     <TouchableOpacity
                       key={doctor._id || doctor.id}
                       style={styles.doctorCard}
-                      onPress={() =>
-                        navigation.navigate("DoctorProfile", { doctor })
-                      }
+                      onPress={() => {
+                        setIsResultModalVisible(false);
+                        navigation.navigate("DoctorProfile", { doctor });
+                      }}
                     >
                       <View style={styles.circleWrapper}>
                         <View style={styles.circleOne}></View>
