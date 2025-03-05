@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { styles } from './style';
-import Logic from './logic';
-import AppButton from '../../components/AppButton';
+import React from "react";
+import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import { styles } from "./style";
+import Logic from "./logic";
+import AppButton from "../../components/AppButton";
 
 const DoctorProfile = ({ navigation, route }) => {
   const doctor = route.params.doctor;
@@ -13,7 +13,10 @@ const DoctorProfile = ({ navigation, route }) => {
     <ScrollView style={styles.container}>
       {/* Header with back button */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Icon name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Doctor Profile</Text>
@@ -29,9 +32,11 @@ const DoctorProfile = ({ navigation, route }) => {
           }
           style={styles.profileImage}
         />
-        <Text style={styles.doctorName}>{doctor.doctorName || 'Dr. Unknown'}</Text>
-        <Text style={styles.specialization}>{doctor.field || 'General'}</Text>
-        
+        <Text style={styles.doctorName}>
+          {doctor.doctorName || "Dr. Unknown"}
+        </Text>
+        <Text style={styles.specialization}>{doctor.field || "General"}</Text>
+
         {/* Rating Badge */}
         <View style={styles.ratingBadge}>
           <Icon name="star" size={16} color="#FD9B63" />
@@ -44,23 +49,32 @@ const DoctorProfile = ({ navigation, route }) => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>About Doctor</Text>
         <Text style={styles.aboutText}>
-          {doctor.doctorName ? `Dr. ${doctor.doctorName}` : 'The doctor'} is a top specialist at {doctor.clinic?.[0]?.clinicName || 'London Bridge Hospital'}. 
-          He has achieved several awards and recognition for is contribution and service in his own field. 
-          He is available for private consultation.
+          {doctor.doctorName ? `Dr. ${doctor.doctorName}` : "The doctor"} is a
+          top specialist at{" "}
+          {doctor.clinic?.[0]?.clinicName || "London Bridge Hospital"}. He has
+          achieved several awards and recognition for is contribution and
+          service in his own field. He is available for private consultation.
         </Text>
       </View>
 
       {/* Working Time Section */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Working time</Text>
-        <Text style={styles.workingTime}>Mon - Sat (08:30 AM - 09:00 PM)</Text>
+        <Text style={styles.sectionTitle}>Working Time</Text>
+        {doctor.clinic[0].clinicWorkDays.map((workDay, index) => (
+          <Text key={index} style={styles.workingTime}>
+            {workDay.day}: {workDay.workingHours}
+          </Text>
+        ))}
       </View>
 
       {/* Book Now Button */}
       <AppButton
         title="BOOK NOW"
         buttonStyle={styles.bookButton}
-        textStyle={{ color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' }}
+        textStyle={{ color: "#FFFFFF", fontSize: 16, fontWeight: "bold" }}
+        onPress={() => {
+          navigation.navigate("BookDate");
+        }}
       />
     </ScrollView>
   );
