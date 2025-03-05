@@ -11,6 +11,8 @@ import DoctorProfile from "../screens/doctorProfile";
 import MenuButton from "../components/menuButton";
 import Profile from "../screens/profile";
 import Settingsscreen from "../screens/Setting";
+import Terms from "../screens/Setting/terms";
+import RateApp from "../screens/rateApp";
 import Appointments from "../screens/Appointments";
 import AuthNavigator from "./authNavigator";
 import AiChatScreen from "../screens/AiChat";
@@ -28,6 +30,8 @@ const HomeNavigator = () => {
       <Stack.Screen name="Home" component={Home}></Stack.Screen>
       <Stack.Screen name="Profile" component={Profile}></Stack.Screen>
       <Stack.Screen name="Settings" component={Settingsscreen}></Stack.Screen>
+      <Stack.Screen name="Terms" component={Terms}></Stack.Screen>
+      <Stack.Screen name="RateApp" component={RateApp}></Stack.Screen>
       <Stack.Screen name="Doctors" component={Doctors}></Stack.Screen>
       {/* <Stack.Screen name="Messages" component={DoctorProfile}></Stack.Screen> */}
       <Stack.Screen name="Appointments" component={Appointments}></Stack.Screen>

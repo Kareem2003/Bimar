@@ -1,5 +1,6 @@
 import { Dimensions } from "react-native";
-import { primary } from "../../styles/colors";
+import { primary, primaryLight } from "../../styles/colors";
+import { Dropdown } from "react-native-element-dropdown";
 
 export const styles = {
   container: {
@@ -25,8 +26,9 @@ export const styles = {
     marginVertical: 5,
   },
   img: {
-    width: 55,
-    height: 55,
+    width: 34,
+    height: 34,
+    marginLeft: -2,
   },
   imageFill: {
     width: 55,
@@ -77,5 +79,50 @@ export const styles = {
     fontSize: 24,
     color: "#000",
   },
-  
+
+  Dropdown:{
+    width: 40,
+    height: 20,
+    backgroundColor: "transparent", 
+    borderWidth: 0,
+    paddingHorizontal: 0,
+    justifyContent: "center",
+    alignSelf: "flex-start",
+  },
+  // Terms page styles
+  termsContainer: {
+    flex: 1,
+    padding: 20,
+  },
+  termsSection: {
+    marginBottom: 25,
+    borderRadius: 12,
+    padding: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+    backgroundColor: "#fff",
+  },
+  termsTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 12,
+    color: "#16423C",
+  },
+  termsText: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: "#555",
+  },
+  termsDivider: {
+    height: 1,
+    backgroundColor: "#E0E0E0",
+    marginVertical: 15,
+  },
+
 };

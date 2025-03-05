@@ -21,13 +21,18 @@ import ProfilePicture from "../../components/ProfilePicture";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import Header from "../../components/Header";
 import ToggleSwitch from "toggle-switch-react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import AntDesign from "react-native-vector-icons/AntDesign";
+
+
 
 const Settingsscreen = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const { state, updateState, handleNext, handleBack, maritalStatus } =
+  const { state, updateState, handleNext, handleBack , handleLogout } =
     Logic(navigation);
   const [muteIsOn, setMute] = useState(false);
   const [darkIsOn, setDark] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(null);
 
   const handleMuteToggle = () => {
     setMute(!muteIsOn);
@@ -85,17 +90,26 @@ const Settingsscreen = ({ navigation }) => {
               marginTop: 20,
             }}
           >
-            <Image source={require("../../assets/images/notifications.png")} />
+            <Image source={require("../../assets/images/language.png")} style={styles.img} />
             <Text>
-              <Text>Mute Notification</Text>
+              <Text>Language</Text>
             </Text>
-            <ToggleSwitch
-              isOn={muteIsOn}
-              onColor="#16423C"
-              offColor="#C4DAD2"
-              onToggle={handleMuteToggle}
-              size="small"
-            />
+            <Dropdown style={styles.Dropdown}
+        data={[
+          { label: "English", value: "en" },
+          { label: "العربية", value: "ar" },
+        ]}
+        labelField="label"
+        valueField="value"
+        value={selectedLanguage}
+        onChange={(item) => setSelectedLanguage(item.value)}
+        renderRightIcon={() => (
+          <AntDesign name="down" size={20} color="black" />
+        )}
+        selectedTextStyle={{ display: "none" }} 
+        placeholderStyle={{ display: "none" }} 
+        containerStyle={{ width: 120 }} 
+      />
           </View>
           <View style={{ marginTop: 50 }}>
             <Image
@@ -111,7 +125,7 @@ const Settingsscreen = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate("forgetPassword")}
           >
             <Image source={require("../../assets/images/password.png")} />
             <Text>
@@ -128,7 +142,7 @@ const Settingsscreen = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate("RateApp")}
           >
             <Image source={require("../../assets/images/star.png")} />
             <Text>
@@ -151,7 +165,7 @@ const Settingsscreen = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate("Terms")}
           >
             <Image source={require("../../assets/images/terms.png")} />
             <Text>
@@ -169,7 +183,7 @@ const Settingsscreen = ({ navigation }) => {
               gap: 80,
               marginTop: 20,
             }}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => handleLogout()}
           >
             <Image source={require("../../assets/images/logout.png")} />
             <Text>

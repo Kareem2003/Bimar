@@ -55,6 +55,17 @@ const Logic = (navigation) => {
     ]);
   };
 
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.clear();
+      console.log('AsyncStorage cleared');
+      
+      navigation.replace('Login');
+    } catch (error) {
+      console.error('Error clearing AsyncStorage:', error);
+    }
+  };
+  
 
 
   return {
@@ -62,7 +73,7 @@ const Logic = (navigation) => {
     updateState,
     handleNext,
     handleBack,
-    maritalStatus,
+    handleLogout,
   };
 };
 
