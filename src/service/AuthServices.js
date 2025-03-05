@@ -16,9 +16,8 @@ export const patientLogin = (payload, onSuccess, onError, onComplete) => {
     .finally(onComplete);
 };
 export const patientRegister = (payload, onSuccess, onError, onComplete) => {
-  $axios.post(
-    "/patientsAuth/patientRegister",
-    {
+  $axios
+    .post("/patientsAuth/patientRegister", {
       userName: payload.userName,
       userPhone: payload.userPhone,
       userEmail: payload.userEmail,
@@ -34,11 +33,18 @@ export const patientRegister = (payload, onSuccess, onError, onComplete) => {
         DateOfBirth: payload.personalRecords.DateOfBirth,
         Gender: payload.personalRecords.Gender,
       },
-    },
-    onSuccess,
-    onError,
-    onComplete
-  );
+    })
+    .then((res) => {
+      onSuccess(res);
+    })
+    .catch((error) => {
+      const errorMessage =
+        error.response?.data?.[0] || error.message || "An error occurred";
+      onError(errorMessage);
+    })
+    .finally(() => {
+      if (onComplete) onComplete();
+    });
 };
 export const forgotPassword = (payload, onSuccess, onError, onComplete) => {
   $axios.post(
