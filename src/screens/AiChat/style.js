@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
@@ -121,5 +121,85 @@ export const styles = StyleSheet.create({
   robotImageCheck: {
     width: 300,
     height: 300,
+  },
+  doctorSection: {
+    marginVertical: 20,
+    paddingHorizontal: 20,
+  },
+  doctorCard: {
+    backgroundColor: "#fff",
+    marginVertical: 15,
+    borderRadius: 10,
+    elevation: 3,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    width: Dimensions.get("window").width * 0.8,
+    height: 140,
+    overflow: "hidden",
+  },
+  circleWrapper: {
+    position: "absolute",
+    top: -10,
+    left: -10,
+    zIndex: -1,
+  },
+  circleOne: {
+    position: "absolute",
+    width: 110,
+    height: 110,
+    backgroundColor: "#6A9C89",
+    borderRadius: 55,
+    top: 30,
+    left: 10,
+    opacity: 0.6,
+    // iOS shadow properties
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 7 },
+    shadowOpacity: 0.7,
+    shadowRadius: 4,
+    // Android shadow property
+    //elevation: 5,
+  },
+  circleTwo: {
+    position: "absolute",
+    width: 70,
+    height: 70,
+    backgroundColor: "#FD9B63",
+    borderRadius: 35,
+    top: 15,
+    left: 60,
+  },
+  doctorImage: {
+    position: "absolute",
+    width: 100,
+    height: 150,
+  },
+  doctorInfo: {
+    justifyContent: "center",
+    flex: 1,
+    paddingLeft: 110,
+  },
+  doctorName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 5,
+  },
+  doctorSpecialization: {
+    fontSize: 14,
+    color: "#666",
+  },
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: "#16423C",
+    width: "100%",
+    height: 60,
+  },
+  navButton: {
+    alignItems: "center",
+    paddingBottom: 15,
   },
 });

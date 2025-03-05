@@ -13,6 +13,7 @@ import {
   getHead,
   getLimb,
   getSkin,
+  getSpecialistDoctor,
   getStomach,
   predictSpecialist,
 } from "../../service/aiChatServices";
@@ -188,20 +189,41 @@ const Logic = (navigation) => {
             value: res.data.prediction,
           },
         ]);
+        getDoctors(res.data.specialist);
       },
       (err) => {
         console.log("err", err);
       },
+      () => {}
+    );
+  };
+
+  const getDoctors = (field) => {
+    console.log(field);
+    getSpecialistDoctor(
+      {
+        field: field,
+      },
+      (res) => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "doctors",
+            value: res.data.data,
+          },
+        ]);
+      },
+      (error) => {
+        console.log("res", error);
+      },
       () => {
-        setTimeout(() => {
-          updateState([
-            {
-              type: ACTION_TYPES.UPDATE_PROP,
-              prop: "isProcessing",
-              value: false,
-            },
-          ]);
-        }, 1000);
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "isProcessing",
+            value: false,
+          },
+        ]);
       }
     );
   };
@@ -215,6 +237,7 @@ const Logic = (navigation) => {
     updateState,
     handleRemoveSymptom,
     sendAiModel,
+    getDoctors,
   };
 };
 

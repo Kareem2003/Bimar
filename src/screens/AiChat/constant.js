@@ -9,4 +9,5 @@ export const INITIAL_STATE = {
   prediction: "",
   specialist: "",
   isProcessing: false,
+  doctors: [],
 };

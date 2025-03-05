@@ -3,6 +3,12 @@
     "name": "Bimar",
     "slug": "Bimar",
     "userInterfaceStyle": "automatic",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "androidNavigationBar": {
+      "visible": "immersive"
+    },
+    "ios": {
+      "requireFullScreen": true
+    }
   }
 }

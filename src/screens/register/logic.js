@@ -28,69 +28,63 @@ const Logic = (navigation) => {
   };
 
   const handleRegister = () => {
-    let isValid = true;
-    let validationText = "";
-    // Validate form data
-    if (state.formData.userName.trim() === "") {
-      validationText = "Name is required";
-      isValid = false;
-    } else if (
-      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
-        state.formData.userEmail
-      )
-    ) {
-      validationText = "Invalid email format";
-      isValid = false;
-    } else if (state.formData.userPassword.length < 8) {
-      validationText = "Password must be at least 8 characters";
-      isValid = false;
-    } else if (state.formData.userPhone.trim() === "") {
-      validationText = "Phone number is required";
-      isValid = false;
-    } else if (state.formData.personalRecords.City.trim() === "") {
-      validationText = "City is required";
-      isValid = false;
-    } else if (state.formData.personalRecords.Area.trim() === "") {
-      validationText = "Area is required";
-      isValid = false;
-    } else if (
-      isNaN(state.formData.personalRecords.userWeight) ||
-      state.formData.personalRecords.userWeight <= 0
-    ) {
-      validationText = "Weight must be a positive number";
-      isValid = false;
-    } else if (
-      isNaN(state.formData.personalRecords.userHeight) ||
-      state.formData.personalRecords.userHeight <= 0
-    ) {
-      validationText = "Height must be a positive number";
-      isValid = false;
-    } else if (state.formData.personalRecords.emergencyContact.trim() === "") {
-      validationText = "Emergency contact is required";
-      isValid = false;
-    }
-
-    // // If invalid, update state and show validation error
-    // if (!isValid) {
-    //   updateState([
-    //     {
-    //       type: ACTION_TYPES.UPDATE_PROP,
-    //       prop: `formData.validationText`,
-    //       value: validationText,
-    //     },
-    //   ]);
-    //   ToastManager.notify(validationText, { type: "error" });
-    //   return;
+    // let isValid = true;
+    // let validationText = "";
+    // // Validate form data
+    // if (state.formData.userName === "") {
+    //   validationText = "Name is required";
+    //   isValid = false;
+    // } else if (
+    //   !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+    //     state.formData.userEmail
+    //   )
+    // ) {
+    //   validationText = "Invalid email format";
+    //   isValid = false;
+    // } else if (state.formData.userPassword.length < 8) {
+    //   validationText = "Password must be at least 8 characters";
+    //   isValid = false;
+    // } else if (state.formData.userPhone === "") {
+    //   validationText = "Phone number is required";
+    //   isValid = false;
+    // } else if (state.formData.personalRecords.City === "") {
+    //   validationText = "City is required";
+    //   isValid = false;
+    // } else if (state.formData.personalRecords.Area === "") {
+    //   validationText = "Area is required";
+    //   isValid = false;
+    // } else if (state.formData.personalRecords.Gender === "") {
+    //   validationText = "Gender is required";
+    //   isValid = false;
+    // } else if (state.formData.medicalRecord.bloodType === "") {
+    //   validationText = "bloodType is required";
+    //   isValid = false;
+    // } else if (
+    //   isNaN(state.formData.personalRecords.userWeight) ||
+    //   state.formData.personalRecords.userWeight <= 0
+    // ) {
+    //   validationText = "Weight must be a positive number";
+    //   isValid = false;
+    // } else if (
+    //   isNaN(state.formData.personalRecords.userHeight) ||
+    //   state.formData.personalRecords.userHeight <= 0
+    // ) {
+    //   validationText = "Height must be a positive number";
+    //   isValid = false;
     // }
 
-    // If valid, proceed with registration
     patientRegister(
       state.formData,
       (res) => {
+
+        console.log("res", res);
+
         ToastManager.notify("User Created successfully", { type: "success" });
         navigation.navigate("Login");
       },
       (error) => {
+        console.log("error", error);
+
         if (error.data) {
           const errorMessage = error.data.join("\n");
           ToastManager.notify(errorMessage, { type: "error" });
@@ -99,29 +93,6 @@ const Logic = (navigation) => {
             type: "error",
           });
         }
-        const errorMessages = error.reduce((acc, message) => {
-          if (message.includes("Name")) {
-            acc.userNameValidationText = message;
-          } else if (message.includes("Password")) {
-            acc.userPasswordValidationText = message;
-          } else if (message.includes("Email")) {
-            acc.userEmailValidationText = message;
-          } // Handle all error messages...
-          return acc;
-        }, {});
-        updateState([
-          {
-            type: ACTION_TYPES.UPDATE_PROP,
-            prop: "formData",
-            value: {
-              ...state.formData,
-              ...errorMessages,
-            },
-          },
-        ]);
-        ToastManager.notify("Please fix the errors before proceeding.", {
-          type: "error",
-        });
       }
     );
   };

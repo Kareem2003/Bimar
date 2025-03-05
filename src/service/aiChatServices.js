@@ -51,3 +51,16 @@ export const predictSpecialist = (payload, onSuccess, onError, onComplete) => {
     .catch(onError)
     .finally(onComplete);
 };
+
+export const getSpecialistDoctor = (
+  payload,
+  onSuccess,
+  onError,
+  onComplete
+) => {
+  $securedAxios
+    .post("/doctor/field", { field: payload.field })
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};
