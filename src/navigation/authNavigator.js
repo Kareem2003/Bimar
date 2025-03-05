@@ -52,6 +52,7 @@ const AuthNavigator = () => {
         component={HomeNavigator}
         options={{ headerShown: false }}
       ></Stack.Screen>
+     
     </Stack.Navigator>
   );
 };

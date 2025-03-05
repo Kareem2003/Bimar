@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
+import { Dropdown } from "react-native-element-dropdown";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const AppSelect = ({
   options = [],
   defaultValue = null,
+  placeholder,
   label,
   labelStyle,
   requiredSign,
@@ -16,9 +17,9 @@ const AppSelect = ({
   customArrowDown,
   customArrowUp,
 }) => {
-  const [open, setOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState(defaultValue);
   const [error, setError] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Validate when closing the dropdown
   const validate = () => {
@@ -51,39 +52,34 @@ const AppSelect = ({
         </View>
       )}
 
-      <DropDownPicker
-        open={open}
-        value={selectedValue}
-        items={options.map((option) => ({
-          label: option.label,
-          value: option.value,
-        }))}
-        setOpen={setOpen}
-        setValue={handleChange}
-        onClose={validate}
-        placeholder="Select an option"
-        zIndex={1000}
+      <Dropdown
         style={[
           styles.dropdown,
-          {
-            borderColor: error ? "red" : "#b7b7b7",
-            width: Dimensions.get("window").width * 0.75,
-          },
+          { borderColor: selectedValue ? "#A09CAB" : "transparent" },
         ]}
-        dropDownContainerStyle={{
-          borderColor: "#b7b7b7",
-          width: Dimensions.get("window").width * 0.75,
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={options}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder={placeholder}
+        value={selectedValue}
+        onChange={(item) => {
+          handleChange(item.value);
+          validate();
         }}
-        ArrowDownIconComponent={
-          customArrowDown ||
-          (() => (
-            <MaterialIcons name="arrow-drop-down" size={24} color="black" />
-          ))
-        }
-        ArrowUpIconComponent={
-          customArrowUp ||
-          (() => <MaterialIcons name="arrow-drop-up" size={24} color="black" />)
-        }
+        onFocus={() => setIsOpen(true)}
+        onBlur={() => setIsOpen(false)}
+        renderRightIcon={() => (
+          <MaterialIcons
+            name={isOpen ? "arrow-drop-up" : "arrow-drop-down"}
+            size={24}
+            color="black"
+          />
+        )}
       />
 
       {/* Error Message */}
@@ -94,7 +90,6 @@ const AppSelect = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
     width: "100%",
   },
   labelContainer: {
@@ -111,16 +106,39 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   dropdown: {
+    width: Dimensions.get("window").width * 0.8,
+    height: 50,
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    backgroundColor: "#F2F2F2",
+    marginVertical: 10,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+    color: "#A09CAB",
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  inputSearchStyle: {
     height: 40,
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    backgroundColor: "#fff",
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 24,
+    height: 24,
   },
   errorText: {
     marginTop: 5,
     fontSize: 12,
     color: "red",
+    opacity: 0.8,
+    alignSelf: "flex-end",
   },
 });
 

@@ -1,6 +1,13 @@
 import { styles } from "./style";
 import React, { useState } from "react";
-import { View, Text, ScrollView, Modal, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Modal,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import Logic from "./logic";
 import LottieView from "lottie-react-native";
 import Header from "../../components/Header";
@@ -112,16 +119,73 @@ const AiChatScreen = ({ navigation }) => {
               />
             </>
           ) : (
-            <View style={styles.resultContainer}>
-              <Text style={styles.resultText}>
-                Prediction: {state.prediction}
+            <View>
+              <Text
+                style={{
+                  fontSize: 20,
+                  marginTop: 20,
+                  color: "#16423C",
+                  textAlign: "center",
+                }}
+              >
+                It's recommended that you consult
               </Text>
-              <Text style={styles.resultText}>
-                Specialist: {state.specialist}
+              <Text
+                style={{
+                  fontSize: 20,
+                  marginBottom: 20,
+                  color: "#F08900",
+                  textAlign: "center",
+                }}
+              >
+                {state.specialist}
               </Text>
-              <TouchableOpacity onPress={() => setIsResultModalVisible(false)}>
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
+              <ScrollView
+                contentContainerStyle={{
+                  alignItems: "center",
+                }}
+              >
+                {state.doctors && state.doctors.length > 0 ? (
+                  state.doctors.map((doctor) => (
+                    <TouchableOpacity
+                      key={doctor._id || doctor.id}
+                      style={styles.doctorCard}
+                      onPress={() => {
+                        setIsResultModalVisible(false);
+                        navigation.navigate("DoctorProfile", { doctor });
+                      }}
+                    >
+                      <View style={styles.circleWrapper}>
+                        <View style={styles.circleOne}></View>
+                        <View style={styles.circleTwo}></View>
+                      </View>
+                      <Image
+                        source={
+                          doctor.doctorImage && doctor.doctorImage !== "null"
+                            ? { uri: doctor.doctorImage }
+                            : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
+                        }
+                        style={styles.doctorImage}
+                      />
+                      <View style={styles.doctorInfo}>
+                        <Text style={styles.doctorName}>
+                          {doctor.doctorName || "Dr. Unknown"}
+                        </Text>
+                        <Text style={styles.doctorSpecialization}>
+                          {doctor.field || "General"}
+                        </Text>
+                        <Text style={styles.doctorSpecialization}>
+                          {doctor.clinic && doctor.clinic.length > 0
+                            ? doctor.clinic[0].clinicArea
+                            : "Clinic Area Not Available"}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <Text style={styles.noDataText}>No doctors available</Text>
+                )}
+              </ScrollView>
             </View>
           )}
         </View>

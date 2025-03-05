@@ -33,7 +33,7 @@ const headerStyles = StyleSheet.create({
     zIndex: 1,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     flex: 1,
     textAlign: "center",

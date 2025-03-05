@@ -10,43 +10,41 @@ export const patientLogin = (payload, onSuccess, onError, onComplete) => {
     .then(onSuccess)
     .catch((error) => {
       // Extract the error message
-      const errorMessage =
-        error.data?.[0] || "An error occurred"; // Access the first item in the data array
+      const errorMessage = error.data?.[0] || "An error occurred"; // Access the first item in the data array
       onError(errorMessage); // Pass the string message to onError
     })
     .finally(onComplete);
 };
 export const patientRegister = (payload, onSuccess, onError, onComplete) => {
-  $axios.post(
-    "/patientsAuth/patientRegister",
-    {
+  $axios
+    .post("/patientsAuth/patientRegister", {
       userName: payload.userName,
       userPhone: payload.userPhone,
       userEmail: payload.userEmail,
       userPassword: payload.userPassword,
+      medicalRecord: {
+        bloodType: payload.medicalRecord.bloodType,
+      },
       personalRecords: {
         City: payload.personalRecords.City,
         Area: payload.personalRecords.Area,
         userWeight: payload.personalRecords.userWeight,
         userHeight: payload.personalRecords.userHeight,
         DateOfBirth: payload.personalRecords.DateOfBirth,
-        emergencyContact: payload.personalRecords.emergencyContact,
-        workName: payload.personalRecords.workName,
-        workPlace: payload.personalRecords.workPlace,
-        childrenNumber: payload.personalRecords.childrenNumber,
-        birthDateOfFirstChild: payload.personalRecords.birthDateOfFirstChild,
-        smoking: payload.personalRecords.smoking,
-        alcohol: payload.personalRecords.alcohol,
-        wifesNumber: payload.personalRecords.wifesNumber,
-        petsTypes: payload.personalRecords.petsTypes,
-        familyStatus: payload.personalRecords.familyStatus,
         Gender: payload.personalRecords.Gender,
       },
-    },
-    onSuccess,
-    onError,
-    onComplete
-  );
+    })
+    .then((res) => {
+      onSuccess(res);
+    })
+    .catch((error) => {
+      const errorMessage =
+        error.response?.data?.[0] || error.message || "An error occurred";
+      onError(errorMessage);
+    })
+    .finally(() => {
+      if (onComplete) onComplete();
+    });
 };
 export const forgotPassword = (payload, onSuccess, onError, onComplete) => {
   $axios.post(
@@ -82,39 +80,38 @@ export const resetPassword = (payload, onSuccess, onError, onComplete) => {
   );
 };
 export const updatePatient = (id, payload, onSuccess, onError, onComplete) => {
-
   const requestData = {
     userName: payload.userName,
     userEmail: payload.userEmail,
     userPhone: payload.userPhone,
     personalRecords: {
-      userHeight: parseInt(payload.personalRecords?.userHeight || '0'),
-      userWeight: parseInt(payload.personalRecords?.userWeight || '0'),
-      DateOfBirth: payload.personalRecords?.DateOfBirth || '',
-      Gender: payload.personalRecords?.Gender || '',
-      City: payload.personalRecords?.City || '',
-      Area: payload.personalRecords?.Area || ''
+      userHeight: parseInt(payload.personalRecords?.userHeight || "0"),
+      userWeight: parseInt(payload.personalRecords?.userWeight || "0"),
+      DateOfBirth: payload.personalRecords?.DateOfBirth || "",
+      Gender: payload.personalRecords?.Gender || "",
+      City: payload.personalRecords?.City || "",
+      Area: payload.personalRecords?.Area || "",
     },
     medicalRecord: {
-      bloodType: payload.medicalRecord?.bloodType || ''
-    }
+      bloodType: payload.medicalRecord?.bloodType || "",
+    },
   };
 
   $axios
     .patch(`/patientsAuth/${id}`, requestData)
     .then((response) => {
       if (response.data && response.data.data === "Updated Successfulyy") {
-        $axios.get(`/patientsAuth/${id}`)
+        $axios
+          .get(`/patientsAuth/${id}`)
           .then((userResponse) => {
             onSuccess({
               data: {
                 ...userResponse.data,
-                id: id
-              }
+                id: id,
+              },
             });
           })
           .catch(() => {
-
             onSuccess(response);
           });
       } else {
@@ -122,7 +119,10 @@ export const updatePatient = (id, payload, onSuccess, onError, onComplete) => {
       }
     })
     .catch((error) => {
-      const errorMessage = error.response?.data?.message || error.message || "An error occurred during update";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred during update";
       onError(errorMessage);
     })
     .finally(() => {

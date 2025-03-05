@@ -1,25 +1,9 @@
-import {
-  useContext,
-  useEffect,
-  useReducer,
-  useCallback,
-  useState,
-} from "react";
-import { reducer } from "../../reducers/reducer";
-import { INITIAL_STATE } from "./constant";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  AUTHENTICATION_TOKEN,
-  USERINFO,
-} from "../../helpers/constants/staticKeys";
-import { Context } from "../../contexts/appContext";
-import ACTION_TYPES from "../../reducers/actionTypes";
-import { patientLogin, patientRegister } from "../../service/AuthServices";
+import { useReducer } from "react";
 import { ToastManager } from "../../helpers/ToastManager";
-import { useRef } from "react";
-import { Animated } from "react-native";
-import { BackHandler } from "react-native";
-import { Dimensions } from "react-native";
+import ACTION_TYPES from "../../reducers/actionTypes";
+import { reducer } from "../../reducers/reducer";
+import { patientRegister } from "../../service/AuthServices";
+import { INITIAL_STATE } from "./constant";
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
@@ -28,62 +12,6 @@ const Logic = (navigation) => {
   };
 
   const handleRegister = () => {
-    let isValid = true;
-    let validationText = "";
-    // Validate form data
-    if (state.formData.userName.trim() === "") {
-      validationText = "Name is required";
-      isValid = false;
-    } else if (
-      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
-        state.formData.userEmail
-      )
-    ) {
-      validationText = "Invalid email format";
-      isValid = false;
-    } else if (state.formData.userPassword.length < 8) {
-      validationText = "Password must be at least 8 characters";
-      isValid = false;
-    } else if (state.formData.userPhone.trim() === "") {
-      validationText = "Phone number is required";
-      isValid = false;
-    } else if (state.formData.personalRecords.City.trim() === "") {
-      validationText = "City is required";
-      isValid = false;
-    } else if (state.formData.personalRecords.Area.trim() === "") {
-      validationText = "Area is required";
-      isValid = false;
-    } else if (
-      isNaN(state.formData.personalRecords.userWeight) ||
-      state.formData.personalRecords.userWeight <= 0
-    ) {
-      validationText = "Weight must be a positive number";
-      isValid = false;
-    } else if (
-      isNaN(state.formData.personalRecords.userHeight) ||
-      state.formData.personalRecords.userHeight <= 0
-    ) {
-      validationText = "Height must be a positive number";
-      isValid = false;
-    } else if (state.formData.personalRecords.emergencyContact.trim() === "") {
-      validationText = "Emergency contact is required";
-      isValid = false;
-    }
-
-    // // If invalid, update state and show validation error
-    // if (!isValid) {
-    //   updateState([
-    //     {
-    //       type: ACTION_TYPES.UPDATE_PROP,
-    //       prop: `formData.validationText`,
-    //       value: validationText,
-    //     },
-    //   ]);
-    //   ToastManager.notify(validationText, { type: "error" });
-    //   return;
-    // }
-
-    // If valid, proceed with registration
     patientRegister(
       state.formData,
       (res) => {
@@ -99,113 +27,11 @@ const Logic = (navigation) => {
             type: "error",
           });
         }
-        const errorMessages = error.reduce((acc, message) => {
-          if (message.includes("Name")) {
-            acc.userNameValidationText = message;
-          } else if (message.includes("Password")) {
-            acc.userPasswordValidationText = message;
-          } else if (message.includes("Email")) {
-            acc.userEmailValidationText = message;
-          } // Handle all error messages...
-          return acc;
-        }, {});
-        updateState([
-          {
-            type: ACTION_TYPES.UPDATE_PROP,
-            prop: "formData",
-            value: {
-              ...state.formData,
-              ...errorMessages,
-            },
-          },
-        ]);
-        ToastManager.notify("Please fix the errors before proceeding.", {
-          type: "error",
-        });
       }
     );
   };
-
-  const progressBarWidth = useRef(
-    new Animated.Value((state.step / 5) * 100)
-  ).current;
-  const slideAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(progressBarWidth, {
-      toValue: (state.step / 5) * 100,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
-  }, [state.step]);
-
-  const handleNext = () => {
-    Animated.timing(slideAnim, {
-      toValue: -Dimensions.get("window").width,
-      duration: 300,
-      useNativeDriver: true,
-    }).start(() => {
-      updateState([
-        {
-          type: ACTION_TYPES.UPDATE_PROP,
-          prop: "step",
-          value: state.step + 1,
-        },
-      ]);
-      slideAnim.setValue(Dimensions.get("window").width);
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    });
-  };
-
-  const handleBack = () => {
-    if (state.step === 1) {
-      return;
-    }
-    Animated.timing(slideAnim, {
-      toValue: Dimensions.get("window").width,
-      duration: 300,
-      useNativeDriver: true,
-    }).start(() => {
-      updateState([
-        {
-          type: ACTION_TYPES.UPDATE_PROP,
-          prop: "step",
-          value: state.step - 1,
-        },
-      ]);
-      slideAnim.setValue(-Dimensions.get("window").width);
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    });
-  };
-
-  useEffect(() => {
-    const backAction = () => {
-      if (state.step > 1) {
-        handleBack();
-        return true;
-      }
-      return false;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-
-    return () => backHandler.remove();
-  }, [state.step]);
 
   const handleChange = (field, value) => {
-    const fieldParts = field.split(".");
-    // Update state with the new value and validation text
     updateState([
       {
         type: ACTION_TYPES.UPDATE_PROP,
@@ -243,36 +69,13 @@ const Logic = (navigation) => {
       },
     ]);
   };
-  const handleDateOfFirstChildConfirm = (selectedDate) => {
-    const formattedDate = selectedDate.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
-
-    updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: "formData.personalRecords.birthDateOfFirstChild",
-        value: formattedDate,
-      },
-    ]);
-    updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: "isDateOfChildPickerVisible",
-        value: false,
-      },
-    ]);
-  };
 
   return {
     state,
     updateState,
-    handleNext,
-    handleBack,
     handleChange,
     togglePasswordVisibility,
     handleDateOfBirthConfirm,
-    handleDateOfFirstChildConfirm,
-    progressBarWidth,
-    slideAnim,
     handleRegister,
   };
 };
