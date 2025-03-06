@@ -1,6 +1,5 @@
 import { styles } from "./style";
 import React, { useEffect, useRef, useState } from "react";
-import Icon from "react-native-vector-icons/FontAwesome";
 import {
   View,
   Text,
@@ -18,10 +17,10 @@ import TypeWriterEffect from "react-native-typewriter-effect";
 import TypeWriter from "react-native-typewriter";
 import MenuButton from "../../components/menuButton";
 import StepCounter from "../../service/stepCounter";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Home = ({ navigation }) => {
-  const { state, updateState, handlePress } = Logic(navigation);
-  const [activeIcon, setActiveIcon] = useState(null);
+  const { state, updateState } = Logic(navigation);
   const translateY = useRef(new Animated.Value(0)).current;
   const translateX = useRef(new Animated.Value(0)).current;
 
@@ -84,7 +83,15 @@ const Home = ({ navigation }) => {
       <ScrollView style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>Hi, {state.userName || "User"}</Text>
+          <View style={styles.headerTop}>
+            <TouchableOpacity 
+              style={styles.menuButton}
+              onPress={() => navigation.openDrawer()}
+            >
+              <Icon name="navicon" size={24} color="#000" />
+            </TouchableOpacity>
+            <Text style={styles.greeting}>Hi, {state.userName || "User"}</Text>
+          </View>
           <Text style={styles.subGreeting}>How are you feeling today!</Text>
         </View>
 
@@ -132,9 +139,9 @@ const Home = ({ navigation }) => {
 
         {/* Services Section */}
         <View style={styles.servicesSection}>
-  <Text style={styles.sectionTitle}>Health Tracking</Text>
-  <StepCounter />
-</View>
+          <Text style={styles.sectionTitle}>Health Tracking</Text>
+          <StepCounter />
+        </View>
 
         {/* Doctor Cards (Horizontal Scroll) */}
         <View style={styles.doctorSection}>
@@ -191,28 +198,6 @@ const Home = ({ navigation }) => {
           </ScrollView>
         </View>
       </ScrollView>
-
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        {["gear", "envelope", "home", "clipboard", "user"].map(
-          (icon, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.navButton,
-                state.activeIcon === icon && styles.activeButton,
-              ]}
-              onPress={() => handlePress(icon)}
-            >
-              <Icon
-                name={icon}
-                size={icon === "home" ? 40 : 27}
-                color={icon === "home" ? "#FD9B63" : "#ffffff"}
-              />
-            </TouchableOpacity>
-          )
-        )}
-      </View>
     </View>
   );
 };

@@ -1,11 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Animated } from 'react-native';
 import { ToastManager } from "../../helpers/ToastManager";
+import { appRate } from "../../service/rateServices";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { USERINFO, AUTHENTICATION_TOKEN } from "../../helpers/constants/staticKeys";
 
 const Logic = (navigation) => {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
+  const [userId, setUserId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const scaleAnim = new Animated.Value(1);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const userData = await AsyncStorage.getItem(USERINFO);
+        if (userData) {
+          const parsedData = JSON.parse(userData);
+          setUserId(parsedData.id);
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+        ToastManager.notify("Error fetching user information", { type: "error" });
+      }
+    };
+    fetchUserInfo();
+  }, []);
 
   const getRatingEmoji = (rating) => {
     switch (rating) {
@@ -46,14 +67,39 @@ const Logic = (navigation) => {
     setRating(starValue);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
     if (rating === 0) {
       ToastManager.notify("Please select a rating", { type: "error" });
       return;
     }
-    
-    ToastManager.notify("Thank you for your feedback!", { type: "success" });
-    navigation.goBack();
+
+    if (!userId) {
+      ToastManager.notify("User information not found", { type: "error" });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      appRate({
+        rating: rating,
+        comment: feedback
+      }, 
+      () => {
+        ToastManager.notify("Thank you for your feedback!", { type: "success" });
+        navigation.goBack();
+      },
+      (error) => {
+        ToastManager.notify(error, { type: "error" });
+        setIsSubmitting(false);
+      });
+    } catch (error) {
+      console.error('Error during rating submission:', error);
+      ToastManager.notify("Error submitting rating", { type: "error" });
+      setIsSubmitting(false);
+    }
   };
 
   return {
@@ -64,7 +110,8 @@ const Logic = (navigation) => {
     getRatingEmoji,
     getRatingLabel,
     handleStarPress,
-    handleSubmit
+    handleSubmit,
+    isSubmitting
   };
 };
 

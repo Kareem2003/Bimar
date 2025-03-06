@@ -20,7 +20,7 @@ const reducer = (state, action) => {
   }
 };
 
-const Logic = (navigation) => {
+const Logic = (navigation, route) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
   const updateState = (type, payload) => {
@@ -36,7 +36,7 @@ const Logic = (navigation) => {
       alert("This date is fully booked. Please choose another date.");
       return;
     }
-    navigation.navigate("NextScreen");
+    navigation.navigate("BookNow");
   };
 
   const handleBooking = (date) => {

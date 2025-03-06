@@ -64,7 +64,7 @@ const Logic = (navigation) => {
               AsyncStorage.setItem(USERINFO, JSON.stringify(res.data.patient)),
             ])
               .then(() => {
-                navigation.replace("HomeNav");
+                navigation.replace("MainApp");
               })
               .catch((error) => {
                 ToastManager.notify("Error storing credentials", {

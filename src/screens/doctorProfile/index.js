@@ -73,7 +73,7 @@ const DoctorProfile = ({ navigation, route }) => {
         buttonStyle={styles.bookButton}
         textStyle={{ color: "#FFFFFF", fontSize: 16, fontWeight: "bold" }}
         onPress={() => {
-          navigation.navigate("BookDate");
+          navigation.navigate("BookDate", { doctor });
         }}
       />
     </ScrollView>

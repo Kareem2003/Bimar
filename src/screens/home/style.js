@@ -17,9 +17,19 @@ export const styles = {
     paddingHorizontal: 20,
     paddingBottom: 10,
   },
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  menuButton: {
+    padding: 8,
+    marginRight: 15,
+  },
   greeting: {
     fontSize: 24,
     color: "#000",
+    flex: 1,
   },
   subGreeting: {
     fontSize: 16,

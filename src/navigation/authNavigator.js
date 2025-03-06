@@ -3,13 +3,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Splash from "../screens/splash";
 import Login from "../screens/login";
 import { createNavigationContainerRef } from "@react-navigation/native";
-import HomeNavigator from "./homeNavigator";
+import DrawerNavigator from "./drawerNavigator";
 import Register from "../screens/register";
 import ForgetPassword from "../screens/forgetPassword";
-import Profile from "../screens/profile";
-import Diagnos from "../screens/diagnos";
 
-// import { createNavigationContainerRef } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator();
 export const navigationRef = createNavigationContainerRef();
@@ -38,21 +35,10 @@ const AuthNavigator = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="profile"
-        component={Profile}
+        name="MainApp"
+        component={DrawerNavigator}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="diagnos"
-        component={Diagnos}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="HomeNav"
-        component={HomeNavigator}
-        options={{ headerShown: false }}
-      ></Stack.Screen>
-     
     </Stack.Navigator>
   );
 };

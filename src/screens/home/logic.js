@@ -27,35 +27,6 @@ const Logic = (navigation) => {
     ]);
   };
 
-  const handlePress = (iconName) => {
-    updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: "activeIcon",
-        value: iconName,
-      },
-    ]);
-
-    if (navigation) {
-      switch (iconName) {
-        case "gear":
-          navigation.navigate("Settings");
-          break;
-        case "envelope":
-          navigation.navigate("Messages");
-          break;
-        case "home":
-          navigation.navigate("Home");
-          break;
-        case "clipboard":
-          navigation.navigate("Appointments");
-          break;
-        case "user":
-          navigation.navigate("Profile");
-          break;
-      }
-    }
-  };
   const fetchDoctors = () => {
     updateState([
       {
@@ -115,11 +86,7 @@ const Logic = (navigation) => {
     fetchUserInfo();
   }, []);
 
-  return {
-    state,
-    updateState,
-    handlePress,
-  };
+  return { state, updateState };
 };
 
 export default Logic;

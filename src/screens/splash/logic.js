@@ -9,6 +9,7 @@ import {
 } from "../../helpers/constants/staticKeys";
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
+
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   const { updateState: updateCtxState } = useContext(Context);
@@ -16,6 +17,7 @@ const Logic = (navigation) => {
   const updateState = (payload) => {
     dispatch({ payload });
   };
+
   const checkAuth = useCallback(async () => {
     const authToken = await AsyncStorage.getItem(AUTHENTICATION_TOKEN);
     setTimeout(async () => {
@@ -35,16 +37,18 @@ const Logic = (navigation) => {
             },
           },
         ]);
-        navigation.reset({ index: 0, routes: [{ name: "HomeNav" }] });
+        navigation.reset({ index: 0, routes: [{ name: "MainApp" }] });
       } else {
         // Not authorized
         navigation.replace("Login");
       }
     }, 2000);
   }, [navigation, updateCtxState]);
+
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
   return { state, updateState };
 };
 

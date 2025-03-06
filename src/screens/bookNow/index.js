@@ -27,7 +27,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../../helpers/constants/staticKeys";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
-const BookNow = ({ navigation }) => {
+const BookNow = ({ navigation, route }) => {
   const { isDarkTheme } = useContext(ThemeContext);
   const { state, updateState, handleNext, handleBack, maritalStatus } =
     Logic(navigation);
@@ -60,7 +60,7 @@ const BookNow = ({ navigation }) => {
         <View style={styles.profile}>
           <Image
             style={styles.profileAvatar}
-            source={require("../../assets/images/doctor.png")}
+            source={require("../../assets/images/WhatsApp Image 2023-07-23 at 15.23.54.jpg")}
           />
         </View>
       </View>
@@ -95,7 +95,12 @@ const BookNow = ({ navigation }) => {
         </View>
       </View>
       <View style={{ margin: 'auto' }}>
-        <AppButton title="Book Now"  onPress={() => {}} />
+        <AppButton 
+          title="Book Now" 
+          onPress={() => {
+            navigation.navigate("BookDate");
+          }} 
+        />
       </View>
     </View>
   );

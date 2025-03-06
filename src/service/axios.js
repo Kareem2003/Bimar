@@ -33,12 +33,16 @@ export const $securedAxios = axios.create({
   baseURL: BASE_URL,
   headers: getCommonHeaders(),
   timeout: 10000, // 10 seconds timeout
+  withCredentials: true, // Enable sending cookies
 });
 
 const requestHandler = async (request) => {
   const authToken = await AsyncStorage.getItem(AUTHENTICATION_TOKEN);
   if (authToken) {
+    // Set token in both cookie and Authorization header
     request.headers.Authorization = `Bearer ${authToken}`;
+    // Add cookie header
+    request.headers.Cookie = `jwt=${authToken}`;
   }
   return request;
 };
