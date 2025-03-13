@@ -37,7 +37,6 @@ const Logic = (navigation) => {
       });
       return;
     }
-
     dispatch({
       payload: [
         {
@@ -57,6 +56,7 @@ const Logic = (navigation) => {
           });
           const cookies = res.headers["set-cookie"];
           const token = extractTokenFromCookies(cookies);
+          console.log("Login Success:", cookies);
           // Store token in AsyncStorage using Promise chain
           if (token) {
             Promise.all([
@@ -72,6 +72,7 @@ const Logic = (navigation) => {
                 });
               });
           }
+          
         } else {
           ToastManager.notify("Login Failed!", {
             type: "error",
