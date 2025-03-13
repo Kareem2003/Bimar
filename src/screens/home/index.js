@@ -77,6 +77,7 @@ const Home = ({ navigation }) => {
       wiggleAnimation.stop();
     };
   }, [translateY, translateX]);
+  
 
   return (
     <View style={styles.container}>

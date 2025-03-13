@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { styles } from "./style";
@@ -7,7 +7,14 @@ import AppButton from "../../components/AppButton";
 
 const DoctorProfile = ({ navigation, route }) => {
   const doctor = route.params.doctor;
-  const { state } = Logic(navigation);
+  const { state, sendSelectedDateToDB } = Logic(navigation); // Get function from Logic
+  const [selectedDate, setSelectedDate] = useState(null); // Fix useState
+
+  const handleDateSelection = (date) => {
+    setSelectedDate(date); // Store the formatted date in YYYY-MM-DD format
+    console.log("Selected Date: ", date);
+  };
+
 
   return (
     <ScrollView style={styles.container}>
@@ -52,19 +59,53 @@ const DoctorProfile = ({ navigation, route }) => {
           {doctor.doctorName ? `Dr. ${doctor.doctorName}` : "The doctor"} is a
           top specialist at{" "}
           {doctor.clinic?.[0]?.clinicName || "London Bridge Hospital"}. He has
-          achieved several awards and recognition for is contribution and
-          service in his own field. He is available for private consultation.
+          achieved several awards and recognition
         </Text>
       </View>
 
       {/* Working Time Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Working Time</Text>
-        {doctor.clinic[0].clinicWorkDays.map((workDay, index) => (
-          <Text key={index} style={styles.workingTime}>
-            {workDay.day}: {workDay.workingHours}
-          </Text>
-        ))}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {doctor.clinic?.[0]?.clinicWorkDays?.map((workDay, index) => {
+            const today = new Date();
+            const daysOfWeek = [
+              "Sunday",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+            ];
+            const workDayIndex = daysOfWeek.indexOf(workDay.day);
+
+            // Find the next occurrence of the selected workday
+            let actualDate = new Date(today);
+            actualDate.setDate(
+              today.getDate() + ((workDayIndex - today.getDay() + 7) % 7)
+            );
+
+            // Convert to "YYYY-MM-DD" format
+            const formattedDate = actualDate.toISOString().split("T")[0];
+
+            return (
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleDateSelection(formattedDate)}
+                style={[
+                  styles.workDayCard,
+                  selectedDate === formattedDate && styles.activeWorkDayCard,
+                ]}
+              >
+                <Text style={styles.workDayText}>{workDay.day}</Text>
+                <Text style={styles.workHoursText}>{workDay.workingHours}</Text>
+                <Text style={styles.dateText}>{formattedDate}</Text>
+                {/* Display actual date */}
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
 
       {/* Book Now Button */}
@@ -73,7 +114,13 @@ const DoctorProfile = ({ navigation, route }) => {
         buttonStyle={styles.bookButton}
         textStyle={{ color: "#FFFFFF", fontSize: 16, fontWeight: "bold" }}
         onPress={() => {
-          navigation.navigate("BookDate", { doctor });
+          if (!selectedDate) {
+            alert("Please select a date first!");
+            return;
+          }
+          sendSelectedDateToDB(doctor._id, doctor.clinic[0]._id, selectedDate);
+
+          navigation.navigate("BookDate", { doctor, selectedDate });
         }}
       />
     </ScrollView>

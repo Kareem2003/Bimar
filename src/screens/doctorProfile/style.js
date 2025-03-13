@@ -62,28 +62,48 @@ export const styles = StyleSheet.create({
   },
   section: {
     padding: 16,
-    marginTop: 7,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   aboutText: {
     fontSize: 14,
     lineHeight: 24,
   },
-  workingTime: {
-    fontSize: 14,
-    color: '#666',
+  workDayCard: {
+    backgroundColor: "#C4DAD2",
+    borderRadius: 10,
+    padding: 10,
+    width: 150,
+    alignItems: "center",
+    marginHorizontal: 5,
   },
+  workDayText: {
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  workHoursText: {
+    color: "black",
+    fontSize: 13,
+    marginVertical: 10,
+  },
+  activeWorkDayCard: {
+    backgroundColor: "white",
+  },
+  dateText: {
+    color: "#FD9B63",
+    fontSize: 13,
+    fontWeight: "bold",
+  },  
   bookButton: {
     backgroundColor: '#16423C',
-    margin: 16,
     paddingVertical: 16,
     borderRadius: 20,
     alignSelf: 'center',
     width: '60%',
-    marginTop: 20,
+    marginTop: 10,
   },
 });
