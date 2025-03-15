@@ -273,4 +273,207 @@ export const styles = {
     color: "#FFF",
     fontSize: 16,
   },
+  medicationSection: {
+    paddingHorizontal: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#333",
+  },
+  timelineScrollContainer: {
+    paddingVertical: 20,
+  },
+  timelineHours: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    height: 150,
+    position: "relative",
+  },
+  hourContainer: {
+    width: 100,
+    alignItems: "center",
+  },
+  hourText: {
+    fontSize: 11,
+    color: "#666",
+    marginBottom: 5,
+  },
+  timelineLine: {
+    width: "100%",
+    height: 4,
+    backgroundColor: "#008000",
+    marginTop: 10,
+  },
+  medicationCircles: {
+    position: "absolute",
+    top: 50,
+    left: 50,
+    right: 0,
+    height: 150,
+  },
+  medicationCircleContainer: {
+    position: "absolute",
+    alignItems: "center",
+    width: 40, // Fixed width to match the circle size
+  },
+  medicationCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  checkMarkOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(76, 175, 80, 0.8)",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  expandedDetails: {
+    position: "absolute",
+    top: 45, // Position below the circle
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    width: 120,
+    alignItems: "center",
+    marginLeft: -40, // Center the expanded details under the circle
+    zIndex: 9999,
+  },
+  expandedName: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  expandedDose: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 4,
+  },
+  expandedTime: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 8,
+  },
+  takeButton: {
+    backgroundColor: "#16423C",
+    padding: 6,
+    borderRadius: 15,
+    alignItems: "center",
+  },
+  takenButton: {
+    backgroundColor: "#4CAF50",
+  },
+  takeButtonText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  circleImage: {
+    width: 30,
+    height: 30,
+    resizeMode: "contain",
+  },
+  timeLabel: {
+    position: "absolute",
+    bottom: -20,
+    fontSize: 10,
+    color: "#666",
+  },
+  medicationDetailsCard: {
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 15,
+    marginTop: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  detailsImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginBottom: 10,
+  },
+  detailsName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  detailsDose: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 5,
+  },
+  detailsTaken: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 5,
+  },
+  detailsTime: {
+    fontSize: 14,
+    color: "#666",
+  },
+  currentTimeIndicator: {
+    position: "absolute",
+    top: 0,
+    height: "100%",
+    alignItems: "center",
+    zIndex: 2,
+    elevation: 3, // For Android
+  },
+  timeIndicatorLine: {
+    position: "absolute",
+    top: 30, // Adjust based on your timeline layout
+    width: 2,
+    height: "100%",
+    backgroundColor: "#FD9B63",
+  },
+  timeIndicatorDot: {
+    position: "absolute",
+    top: 28, // Adjust to align with timeline
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#FD9B63",
+  },
+  currentTimeText: {
+    position: "absolute",
+    top: 8,
+    backgroundColor: "#FD9B63",
+    color: "#fff",
+    padding: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    fontSize: 11,
+    fontWeight: "bold",
+  },
 };
