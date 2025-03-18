@@ -5,7 +5,7 @@ import { softPurpleColor, primaryColor, secondaryColor, textColor, backgroundCol
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { USERINFO } from '../helpers/constants/staticKeys';
+import { AUTHENTICATION_TOKEN, USERINFO } from '../helpers/constants/staticKeys';
 
 const Drawer = createDrawerNavigator();
 
