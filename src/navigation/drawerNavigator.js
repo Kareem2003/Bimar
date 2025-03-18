@@ -94,6 +94,13 @@ const CustomDrawerContent = (props) => {
           <Text style={[styles.drawerItemText, activeRoute === 'Appointments' && styles.activeDrawerItemText]}>Appointments</Text>
         </TouchableOpacity>
         <TouchableOpacity 
+          style={[styles.drawerItem, activeRoute === 'MyDiagnoses' && styles.activeDrawerItem]} 
+          onPress={() => handleNavigation('MyDiagnoses')}
+        >
+          <Icon name="medkit" size={20} color={activeRoute === 'MyDiagnoses' ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, activeRoute === 'MyDiagnoses' && styles.activeDrawerItemText]}>My Diagnoses</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
           style={[styles.drawerItem, activeRoute === 'Settings' && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('Settings')}
         >
@@ -106,13 +113,6 @@ const CustomDrawerContent = (props) => {
         >
           <Icon name="stethoscope" size={20} color={activeRoute === 'Doctors' ? softPurpleColor : '#666'} />
           <Text style={[styles.drawerItemText, activeRoute === 'Doctors' && styles.activeDrawerItemText]}>Doctors</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.drawerItem, activeRoute === 'Diagnos' && styles.activeDrawerItem]} 
-          onPress={() => handleNavigation('Diagnos')}
-        >
-          <Icon name="heartbeat" size={20} color={activeRoute === 'Diagnos' ? softPurpleColor : '#666'} />
-          <Text style={[styles.drawerItemText, activeRoute === 'Diagnos' && styles.activeDrawerItemText]}>Diagnos</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={[styles.drawerItem, activeRoute === 'Terms' && styles.activeDrawerItem]} 

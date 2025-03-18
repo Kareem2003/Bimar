@@ -20,6 +20,10 @@ import Diagnos from "../screens/diagnos";
 import BookDate from "../screens/bookDate";
 import BookNow from "../screens/bookNow";
 import Icon from "react-native-vector-icons/Ionicons";
+import Prescription from "../screens/prescription"
+import TestingResult from "../screens/testingResult"
+import Xray from "../screens/xRay"
+import MyDiagnoses from "../screens/allDiagnos"
 
 const Stack = createNativeStackNavigator();
 const HomeNavigator = () => {
@@ -48,6 +52,10 @@ const HomeNavigator = () => {
       <Stack.Screen name="BookNow" component={BookNow} />
       <Stack.Screen name="DoctorProfile" component={DoctorProfile} />
       <Stack.Screen name="login" component={AuthNavigator} />
+      <Stack.Screen name="Prescription" component={Prescription} />
+      <Stack.Screen name="TestingResult" component={TestingResult} />
+      <Stack.Screen name="Xray" component={Xray} />
+      <Stack.Screen name="MyDiagnoses" component={MyDiagnoses} />
     </Stack.Navigator>
   );
 };

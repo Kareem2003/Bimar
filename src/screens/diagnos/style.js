@@ -1,7 +1,8 @@
-import { Dimensions } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 import { primary } from "../../styles/colors";
 import Diagnos from ".";
-export const styles = {
+
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#E9EFEC",
@@ -62,7 +63,7 @@ export const styles = {
     paddingHorizontal: 10,
   },
   DiagnosCard: {
-    
+    backgroundColor: "#FFF",
     margin: "auto",
     marginBottom: 15,
     borderRadius: 12,
@@ -72,6 +73,7 @@ export const styles = {
     width: "95%",
     height: 100,
     overflow: "hidden",
+    elevation: 3,
   },
   AttechmentCard: {
     backgroundColor: "#FFF",
@@ -121,27 +123,27 @@ export const styles = {
   attechmentImage: {
     position: "absolute",
     margin: 30,
-    
   },
   doctorImage: {
-    position: "absolute",
     width: 80,
     height: 80,
+    borderRadius: 40,
+    marginRight: 15,
   },
   doctorInfo: {
-    justifyContent: "center",
     flex: 1,
-    paddingLeft: 70,
+    marginLeft: 70,
   },
   doctorName: {
-    fontSize: 14,
-    
+    fontSize: 16,
+    fontWeight: "bold",
     color: "#333",
-    marginBottom: 5,
+    marginBottom: 4,
   },
   doctorSpecialization: {
     fontSize: 14,
-    color: "#333",
+    color: "#666",
+    marginBottom: 4,
   },
   bottomNav: {
     flexDirection: "row",
@@ -195,5 +197,132 @@ closeButtonText: {
   color: "#FFF",
   fontSize: 16,
 },
+cardScroll: {
+  flexGrow: 0,
+},
+headerTitle: {
+  fontSize: 18,
+  fontWeight: "bold",
+  flex: 1,
+  textAlign: "center",
+  marginRight: 40,
+},
+  
+section: {
+  marginVertical: 10,
+  paddingHorizontal: 20,
+},
+  
+sectionLabel: {
+  fontSize: 16,
+  color: "#FD9B63",
+  marginBottom: 10,
+  fontWeight: "500",
+},
 
-};
+notesContainer: {
+  backgroundColor: "white",
+  borderStyle: "dashed",
+  borderWidth: 2,
+  borderColor: "#16423C",
+  borderRadius: 12,
+  padding: 15,
+  minHeight: 150,
+  maxHeight: 250,
+},
+
+notesText: {
+  fontSize: 14,
+  color: "#333",
+  lineHeight: 20,
+},
+
+attachmentCard: {
+  backgroundColor: "white",
+  flexDirection: "row",
+  alignItems: "center",
+  padding: 15,
+  borderRadius: 12,
+  marginBottom: 10,
+  elevation: 2,
+},
+
+attachmentIcon: {
+  margin: 15,
+},
+
+attachmentInfo: {
+  flex: 1,
+},
+
+attachmentType: {
+  fontSize: 16,
+  fontWeight: "500",
+  color: "#333",
+},
+
+attachmentName: {
+  fontSize: 14,
+  color: "#666",
+  marginTop: 2,
+},
+
+attachmentTime: {
+  fontSize: 12,
+  color: "#999",
+  marginTop: 2,
+},
+
+dateTime: {
+  fontSize: 12,
+  color: "#777777",
+},
+
+// New styles for bottom buttons
+bottomButtonsContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingBottom: 20,
+},
+
+bottomButtonsRow: {
+  position: 'absolute',
+  bottom: 25,
+  left: 0,
+  right: 0,
+  flexDirection: 'row',
+  paddingHorizontal: 20,
+  justifyContent: 'space-between',
+},
+
+actionButton: {
+  backgroundColor: '#16423C',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: 16,
+  borderRadius: 20,
+  width: '48%',
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  elevation: 5,
+},
+
+chatButton: {
+  backgroundColor: '#FD9B63',
+},
+
+actionButtonText: {
+  color: '#FFFFFF',
+  fontSize: 16,
+  fontWeight: 'bold',
+  marginLeft: 8,
+},
+
+scrollContainer: {
+  flex: 1,
+}
+});

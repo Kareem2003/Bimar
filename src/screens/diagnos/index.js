@@ -1,182 +1,168 @@
 import { styles } from "./style";
 import React, { useState } from "react";
-// import Icon from "react-native-vector-icons/FontAwesome";
 import Icon from "react-native-vector-icons/Ionicons";
 import {
   View,
   Text,
   TextInput,
-  styleSheet,
+  StyleSheet,
   TouchableOpacity,
   Image,
   ScrollView,
+  FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { Button } from "react-native-paper";
 import AppButton from "../../components/AppButton";
 import AuthTitles from "../../components/AuthTitles";
 import Logic from "./logic";
 
-const Diagnos = ({ navigation }) => {
-  const [activeIcon, setActiveIcon] = useState(null); // State to track active icon
+const Diagnos = ({ navigation, route }) => {
+  const diagnosis = route.params?.diagnosis;
 
-  const handlePress = (iconName) => {
-    setActiveIcon(iconName); // Update the active icon
+  if (!diagnosis) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: "red" }}>No diagnosis data found</Text>
+      </View>
+    );
+  }
+
+  const handleBooking = () => {
+    // Navigate to doctor profile for booking
+    navigation.navigate("DoctorProfile", { 
+      doctor: {
+        id: diagnosis.doctorId,
+        name: diagnosis.doctorName,
+        specialization: diagnosis.specialization,
+        image: diagnosis.image
+      }
+    });
   };
 
-  const currentDiagnos = [
-    {
-      id: 1,
-      name: "DR. Mona",
-      specialization: "Consultation Eye",
-      image: require("../../assets/images/woman-doctor-wearing-lab-coat-with-stethoscope-isolated.png"),
-      attachment: 3,
-      time: "8:00 BM",
-      date: "24 jun 2024",
-    },
-  ];
-  const attachments = [
-    {
-      id: 1,
-      prescriptionName: "PDF",
-      time: "10:00 BM",
-      image: require("../../assets/images/pdf.png"),
-    },
-    {
-      id: 2,
-      prescriptionName: "Testing Result",
-      time: "7:00 BM",
-      image: require("../../assets/images/microscope.png"),
-    },
-    {
-      id: 3,
-      prescriptionName: "X-ray",
-      time: "9:00 AM",
-      image: require("../../assets/images/Xray.png"),
-    },
-    {
-      id: 4,
-      prescriptionName: "PDF",
-      time: "10:00 AM",
-      image: require("../../assets/images/pdf.png"),
-    },
-  ];
+  const handleUpload = () => {
+    // Navigate to upload screen
+    navigation.navigate("UploadFiles", { diagnosisId: diagnosis.id });
+  };
 
-  const [value, onChangeText] = React.useState("Useless Multiline Placeholder");
+  const handleChat = () => {
+    // Navigate to chat with the doctor
+    navigation.navigate("DoctorChat", {
+      doctorId: diagnosis.doctorId || diagnosis.id,
+      doctorName: diagnosis.doctorName,
+      doctorImage: diagnosis.image
+    });
+  };
+
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={{ fontWeight: "bold" }}>
-            {currentDiagnos.map((doctor) => doctor.specialization)}
+      <ScrollView style={styles.scrollContainer} contentContainerStyle={{paddingBottom: 120}}>
+        {/* Header with back button */}
+        <View style={[styles.header, { flexDirection: "row", alignItems: "center" }]}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ padding: 10 }}
+          >
+            <Icon name="chevron-back" size={24} color="#000" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>
+            {diagnosis.diagnosis || "Diagnosis Details"}
           </Text>
         </View>
 
-        {/* Diagons Section */}
+        {/* Doctor Card */}
         <View style={styles.doctorSection}>
-          <ScrollView vertical={true} style={styles.cardScroll}>
-            {currentDiagnos.map((doctor) => (
-              <TouchableOpacity key={doctor.id} style={styles.DiagnosCard}>
-                <Image source={doctor.image} style={styles.doctorImage} />
-
-                <View style={styles.doctorInfo}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  ></View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.doctorName}>{doctor.name}</Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={{ color: "#777777", fontSize: 12 }}>
-                      {doctor.time} - {doctor.date}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-
-            <Text style={{ color: "#FD9B63", marginLeft: 25 }}>
-              Doctor Notes
-            </Text>
-
-            <TextInput
-              backgroundColor="white"
-              multiline
-              editable
-              textAlignVertical="top"
-              onChangeText={(text) => onChangeText(text)}
-              value={value}
-              style={{
-                padding: 10,
-                width: "90%",
-                margin: "auto",
-                height: 250,
-                borderStyle: "dashed",
-                borderColor: "#16423C",
-                borderWidth: 2.5,
-                borderRadius: 12,
-              }}
+          <TouchableOpacity 
+            style={styles.DiagnosCard}
+            onPress={handleBooking}
+          >
+            <Image 
+              source={diagnosis.image} 
+              style={styles.doctorImage}
             />
-          </ScrollView>
+            <View style={styles.doctorInfo}>
+              <Text style={styles.doctorName}>{diagnosis.doctorName}</Text>
+              <Text style={styles.doctorSpecialization}>
+                {diagnosis.specialization}
+              </Text>
+              <Text style={styles.dateTime}>
+                {diagnosis.time} - {diagnosis.displayDate}
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
-        {/*Attachments Section */}
-        <View style={styles.doctorSection}>
-          <View style={styles.sectionTitle}>
-            <Text style={styles.sectionTitle}>
-              Attachments ({attachments.length})
+        {/* Treatment Plan */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Treatment Plan</Text>
+          <ScrollView 
+            style={styles.notesContainer}
+            nestedScrollEnabled={true}
+          >
+            <Text style={styles.notesText}>
+              {diagnosis.treatmentPlan || "No treatment plan available"}
             </Text>
-          </View>
-          <ScrollView vertical={true} style={styles.cardScroll}>
-            {attachments.map((a) => (
-              <TouchableOpacity key={a.id} style={styles.AttechmentCard}>
-                <Image source={a.image} style={styles.attechmentImage} />
-                <View style={styles.doctorInfo}>
-                  <Text style={{ fontSize: 14, marginTop: 30 }}>
-                    prescription
-                  </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={{ color: "#777777", fontSize: 12 }}>
-                      {a.prescriptionName}
-                    </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate("#")}>
-                      <Text style={{ fontSize: 20 }}> {">"} </Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <Text
-                    style={{
-                      color: "#777777",
-                      fontSize: 12,
-                      paddingBottom: 10,
-                    }}
-                  >
-                    {a.time}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
           </ScrollView>
         </View>
+
+        {/* Attachments */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>
+            Attachments ({diagnosis.attachments?.length || 0})
+          </Text>
+          {diagnosis.attachments?.map((attachment) => (
+            <TouchableOpacity 
+              key={attachment.id}
+              style={styles.attachmentCard}
+              onPress={() => navigation.navigate(
+                attachment.type === "X-ray" ? "XrayScreen" : 
+                attachment.type === "Lab Results" ? "TestingResultScreen" : 
+                "PrescriptionScreen", 
+                { 
+                  title: attachment.type,
+                  time: attachment.time,
+                  attachmentId: attachment.id 
+                }
+              )}
+            >
+              <Image 
+                source={attachment.image}
+                style={styles.attachmentIcon}
+              />
+              <View style={styles.attachmentInfo}>
+                <Text style={styles.attachmentType}>{attachment.type}</Text>
+                <Text style={styles.attachmentName}>
+                  {attachment.prescriptionName}
+                </Text>
+                <Text style={styles.attachmentTime}>{attachment.time}</Text>
+              </View>
+              <Icon name="chevron-forward" size={24} color="#666" />
+            </TouchableOpacity>
+          ))}
+        </View>
+        
+        {/* Add extra padding at bottom for buttons */}
+        <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* Bottom Buttons - Side by side */}
+      <View style={styles.bottomButtonsRow}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={handleUpload}
+        >
+          <Icon name="cloud-upload-outline" size={20} color="#FFF" />
+          <Text style={styles.actionButtonText}>Upload Files</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.actionButton, styles.chatButton]}
+          onPress={handleChat}
+        >
+          <Icon name="chatbox-outline" size={20} color="#FFF" />
+          <Text style={styles.actionButtonText}>Go to Chat</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

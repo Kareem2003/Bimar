@@ -19,6 +19,14 @@ import MyDiagnosis from "./src/screens/myDiagnosis";
 import Diagnos from "./src/screens/diagnos";
 import Doctors from "./src/screens/doctors";
 import DoctorProfile from "./src/screens/doctorProfile";
+import Prescription from './src/screens/prescription';
+import TestingResult from './src/screens/testingResult';
+import Xray from './src/screens/xRay';
+import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
+
+const Stack = createStackNavigator();
+
 const App = () => {
   return (
     <Provider>
