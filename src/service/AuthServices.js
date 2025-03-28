@@ -47,37 +47,51 @@ export const patientRegister = (payload, onSuccess, onError, onComplete) => {
     });
 };
 export const forgotPassword = (payload, onSuccess, onError, onComplete) => {
-  $axios.post(
-    "/patientsAuth/forgot-password",
-    {
+  $axios
+    .post("/patientsAuth/forgot-password", {
       userEmail: payload,
-    },
-    onSuccess,
-    onError,
-    onComplete
-  );
+    })
+    .then((response) => {
+      console.log(response);
+      onSuccess(response);
+    })
+    .catch((error) => {
+      console.error(error);
+      onError(error);
+    })
+    .finally(() => {
+      onComplete();
+    });
 };
 export const verifyOTP = (payload, onSuccess, onError, onComplete) => {
-  $axios.post(
-    "/patientsAuth/verify-otp",
-    {
+  $axios
+    .post("/patientsAuth/verify-otp", {
       otp: payload,
-    },
-    onSuccess,
-    onError,
-    onComplete
-  );
+    })
+    .then((response) => {
+      onSuccess(response);
+    })
+    .catch((error) => {
+      onError(error);
+    })
+    .finally(() => {
+      onComplete();
+    });
 };
 export const resetPassword = (payload, onSuccess, onError, onComplete) => {
-  $axios.post(
-    "/patientsAuth/reset-password",
-    {
+  $axios
+    .post("/patientsAuth/reset-password", {
       newPassword: payload,
-    },
-    onSuccess,
-    onError,
-    onComplete
-  );
+    })
+    .then((response) => {
+      onSuccess(response);
+    })
+    .catch((error) => {
+      onError(error);
+    })
+    .finally(() => {
+      onComplete();
+    });
 };
 export const updatePatient = (id, payload, onSuccess, onError, onComplete) => {
   const requestData = {

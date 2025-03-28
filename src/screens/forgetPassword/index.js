@@ -32,6 +32,7 @@ const ForgetPassword = ({ navigation }) => {
     handleVerifyOTP,
     handleUpdatePassword,
     updateFormData,
+    handleResendOTP,
   } = Logic(navigation);
 
   return (
@@ -83,20 +84,22 @@ const ForgetPassword = ({ navigation }) => {
           <View style={{ marginTop: 80 }}>
             <OTPInput onVerify={handleVerifyOTP} />
 
-            {/* <AppButton
+            <AppButton
               title="VERIFY CODE"
-              onPress={handleNext}
+              onPress={handleVerifyOTP}
               buttonStyle={{ marginTop: 40, margin: "auto" }}
-            /> */}
+            />
           </View>
 
           <View style={styles.linksContainer}>
-            <TouchableOpacity onPress={handleBack}>
-              <Text>
-                Haven’t got the email yet?
-                <Text style={styles.link}> RESEND</Text>
+            <View style={styles.linkRow}>
+              <Text style={styles.linkText}>
+                Haven't received an email yet?
               </Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={handleResendOTP}>
+                <Text style={styles.resendText}>RESEND</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       )}
@@ -156,11 +159,6 @@ const ForgetPassword = ({ navigation }) => {
           </View>
         </View>
       )}
-      <AppButton
-        title="BACK"
-        onPress={handleBack}
-        buttonStyle={{ width: 120 }}
-      />
     </View>
   );
 };

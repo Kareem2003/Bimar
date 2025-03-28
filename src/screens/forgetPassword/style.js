@@ -28,6 +28,7 @@ export const styles = {
   link: {
     color: "#F08900",
     marginVertical: 5,
+    marginLeft: 5,
   },
   img: {
     width: 55,
@@ -70,5 +71,11 @@ export const styles = {
   label: {
     margin: 10,
     marginTop: 5,
+  },
+  resendText: {
+    color: "#FD9B63",
+    fontWeight: "bold",
+    fontSize: 14,
+    textAlign: "center",
   },
 };

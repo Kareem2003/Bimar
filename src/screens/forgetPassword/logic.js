@@ -109,32 +109,26 @@ const Logic = (navigation) => {
       forgotPassword(
         state.formData.userEmail,
         (res) => {
-          if (res.data.status === "success") {
-            const cookies = res.headers["set-cookie"];
-            const otp = extractOtpFromCookies(cookies);
+          console.log(res);
+          const cookies = res.headers["set-cookie"];
+          const otp = extractOtpFromCookies(cookies);
 
-            if (otp) {
-              AsyncStorage.setItem(OTP, otp);
-              updateState([
-                {
-                  type: ACTION_TYPES.UPDATE_PROP,
-                  prop: "otpAsync",
-                  value: otp,
-                },
-              ]);
-              ToastManager.notify(
-                `OTP Sent To your Email ${state.formData.userEmail}`,
-                {
-                  type: "success",
-                }
-              );
+          console.log(cookies);
+
+          updateState([
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "otpAsync",
+              value: otp,
+            },
+          ]);
+          ToastManager.notify(
+            `OTP Sent To your Email ${state.formData.userEmail}`,
+            {
+              type: "success",
             }
-            handleNext();
-          } else {
-            ToastManager.notify("Unexpected response from server.", {
-              type: "error",
-            });
-          }
+          );
+          handleNext();
         },
         (error) => {
           const errorMessage = error.data || "An unknown error occurred"; // Default message if error.data is undefined
@@ -149,6 +143,39 @@ const Logic = (navigation) => {
         type: "error",
       });
     }
+  };
+  const handleResendOTP = () => {
+    forgotPassword(
+      state.formData.userEmail,
+      (res) => {
+        console.log(res);
+        const cookies = res.headers["set-cookie"];
+        const otp = extractOtpFromCookies(cookies);
+
+        console.log(cookies);
+
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "otpAsync",
+            value: otp,
+          },
+        ]);
+        ToastManager.notify(
+          `OTP Sent To your Email ${state.formData.userEmail}`,
+          {
+            type: "success",
+          }
+        );
+      },
+      (error) => {
+        const errorMessage = error.data || "An unknown error occurred"; // Default message if error.data is undefined
+        ToastManager.notify(errorMessage, {
+          type: "error",
+        });
+      },
+      () => {}
+    );
   };
 
   const handleVerifyOTP = (otp) => {
@@ -177,7 +204,6 @@ const Logic = (navigation) => {
   };
 
   const handleUpdatePassword = () => {
-
     if (state.formData.userPassword !== state.reEnterYourPassword) {
       ToastManager.notify("Passwords do not match. Please try again.", {
         type: "error",
@@ -230,6 +256,7 @@ const Logic = (navigation) => {
     handleUpdatePassword,
     handleVerifyOTP,
     updateFormData,
+    handleResendOTP,
   };
 };
 
