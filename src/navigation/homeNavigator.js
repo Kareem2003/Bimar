@@ -24,6 +24,7 @@ import Prescription from "../screens/prescription"
 import TestingResult from "../screens/testingResult"
 import Xray from "../screens/xRay"
 import MyDiagnoses from "../screens/allDiagnos"
+import withUserDataUpdates from "../helpers/withUserDataUpdates";
 
 const Stack = createNativeStackNavigator();
 const HomeNavigator = () => {
@@ -38,8 +39,16 @@ const HomeNavigator = () => {
         presentation: 'card',
         animation: 'slide_from_right',
       }}
+      id="HomeNavigator"
     >
-      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen 
+        name="Home" 
+        component={Home}
+        options={{
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+        }}
+      />
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="Settings" component={Settingsscreen} />
       <Stack.Screen name="Terms" component={Terms} />

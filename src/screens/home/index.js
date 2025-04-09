@@ -226,16 +226,15 @@ const Home = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.container}>
+      <ScrollView 
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <TouchableOpacity 
-              style={styles.menuButton}
-              onPress={() => navigation.openDrawer()}
-            >
-              <Icon name="navicon" size={24} color="#000" />
-            </TouchableOpacity>
+            <MenuButton navigation={navigation} />
             <Text style={styles.greeting}>Hi, {state.userName || "User"}</Text>
           </View>
           <Text style={styles.subGreeting}>How are you feeling today!</Text>

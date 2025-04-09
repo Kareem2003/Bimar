@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   View,
   Image,
@@ -29,7 +29,7 @@ import { GENDER_OPTIONS, BLOOD_TYPE_OPTIONS } from "./constant";
 
 const Profile = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const { state, updateState, handleNext, handleBack , handleSave } =
+  const { state, updateState, handleNext, handleBack, handleSave, handleImageSelect } =
     Logic(navigation);
 
   return (
@@ -52,6 +52,10 @@ const Profile = ({ navigation }) => {
                 <ProfilePicture
                   profileName={state.userName || ""}
                   profileHandle={state.userEmail || ""}
+                  profileImage={state.profileImage || ""}
+                  layout="row"
+                  clickable={false}
+                  size={60}
                 />
               </View>
 
@@ -60,9 +64,12 @@ const Profile = ({ navigation }) => {
                 onPress={handleNext}
                 buttonStyle={{
                   backgroundColor: primaryDark,
-                  marginLeft: 80,
+                  alignSelf: "flex-start",
                   width: 100,
                   height: 35,
+                  marginLeft: 100,
+                  marginTop: 5,
+                  marginBottom: 10,
                 }}
                 textStyle={{ color: "#fff", fontSize: 10 }}
               />
@@ -200,10 +207,15 @@ const Profile = ({ navigation }) => {
                     marginBlockStart: 0,
                   }}
                 >
-                  <ProfilePicture />
+                  <ProfilePicture
+                    profileImage={state.profileImage || ""}
+                    onImageChange={handleImageSelect}
+                    layout="center"
+                    clickable={true}
+                  />
                 </View>
               </View>
-              <Text style={{ fontSize: 20, marginBottom: 20 }}>Edit Profile</Text>
+              <Text style={{ fontSize: 20, marginBottom: 20, marginTop: -50 }}>Edit Profile</Text>
               <View>
                 <Text style={styles.label}>Name</Text>
                 <AppInput

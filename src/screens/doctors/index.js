@@ -12,6 +12,7 @@ import {
   Modal,
 } from "react-native";
 import Logic from "./logic";
+import { BASE_URL } from "../../helpers/constants/config";
 
 const Doctors = ({ navigation }) => {
   const { state, filterDoctors, searchDoctors } = Logic(navigation);
@@ -186,7 +187,7 @@ const Doctors = ({ navigation }) => {
               <Image
                 source={
                   doctor.doctorImage && doctor.doctorImage !== "null"
-                    ? { uri: doctor.doctorImage }
+                    ? { uri: `${BASE_URL}/${doctor.doctorImage}` }
                     : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
                 }
                 style={styles.doctorImage}

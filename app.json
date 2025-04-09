@@ -7,16 +7,38 @@
     "androidNavigationBar": {
       "visible": "immersive"
     },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to set your profile picture."
+        }
+      ]
+    ],
+    "permissions": [
+      "CAMERA",
+      "READ_EXTERNAL_STORAGE",
+      "WRITE_EXTERNAL_STORAGE",
+      "MEDIA_LIBRARY"
+    ],
     "ios": {
       "requireFullScreen": true,
       "infoPlist": {
         "NSHealthShareUsageDescription": "This app reads your step count data.",
-        "NSHealthUpdateUsageDescription": "This app updates your step count data."
+        "NSHealthUpdateUsageDescription": "This app updates your step count data.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload profile pictures.",
+        "NSCameraUsageDescription": "This app needs access to your camera to take profile pictures."
       },
       "usesHealthKit": true
     },
     "android": {
-      "package": "com.anonymous.Bimar"
+      "package": "com.anonymous.Bimar",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.MEDIA_LIBRARY"
+      ]
     }
   }
 }

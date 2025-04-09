@@ -6,27 +6,89 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { AUTHENTICATION_TOKEN, USERINFO } from '../helpers/constants/staticKeys';
+import { useNavigationState, useNavigation, useFocusEffect } from '@react-navigation/native';
+import { BASE_URL } from '../helpers/constants/config';
+import { subscribeToUserData, USER_DATA_EVENTS } from '../helpers/UserDataManager';
 
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => {
   const [userInfo, setUserInfo] = useState(null);
   const [activeRoute, setActiveRoute] = useState('Home');
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userData = await AsyncStorage.getItem(USERINFO);
-        if (userData) {
-          const parsedData = JSON.parse(userData);
-          console.log('User Info:', parsedData);
-          setUserInfo(parsedData);
+  const navigation = useNavigation();
+  
+  // Get the current route from navigation state
+  const state = useNavigationState(state => state);
+  
+  // Dynamically track active route
+  useFocusEffect(
+    React.useCallback(() => {
+      const getActiveRouteName = (state) => {
+        if (!state || !state.routes) return null;
+        const route = state.routes[state.index];
+  
+        if (route.state) {
+          return getActiveRouteName(route.state); // Recursively get the active route inside nested navigators
         }
-      } catch (error) {
-        console.error('Error fetching user info:', error);
+        return route.name;
+      };
+
+      const currentRoute = getActiveRouteName(state);
+      console.log('Active Route (useFocusEffect):', currentRoute);
+      
+      if (currentRoute && currentRoute !== 'HomeNavigator') {
+        setActiveRoute(currentRoute);
+      } else if (!currentRoute) {
+        // If no route is active, set Home as default
+        setActiveRoute('Home');
       }
-    };
+
+      // Refresh user info when drawer is focused
+      fetchUserInfo();
+    }, [state])
+  );
+
+  const fetchUserInfo = async () => {
+    try {
+      const userData = await AsyncStorage.getItem(USERINFO);
+      if (userData) {
+        const parsedData = JSON.parse(userData);
+        console.log('User Info:', parsedData);
+        setUserInfo(parsedData);
+      }
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  };
+  
+  // Subscribe to user data updates
+  useEffect(() => {
+    // Subscribe to profile updates
+    const profileUnsubscribe = subscribeToUserData(
+      USER_DATA_EVENTS.PROFILE_UPDATED, 
+      (updatedData) => {
+        console.log('Drawer received PROFILE_UPDATED event:', updatedData);
+        setUserInfo(updatedData);
+      }
+    );
+    
+    // Subscribe to image updates
+    const imageUnsubscribe = subscribeToUserData(
+      USER_DATA_EVENTS.IMAGE_UPDATED, 
+      (updatedData) => {
+        console.log('Drawer received IMAGE_UPDATED event:', updatedData);
+        setUserInfo(updatedData);
+      }
+    );
+    
+    // Load initial data
     fetchUserInfo();
+    
+    // Cleanup subscriptions on unmount
+    return () => {
+      profileUnsubscribe();
+      imageUnsubscribe();
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -42,8 +104,24 @@ const CustomDrawerContent = (props) => {
   };
 
   const handleNavigation = (routeName) => {
+    // Always update activeRoute when explicitly navigating
     setActiveRoute(routeName);
+    
+    // Navigate to the route
     props.navigation.navigate('HomeNavigator', { screen: routeName });
+  };
+
+  // Helper function to check if a route is active
+  const isRouteActive = (routeName) => {
+    // Special case for Home - it's active if explicitly selected or if no other route is active
+    if (routeName === 'Home') {
+      return activeRoute === 'Home' || (activeRoute !== 'Appointments' && 
+             activeRoute !== 'AiChatScreen' && activeRoute !== 'MyDiagnoses' && 
+             activeRoute !== 'Settings' && activeRoute !== 'Doctors' && 
+             activeRoute !== 'Terms' && activeRoute !== 'RateApp' && 
+             activeRoute !== 'Profile');
+    }
+    return activeRoute === routeName;
   };
 
   return (
@@ -57,7 +135,7 @@ const CustomDrawerContent = (props) => {
           <View style={styles.profileImageContainer}>
             {userInfo?.profileImage ? (
               <Image
-                source={{ uri: userInfo.profileImage }}
+                source={{ uri: `${BASE_URL}/${userInfo.profileImage}?t=${new Date().getTime()}` }}
                 style={styles.profileImage}
               />
             ) : (
@@ -73,60 +151,60 @@ const CustomDrawerContent = (props) => {
 
       <View style={styles.drawerContent}>
         <TouchableOpacity 
-          style={[styles.drawerItem, activeRoute === 'Home' && styles.activeDrawerItem]} 
+          style={[styles.drawerItem, isRouteActive('Home') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('Home')}
         >
-          <Icon name="home" size={20} color={activeRoute === 'Home' ? softPurpleColor : '#666'} />
-          <Text style={[styles.drawerItemText, activeRoute === 'Home' && styles.activeDrawerItemText]}>Home</Text>
+          <Icon name="home" size={20} color={isRouteActive('Home') ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, isRouteActive('Home') && styles.activeDrawerItemText]}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.drawerItem, activeRoute === 'AiChatScreen' && styles.activeDrawerItem]} 
+          style={[styles.drawerItem, isRouteActive('AiChatScreen') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('AiChatScreen')}
         >
-          <Icon name="envelope" size={20} color={activeRoute === 'AiChatScreen' ? softPurpleColor : '#666'} />
-          <Text style={[styles.drawerItemText, activeRoute === 'AiChatScreen' && styles.activeDrawerItemText]}>AI Chat</Text>
+          <Icon name="envelope" size={20} color={isRouteActive('AiChatScreen') ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, isRouteActive('AiChatScreen') && styles.activeDrawerItemText]}>AI Chat</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.drawerItem, activeRoute === 'Appointments' && styles.activeDrawerItem]} 
+          style={[styles.drawerItem, isRouteActive('Appointments') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('Appointments')}
         >
-          <Icon name="clipboard" size={20} color={activeRoute === 'Appointments' ? softPurpleColor : '#666'} />
-          <Text style={[styles.drawerItemText, activeRoute === 'Appointments' && styles.activeDrawerItemText]}>Appointments</Text>
+          <Icon name="clipboard" size={20} color={isRouteActive('Appointments') ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, isRouteActive('Appointments') && styles.activeDrawerItemText]}>Appointments</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.drawerItem, activeRoute === 'MyDiagnoses' && styles.activeDrawerItem]} 
+          style={[styles.drawerItem, isRouteActive('MyDiagnoses') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('MyDiagnoses')}
         >
-          <Icon name="medkit" size={20} color={activeRoute === 'MyDiagnoses' ? softPurpleColor : '#666'} />
-          <Text style={[styles.drawerItemText, activeRoute === 'MyDiagnoses' && styles.activeDrawerItemText]}>My Diagnoses</Text>
+          <Icon name="medkit" size={20} color={isRouteActive('MyDiagnoses') ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, isRouteActive('MyDiagnoses') && styles.activeDrawerItemText]}>My Diagnoses</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.drawerItem, activeRoute === 'Settings' && styles.activeDrawerItem]} 
+          style={[styles.drawerItem, isRouteActive('Settings') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('Settings')}
         >
-          <Icon name="gear" size={20} color={activeRoute === 'Settings' ? softPurpleColor : '#666'} />
-          <Text style={[styles.drawerItemText, activeRoute === 'Settings' && styles.activeDrawerItemText]}>Settings</Text>
+          <Icon name="gear" size={20} color={isRouteActive('Settings') ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, isRouteActive('Settings') && styles.activeDrawerItemText]}>Settings</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.drawerItem, activeRoute === 'Doctors' && styles.activeDrawerItem]} 
+          style={[styles.drawerItem, isRouteActive('Doctors') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('Doctors')}
         >
-          <Icon name="stethoscope" size={20} color={activeRoute === 'Doctors' ? softPurpleColor : '#666'} />
-          <Text style={[styles.drawerItemText, activeRoute === 'Doctors' && styles.activeDrawerItemText]}>Doctors</Text>
+          <Icon name="stethoscope" size={20} color={isRouteActive('Doctors') ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, isRouteActive('Doctors') && styles.activeDrawerItemText]}>Doctors</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.drawerItem, activeRoute === 'Terms' && styles.activeDrawerItem]} 
+          style={[styles.drawerItem, isRouteActive('Terms') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('Terms')}
         >
-          <Icon name="file-text" size={20} color={activeRoute === 'Terms' ? softPurpleColor : '#666'} />
-          <Text style={[styles.drawerItemText, activeRoute === 'Terms' && styles.activeDrawerItemText]}>Terms</Text>
+          <Icon name="file-text" size={20} color={isRouteActive('Terms') ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, isRouteActive('Terms') && styles.activeDrawerItemText]}>Terms</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.drawerItem, activeRoute === 'Rate App' && styles.activeDrawerItem]} 
+          style={[styles.drawerItem, isRouteActive('RateApp') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('RateApp')}
         >
-          <Icon name="star" size={20} color={activeRoute === 'Rate App' ? softPurpleColor : '#666'} />
-          <Text style={[styles.drawerItemText, activeRoute === 'Rate App' && styles.activeDrawerItemText]}>Rate App</Text>
+          <Icon name="star" size={20} color={isRouteActive('RateApp') ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, isRouteActive('RateApp') && styles.activeDrawerItemText]}>Rate App</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity 
@@ -151,7 +229,11 @@ const DrawerNavigator = () => {
           backgroundColor: '#fff',
           width: 300,
         },
-        drawerLockMode: 'locked-closed',
+        drawerLockMode: 'unlocked',
+        swipeEnabled: true,
+        swipeEdgeWidth: 50,
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
       }}
     >
       <Drawer.Screen name="HomeNavigator" component={HomeNavigator} />

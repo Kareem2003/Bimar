@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { styles } from "./style";
 import Logic from "./logic";
 import AppButton from "../../components/AppButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../../helpers/constants/staticKeys";
+import { BASE_URL } from "../../helpers/constants/config";
+import Header from "../../components/Header";
 
 const DoctorProfile = ({ navigation, route }) => {
   const doctor = route.params.doctor;
@@ -16,24 +19,7 @@ const DoctorProfile = ({ navigation, route }) => {
     setSelectedDate(date); // Store the formatted date in YYYY-MM-DD format
     console.log("Selected Date: ", date);
   };
-  
-  // const fetchUserInfo = async () => {
-  //   try {
-  //     const userData = await AsyncStorage.getItem(USERINFO);
-  //     if (userData) {
-  //       const parsedData = JSON.parse(userData);
-  //       setUserInfo(parsedData); // Store user info
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching user info:", error);
-  //   }
-  // };
-  // // Fetch user info from AsyncStorage
-  // useEffect(() => {
-  //   fetchUserInfo();
-  // }, []);
 
-  //   console.log("user:", userInfo.id);
 
   return (
     <ScrollView style={styles.container}>
@@ -49,14 +35,16 @@ const DoctorProfile = ({ navigation, route }) => {
       </View>
       {/* Doctor Profile Section */}
       <View style={styles.profileSection}>
-        <Image
-          source={
-            doctor.doctorImage && doctor.doctorImage !== "null"
-              ? { uri: doctor.doctorImage }
-              : require("../../assets/images/WhatsApp Image 2023-07-23 at 15.23.54.jpg")
-          }
-          style={styles.profileImage}
-        />
+        {doctor.doctorImage && doctor.doctorImage !== "null" ? (
+          <Image 
+            source={{ uri: `${BASE_URL}/${doctor.doctorImage}` }}
+            style={styles.profileImage}
+          />
+        ) : (
+          <View style={[styles.profileImage, { backgroundColor: '#f5f5f5', justifyContent: 'center', alignItems: 'center' }]}>
+            <FontAwesome name="user-md" size={80} color="#16423C" />
+          </View>
+        )}
         <Text style={styles.doctorName}>
           {doctor.doctorName || "Dr. Unknown"}
         </Text>

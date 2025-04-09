@@ -12,6 +12,7 @@ import {
 import { Button } from "react-native-paper";
 import AppButton from "../../components/AppButton";
 import Header from "../../components/Header";
+import withUserDataUpdates from "../../helpers/withUserDataUpdates";
 
 const Appointments = ({ navigation }) => {
   const [activeIcon, setActiveIcon] = useState(null); // State to track active icon
@@ -229,4 +230,4 @@ const Appointments = ({ navigation }) => {
   );
 };
 
-export default Appointments;
+export default withUserDataUpdates(Appointments);

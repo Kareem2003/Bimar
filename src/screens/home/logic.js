@@ -7,6 +7,7 @@ import ACTION_TYPES from "../../reducers/actionTypes";
 import { ToastManager } from "../../helpers/ToastManager";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../../helpers/constants/staticKeys";
+import { subscribeToUserData, USER_DATA_EVENTS } from "../../helpers/UserDataManager";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -17,15 +18,46 @@ const Logic = (navigation) => {
   };
 
   const fetchUserInfo = async () => {
-    const userInfo = JSON.parse(await AsyncStorage.getItem(USERINFO));
-    updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: "userName",
-        value: userInfo.userName,
-      },
-    ]);
+    try {
+      const userInfo = JSON.parse(await AsyncStorage.getItem(USERINFO));
+      if (userInfo) {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "userName",
+            value: userInfo.userName || "",
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
   };
+
+  // Subscribe to user data updates
+  useEffect(() => {
+    // Subscribe to profile updates
+    const profileUnsubscribe = subscribeToUserData(
+      USER_DATA_EVENTS.PROFILE_UPDATED,
+      (updatedData) => {
+        console.log('Home logic received profile update:', updatedData.userName);
+        
+        // Update the userName in state
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "userName",
+            value: updatedData.userName || "",
+          },
+        ]);
+      }
+    );
+    
+    // Cleanup subscription on unmount
+    return () => {
+      profileUnsubscribe();
+    };
+  }, []);
 
   const fetchDoctors = () => {
     updateState([
