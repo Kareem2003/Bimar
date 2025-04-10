@@ -17,6 +17,8 @@ import TypeWriterEffect from "react-native-typewriter-effect";
 import MenuButton from "../../components/menuButton";
 import StepCounter from "../../service/stepCounter";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import moment from 'moment';
 
 const Home = ({ navigation }) => {
   const { state, updateState } = Logic(navigation);
@@ -47,9 +49,10 @@ const Home = ({ navigation }) => {
       name: "Paracetamol",
       times: 3,
       dose: 500,
-      doseTimes: calculateMedicationTimes(3, "09:00"),
+      doseTimes: ["09:00", "13:00", "17:00"],
       completed: false,
       takenCount: 0,
+      takenTimes: [],
       image: require("../../assets/images/med1.png"),
     },
     {
@@ -57,9 +60,10 @@ const Home = ({ navigation }) => {
       name: "Amoxicillin",
       times: 2,
       dose: 250,
-      doseTimes: calculateMedicationTimes(2, "08:00"),
+      doseTimes: ["08:00", "14:00"],
       completed: false,
       takenCount: 0,
+      takenTimes: [],
       image: require("../../assets/images/med2.png"),
     },
   ]);
@@ -224,6 +228,94 @@ const Home = ({ navigation }) => {
     return () => clearInterval(timer);
   }, []);
 
+  // Calculate medication status: taken, missed, or upcoming
+  const getMedicationStatus = (time) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const medicationTime = new Date();
+    medicationTime.setHours(hours, minutes, 0);
+    
+    const now = new Date();
+    
+    // If the time has passed by more than 2 hours and not taken, mark as missed
+    if (now > medicationTime && (now - medicationTime) > 2 * 60 * 60 * 1000) {
+      return 'missed';
+    }
+    
+    // Otherwise, it's either upcoming or available to take
+    return 'upcoming';
+  };
+  
+  // Calculate progress percentage
+  const calculateProgress = () => {
+    const totalDoses = medications.reduce((sum, med) => sum + med.doseTimes.length, 0);
+    const takenDoses = medications.reduce((sum, med) => sum + (med.takenTimes?.length || 0), 0);
+    
+    if (totalDoses === 0) return 0;
+    return Math.round((takenDoses / totalDoses) * 100);
+  };
+  
+  // Find the next medication dose
+  const getNextMedication = () => {
+    const now = new Date();
+    let nextMed = null;
+    let minTimeDiff = Infinity;
+    
+    medications.forEach(med => {
+      med.doseTimes.forEach(time => {
+        if ((med.takenTimes || []).includes(time)) return; // Skip taken doses
+        
+        const [hours, minutes] = time.split(':').map(Number);
+        const doseTime = new Date();
+        doseTime.setHours(hours, minutes, 0);
+        
+        // If time has passed, set it for tomorrow
+        if (doseTime < now) {
+          doseTime.setDate(doseTime.getDate() + 1);
+        }
+        
+        const timeDiff = doseTime - now;
+        if (timeDiff < minTimeDiff) {
+          minTimeDiff = timeDiff;
+          nextMed = { 
+            name: med.name, 
+            time: time,
+            formattedTime: formatTo12Hour(hours, minutes)
+          };
+        }
+      });
+    });
+    
+    return nextMed;
+  };
+
+  // Function to render medication status icon
+  const renderStatusIcon = (medication, time) => {
+    const isTaken = (medication.takenTimes || []).includes(time);
+    
+    if (isTaken) {
+      return (
+        <View style={styles.statusIconTaken}>
+          <MaterialIcons name="check" size={12} color="#fff" />
+        </View>
+      );
+    }
+    
+    const status = getMedicationStatus(time);
+    if (status === 'missed') {
+      return (
+        <View style={styles.statusIconMissed}>
+          <MaterialIcons name="close" size={12} color="#fff" />
+        </View>
+      );
+    }
+    
+    return (
+      <View style={styles.statusIconUpcoming}>
+        <MaterialIcons name="circle" size={12} color="#fff" />
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView 
@@ -333,123 +425,194 @@ const Home = ({ navigation }) => {
           </ScrollView>
         </View>
 
-        {/* Today's List of Medication */}
-        {/* Today's List of Medication */}
-        <View style={styles.medicationSection}>
-          <Text style={styles.sectionTitle}>Today's Medications</Text>
+        {/* Medication section */}
+        <View style={styles.medicationCard}>
+          <View style={styles.medicationHeader}>
+            <Text style={styles.medicationTitle}>Today's medication</Text>
+            <Text style={styles.medicationSubtext}>
+              You've taken {medications.reduce((sum, med) => sum + (med.takenTimes?.length || 0), 0)} out of 5 meds today!
+            </Text>
+          </View>
 
-          {/* Timeline Container */}
+          {/* Horizontal scrollable medication cards */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.timelineScrollContainer}
+            style={styles.medicationCardsScroll}
           >
-            {/* Timeline Hours */}
-            <View style={styles.timelineHours}>
-              {Array.from({ length: 24 }, (_, i) => (
-                <View key={i} style={styles.hourContainer}>
-                  <Text style={styles.hourText}>{formatTo12Hour(i, 0)}</Text>
-                  <View style={styles.timelineLine} />
-                </View>
-              ))}
+            {/* First Paracetamol - 9:00 AM */}
+            <TouchableOpacity style={styles.medicationCardItem} onPress={() => toggleMedication(1, "09:00")}>
+              <Text style={styles.pillName}>Paracetamol</Text>
+              <Text style={styles.pillTime}>9:00 AM</Text>
+              <View style={styles.pillStatus}>
+                {(medications[0].takenTimes || []).includes("09:00") ? (
+                  <>
+                    <View style={[styles.statusIcon, styles.statusIconTaken]}>
+                      <MaterialIcons name="check" size={10} color="#fff" />
+                    </View>
+                    <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
+                  </>
+                ) : (
+                  <>
+                    <View style={[styles.statusIcon, styles.statusIconMissed]}>
+                      <MaterialIcons name="close" size={10} color="#fff" />
+                    </View>
+                    <Text style={[styles.pillStatusText, styles.statusTextMissed]}>missed</Text>
+                  </>
+                )}
+              </View>
+            </TouchableOpacity>
 
-              {/* Current Time Indicator */}
-              <Animated.View
-                style={[
-                  styles.currentTimeIndicator,
-                  {
-                    transform: [{ translateX: timeIndicatorPosition }],
-                  },
-                ]}
-              >
-                <View style={styles.timeIndicatorLine} />
-                <View style={styles.timeIndicatorDot} />
-                <Text style={styles.currentTimeText}>
-                  {formatTo12Hour(
-                    currentTime.getHours(),
-                    currentTime.getMinutes()
-                  )}
-                </Text>
-              </Animated.View>
+            {/* Second Paracetamol - 13:00 PM */}
+            <TouchableOpacity style={styles.medicationCardItem} onPress={() => toggleMedication(1, "13:00")}>
+              <Text style={styles.pillName}>Paracetamol</Text>
+              <Text style={styles.pillTime}>13:00 PM</Text>
+              <View style={styles.pillStatus}>
+                {(medications[0].takenTimes || []).includes("13:00") ? (
+                  <>
+                    <View style={[styles.statusIcon, styles.statusIconTaken]}>
+                      <MaterialIcons name="check" size={10} color="#fff" />
+                    </View>
+                    <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
+                  </>
+                ) : (
+                  <>
+                    <View style={[styles.statusIcon, styles.statusIconMissed]}>
+                      <MaterialIcons name="close" size={10} color="#fff" />
+                    </View>
+                    <Text style={[styles.pillStatusText, styles.statusTextMissed]}>missed</Text>
+                  </>
+                )}
+              </View>
+            </TouchableOpacity>
+
+            {/* Third Paracetamol - 17:00 PM */}
+            <TouchableOpacity style={styles.medicationCardItem} onPress={() => toggleMedication(1, "17:00")}>
+              <Text style={styles.pillName}>Paracetamol</Text>
+              <Text style={styles.pillTime}>17:00 PM</Text>
+              <View style={styles.pillStatus}>
+                {(medications[0].takenTimes || []).includes("17:00") ? (
+                  <>
+                    <View style={[styles.statusIcon, styles.statusIconTaken]}>
+                      <MaterialIcons name="check" size={10} color="#fff" />
+                    </View>
+                    <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
+                  </>
+                ) : (
+                  <>
+                    <View style={[styles.statusIcon, styles.statusIconMissed]}>
+                      <MaterialIcons name="close" size={10} color="#fff" />
+                    </View>
+                    <Text style={[styles.pillStatusText, styles.statusTextMissed]}>missed</Text>
+                  </>
+                )}
+              </View>
+            </TouchableOpacity>
+
+            {/* First Amoxicillin - 8:00 AM */}
+            <TouchableOpacity style={styles.medicationCardItem} onPress={() => toggleMedication(2, "08:00")}>
+              <Text style={styles.pillName}>Amoxicillin</Text>
+              <Text style={styles.pillTime}>8:00 AM</Text>
+              <View style={styles.pillStatus}>
+                {(medications[1].takenTimes || []).includes("08:00") ? (
+                  <>
+                    <View style={[styles.statusIcon, styles.statusIconTaken]}>
+                      <MaterialIcons name="check" size={10} color="#fff" />
+                    </View>
+                    <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
+                  </>
+                ) : (
+                  <>
+                    <View style={[styles.statusIcon, styles.statusIconMissed]}>
+                      <MaterialIcons name="close" size={10} color="#fff" />
+                    </View>
+                    <Text style={[styles.pillStatusText, styles.statusTextMissed]}>missed</Text>
+                  </>
+                )}
+              </View>
+            </TouchableOpacity>
+
+            {/* Second Amoxicillin - 14:00 PM */}
+            <TouchableOpacity style={styles.medicationCardItem} onPress={() => toggleMedication(2, "14:00")}>
+              <Text style={styles.pillName}>Amoxicillin</Text>
+              <Text style={styles.pillTime}>14:00 PM</Text>
+              <View style={styles.pillStatus}>
+                {(medications[1].takenTimes || []).includes("14:00") ? (
+                  <>
+                    <View style={[styles.statusIcon, styles.statusIconTaken]}>
+                      <MaterialIcons name="check" size={10} color="#fff" />
+                    </View>
+                    <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
+                  </>
+                ) : (
+                  <>
+                    <View style={[styles.statusIcon, styles.statusIconMissed]}>
+                      <MaterialIcons name="close" size={10} color="#fff" />
+                    </View>
+                    <Text style={[styles.pillStatusText, styles.statusTextMissed]}>missed</Text>
+                  </>
+                )}
+                </View>
+            </TouchableOpacity>
+          </ScrollView>
+
+          {/* Progress indicator with fluid, ink-like fill */}
+          <View style={styles.progressRow}>
+            <View style={styles.progressCircleContainer}>
+              <View style={styles.progressBackground} />
+              
+              {calculateProgress() > 0 && (
+                calculateProgress() >= 100 ? (
+                  // Special case for 100% - fully filled circle
+                  <View style={{
+                    position: 'absolute',
+                    width: 65,
+                    height: 65,
+                    borderRadius: 32.5,
+                    backgroundColor: '#6A9C89',
+                    zIndex: 5
+                  }} />
+                ) : (
+                  // For 1-99%, show a fluid circular progress
+                  <View style={{
+                    position: 'absolute',
+                    width: 65,
+                    height: 65,
+                    overflow: 'hidden',
+                    borderRadius: 32.5,
+                  }}>
+                    <View style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      width: 65,
+                      height: `${calculateProgress()}%`,
+                      backgroundColor: '#6A9C89',
+                      borderTopLeftRadius: calculateProgress() > 90 ? 0 : 32.5,
+                      borderTopRightRadius: calculateProgress() > 90 ? 0 : 32.5,
+                    }} />
+                  </View>
+                )
+              )}
+              
+              <View style={styles.progressInnerCircle}>
+                <Text style={styles.progressPercentage}>{calculateProgress()}%</Text>
+              </View>
             </View>
 
-            {/* Medication Circles */}
-            <View style={styles.medicationCircles}>
-              {medications.flatMap((item) =>
-                item.doseTimes.map((time, timeIndex) => {
-                  const [hour, minute] = time.split(":").map(Number);
-                  // Center the medication circle under the hour marker
-                  const leftPosition = (hour + minute / 60) * 100 - 20; // 20 is half the width of medication circle
-                  const isExpanded =
-                    expandedItem?.id === item.id && expandedItem?.time === time;
-                  const isTaken = (item.takenTimes || []).includes(time);
-
-                  return (
-                    <TouchableOpacity
-                      key={`${item.id}-${timeIndex}`}
-                      onPress={() => handleMedicationPress(item, time)}
-                      style={[
-                        styles.medicationCircleContainer,
-                        {
-                          position: "absolute",
-                          left: leftPosition,
-                          zIndex: isExpanded ? 2 : 1,
-                        },
-                      ]}
-                    >
-                      <Animated.View
-                        style={[
-                          styles.medicationCircle,
-                          {
-                            transform: [
-                              {
-                                scale: isExpanded ? scaleAnimation : 1,
-                              },
-                            ],
-                          },
-                        ]}
-                      >
-                        <Image source={item.image} style={styles.circleImage} />
-                        {isTaken && (
-                          <View style={styles.checkMarkOverlay}>
-                            <Icon name="check" size={15} color="#fff" />
-                          </View>
-                        )}
-                      </Animated.View>
-
-                      {/* Expanded Details */}
-                      <Animated.View
-                        style={[
-                          styles.expandedDetails,
-                          {
-                            opacity: isExpanded ? opacityAnimation : 0,
-                            display: isExpanded ? "flex" : "none",
-                          },
-                        ]}
-                      >
-                        <Text style={styles.expandedName}>{item.name}</Text>
-                        <Text style={styles.expandedDose}>
-                          {item.dose}mg -{" "}
-                          {formatTo12Hour(...time.split(":").map(Number))}
+            <View style={styles.progressInfo}>
+              <Text style={styles.progressText}>Complete</Text>
+              {getNextMedication() ? (
+                <Text style={styles.nextMedicationText}>
+                  Next: {getNextMedication().name} - {getNextMedication().formattedTime}
                         </Text>
-                        <TouchableOpacity
-                          style={[
-                            styles.takeButton,
-                            isTaken && styles.takenButton,
-                          ]}
-                          onPress={() => toggleMedication(item.id, time)}
-                        >
-                          <Text style={styles.takeButtonText}>
-                            {isTaken ? "Taken" : "Take Now"}
+              ) : (
+                <Text style={styles.nextMedicationText}>
+                  All medications taken for today!
                           </Text>
-                        </TouchableOpacity>
-                      </Animated.View>
-                    </TouchableOpacity>
-                  );
-                })
               )}
             </View>
-          </ScrollView>
+          </View>
         </View>
       </ScrollView>
     </View>

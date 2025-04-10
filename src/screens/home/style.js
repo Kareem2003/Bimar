@@ -274,12 +274,179 @@ export const styles = {
     fontSize: 16,
   },
   medicationSection: {
-    paddingHorizontal: 20,
+    marginTop: 25,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 4,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#333",
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 16,
+    letterSpacing: 0.5,
+  },
+  // Medication list styles
+  medicationListContainer: {
+    paddingVertical: 15,
+    paddingRight: 20,
+  },
+  medicationItem: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 12,
+    marginLeft: 10,
+    width: 120,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 5,
+    borderWidth: 0,
+  },
+  medicationImageContainer: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  medicationImage: {
+    width: 32,
+    height: 32,
+    resizeMode: 'contain',
+  },
+  medicationName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  medicationTime: {
+    fontSize: 13,
+    color: '#666',
+    marginBottom: 8,
+  },
+  medicationStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statusText: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginLeft: 4,
+    color: '#3A86FF',
+  },
+  statusTextTaken: {
+    color: '#5CAE9F',
+  },
+  statusTextMissed: {
+    color: '#FD9B63',
+  },
+  statusIconTaken: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#5CAE9F',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statusIconMissed: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#FD9B63',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statusIconUpcoming: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#3A86FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  // Progress section styles
+  progressSection: {
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  progressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  progressCircleContainer: {
+    width: 65,
+    height: 65,
+    position: 'relative',
+  },
+  progressBackground: {
+    width: 65,
+    height: 65,
+    borderRadius: 32.5,
+    borderWidth: 4,
+    borderColor: '#E0F2E9',
+    position: 'absolute',
+  },
+  progressStep: {
+    position: 'absolute',
+    width: 3,
+    height: 28,
+    backgroundColor: '#E0F2E9',
+    top: 4, // Align with the border
+    left: 31, // (65 / 2) - (3 / 2) to center the bar
+    transformOrigin: 'bottom center',
+    borderRadius: 1.5,
+  },
+  progressStepActive: {
+    backgroundColor: '#6A9C89', // Use the app's primary green color
+  },
+  progressArc: {
+    width: 65,
+    height: 65,
+    position: 'absolute',
+    borderRadius: 32.5,
+  },
+  progressArcInner: {
+    width: 65,
+    height: 65,
+    position: 'absolute',
+  },
+  progressArcComplete: {
+    position: 'absolute',
+  },
+  progressInnerCircle: {
+    width: 57,
+    height: 57,
+    borderRadius: 28.5,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    zIndex: 10,
+  },
+  progressPercentage: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#333',
+  },
+  progressInfo: {
+    marginLeft: 20,
+  },
+  progressText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 5,
+  },
+  nextMedicationText: {
+    fontSize: 14,
+    color: '#666',
   },
   timelineScrollContainer: {
     paddingVertical: 20,
@@ -385,7 +552,7 @@ export const styles = {
     alignItems: "center",
   },
   takenButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: '#5CAE9F',
   },
   takeButtonText: {
     color: "#fff",
@@ -475,5 +642,84 @@ export const styles = {
     borderRadius: 4,
     fontSize: 11,
     fontWeight: "bold",
+  },
+  // New medication card styles to match the image
+  medicationCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    marginVertical: 20,
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  medicationHeader: {
+    marginBottom: 15,
+  },
+  medicationTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 6,
+  },
+  medicationSubtext: {
+    fontSize: 15,
+    color: '#6A9C89',
+    fontWeight: '500',
+  },
+  medicationCardsScroll: {
+    marginBottom: 20,
+  },
+  medicationCardItem: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 12,
+    marginRight: 12,
+    width: 120,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+  },
+  pillName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  pillTime: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+  },
+  pillStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statusIcon: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#3A86FF',
+  },
+  statusIconTaken: {
+    backgroundColor: '#34C759',
+  },
+  statusIconMissed: {
+    backgroundColor: '#FD9B63',
+  },
+  pillStatusText: {
+    fontSize: 11,
+    fontWeight: '500',
+    marginLeft: 4,
+    color: '#3A86FF',
   },
 };
