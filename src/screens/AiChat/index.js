@@ -11,9 +11,9 @@ import {
 import Logic from "./logic";
 import LottieView from "lottie-react-native";
 import Header from "../../components/Header";
-import SymptomCard from "../../components/SymptomCard";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import AppButton from "../../components/AppButton";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const AiChatScreen = ({ navigation }) => {
   const { state, updateState, handleRemoveSymptom, sendAiModel } =
@@ -46,6 +46,15 @@ const AiChatScreen = ({ navigation }) => {
     setIsResultModalVisible(true);
   };
 
+  const SymptomCard = ({ text, onPress, iconName }) => {
+    return (
+      <TouchableOpacity style={styles.card} onPress={onPress}>
+        <Icon name={iconName} size={24} color="#fff" style={styles.cardIcon} />
+        <Text style={styles.cardHeader}>{text}</Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <ScrollView style={styles.container}>
       <Header
@@ -63,39 +72,61 @@ const AiChatScreen = ({ navigation }) => {
         />
       </View>
 
-      {/* Symptoms Container */}
-      <ScrollView horizontal={true} style={styles.symptomsContainer}>
-        <View style={{ flexDirection: "row" }}>
-          {state.symptoms.map((symptom, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.symptomTagContainer}
-              onPress={() => handleRemoveSymptom(symptom)}
-            >
-              <Text style={styles.symptomText}>{symptom}</Text>
-              <Text style={styles.deleteIcon}>✕</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
-
       <View style={styles.cardContainer}>
-        <SymptomCard text={"Head"} onPress={() => handleCardClick("head")} />
-        <SymptomCard text={"Chest"} onPress={() => handleCardClick("chest")} />
-        <SymptomCard text={"Skin"} onPress={() => handleCardClick("skin")} />
-        <SymptomCard text={"Limb"} onPress={() => handleCardClick("limb")} />
+        <SymptomCard
+          text={"Head"}
+          iconName="bandage-outline"
+          onPress={() => handleCardClick("head")}
+        />
+        <SymptomCard
+          text={"Chest"}
+          iconName="heart-outline"
+          onPress={() => handleCardClick("chest")}
+        />
+        <SymptomCard
+          text={"Skin"}
+          iconName="hand-left-outline"
+          onPress={() => handleCardClick("skin")}
+        />
+        <SymptomCard
+          text={"Limb"}
+          iconName="walk-outline"
+          onPress={() => handleCardClick("limb")}
+        />
         <SymptomCard
           text={"Stomach"}
+          iconName="medkit-outline"
           onPress={() => handleCardClick("stomach")}
         />
         <SymptomCard
           text={"General"}
+          iconName="body-outline"
           onPress={() => handleCardClick("general")}
         />
       </View>
 
-      <View style={{ marginTop: 20, alignItems: "center" }}>
-        <AppButton title="Send" onPress={handleSendAiModel} />
+      {/* Symptoms Container */}
+      <View style={styles.symptomTagWrapper}>
+        <ScrollView horizontal>
+          <View style={{ flexDirection: "row" }}>
+            {state.symptoms.map((symptom, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.symptomTagContainer}
+                onPress={() => handleRemoveSymptom(symptom)}
+              >
+                <Text style={styles.symptomText}>{symptom}</Text>
+                <Text style={styles.deleteIcon}>✕</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.sendButton} onPress={handleSendAiModel}>
+          <Text style={styles.sendButtonText}>Send</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Result Modal */}
@@ -108,6 +139,12 @@ const AiChatScreen = ({ navigation }) => {
         <View style={styles.fullPageModal}>
           {state.isProcessing ? (
             <>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={styles.backButton}
+              >
+                <Icon name="chevron-back" size={24} color="#000" />
+              </TouchableOpacity>
               <Text style={styles.resultText}>
                 We are looking into your case. Please wait!
               </Text>
@@ -192,6 +229,7 @@ const AiChatScreen = ({ navigation }) => {
       </Modal>
 
       {/* Modal to display symptoms */}
+      {/* Symptom Selection Modal */}
       <Modal
         visible={isModalVisible}
         transparent={true}
@@ -201,13 +239,18 @@ const AiChatScreen = ({ navigation }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
-              <Text style={styles.closeButtonText}>Choose what you feel</Text>
+              <Text style={styles.modalTitle}>Choose what you feel</Text>
               <TouchableOpacity onPress={() => setIsModalVisible(false)}>
                 <Text style={styles.closeButtonText}>X</Text>
               </TouchableOpacity>
             </View>
 
-            <View style={styles.tagsContainer}>
+            {/* Scrollable content */}
+            <ScrollView
+              style={styles.scrollContainer}
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+            >
               {selectedSymptoms.map((symptom, index) => {
                 const isSelected = state.symptoms.includes(symptom);
                 return (
@@ -230,7 +273,7 @@ const AiChatScreen = ({ navigation }) => {
                   </TouchableOpacity>
                 );
               })}
-            </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
