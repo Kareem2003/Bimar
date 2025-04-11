@@ -19,6 +19,8 @@ import StepCounter from "../../service/stepCounter";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
+import { BASE_URL } from "../../helpers/constants/config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Home = ({ navigation }) => {
   const { state, updateState } = Logic(navigation);
@@ -30,20 +32,11 @@ const Home = ({ navigation }) => {
   const opacityAnimation = useRef(new Animated.Value(0)).current;
   const [currentTime, setCurrentTime] = useState(new Date());
   const timeIndicatorPosition = useRef(new Animated.Value(0)).current;
+  const [activeMedicationIndex, setActiveMedicationIndex] = useState(null);
+  const [expandAnim, setExpandAnim] = useState(new Animated.Value(0));
 
-  const calculateMedicationTimes = (times, firstDose) => {
-    const [hours, minutes] = firstDose.split(":").map(Number);
-    const interval = times === 2 ? 6 : 4;
-
-    return Array.from({ length: times }, (_, index) => {
-      const newHours = (hours + interval * index) % 24;
-      const formattedHours = newHours.toString().padStart(2, "0");
-      const formattedMinutes = minutes.toString().padStart(2, "0");
-      return `${formattedHours}:${formattedMinutes}`;
-    });
-  };
-
-  const [medications, setMedications] = useState([
+  // Define the initial medication configuration outside of useState to use for resets
+  const initialMedications = [
     {
       id: 1,
       name: "Paracetamol",
@@ -66,7 +59,52 @@ const Home = ({ navigation }) => {
       takenTimes: [],
       image: require("../../assets/images/med2.png"),
     },
-  ]);
+  ];
+
+  const [medications, setMedications] = useState(initialMedications);
+
+  const calculateMedicationTimes = (times, firstDose) => {
+    const [hours, minutes] = firstDose.split(":").map(Number);
+    const interval = times === 2 ? 6 : 4;
+
+    return Array.from({ length: times }, (_, index) => {
+      const newHours = (hours + interval * index) % 24;
+      const formattedHours = newHours.toString().padStart(2, "0");
+      const formattedMinutes = minutes.toString().padStart(2, "0");
+      return `${formattedHours}:${formattedMinutes}`;
+    });
+  };
+
+  // Function to sort medication doses by time
+  const getSortedMedicationDoses = () => {
+    const allDoses = [];
+    
+    medications.forEach(med => {
+      med.doseTimes.forEach(time => {
+        allDoses.push({
+          id: med.id,
+          name: med.name,
+          time: time,
+          formattedTime: formatTo12Hour(...time.split(':').map(Number)),
+          isTaken: (med.takenTimes || []).includes(time),
+          status: (med.takenTimes || []).includes(time) ? 'taken' : getMedicationStatus(time)
+        });
+      });
+    });
+    
+    // Sort by time (HH:MM format)
+    return allDoses.sort((a, b) => {
+      const [aHours, aMinutes] = a.time.split(':').map(Number);
+      const [bHours, bMinutes] = b.time.split(':').map(Number);
+      
+      // First compare hours
+      if (aHours !== bHours) {
+        return aHours - bHours;
+      }
+      // If hours are the same, compare minutes
+      return aMinutes - bMinutes;
+    });
+  };
 
   const handleMedicationPress = (item, time) => {
     if (
@@ -105,9 +143,8 @@ const Home = ({ navigation }) => {
     }
   };
 
-  const toggleMedication = (medicationId, doseTime) => {
-    setMedications((prev) =>
-      prev.map((med) => {
+  const toggleMedication = async (medicationId, doseTime) => {
+    const updatedMedications = medications.map((med) => {
         if (med.id === medicationId) {
           const updatedTakenTimes = med.takenTimes || [];
           const timeIndex = updatedTakenTimes.indexOf(doseTime);
@@ -128,8 +165,13 @@ const Home = ({ navigation }) => {
           };
         }
         return med;
-      })
-    );
+    });
+
+    setMedications(updatedMedications);
+    
+    // Store the taken status with today's date
+    const today = new Date().toDateString();
+    await AsyncStorage.setItem('medications_' + today, JSON.stringify(updatedMedications));
   };
 
   const getTimeRemaining = (nextDoseTime) => {
@@ -228,7 +270,7 @@ const Home = ({ navigation }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Calculate medication status: taken, missed, or upcoming
+  // Calculate medication status: upcoming, pending, or missed
   const getMedicationStatus = (time) => {
     const [hours, minutes] = time.split(':').map(Number);
     const medicationTime = new Date();
@@ -236,13 +278,27 @@ const Home = ({ navigation }) => {
     
     const now = new Date();
     
-    // If the time has passed by more than 2 hours and not taken, mark as missed
-    if (now > medicationTime && (now - medicationTime) > 2 * 60 * 60 * 1000) {
+    // Calculate time difference in minutes
+    const diffMs = medicationTime - now;
+    const diffMinutes = diffMs / (1000 * 60);
+    
+    // If the medication time is in the future but within 30 minutes, it's pending
+    if (diffMinutes > 0 && diffMinutes <= 30) {
+      return 'pending';
+    }
+    
+    // If the medication time has passed by 30 minutes and not taken, mark as missed
+    if (diffMinutes < -30) {
       return 'missed';
     }
     
-    // Otherwise, it's either upcoming or available to take
-    return 'upcoming';
+    // If the medication time is in the future (more than 30 minutes), it's upcoming
+    if (diffMinutes > 30) {
+      return 'upcoming';
+    }
+    
+    // If we're within +/- 30 minutes of medication time, it's pending
+    return 'pending';
   };
   
   // Calculate progress percentage
@@ -268,22 +324,49 @@ const Home = ({ navigation }) => {
         const doseTime = new Date();
         doseTime.setHours(hours, minutes, 0);
         
-        // If time has passed, set it for tomorrow
-        if (doseTime < now) {
+        // Calculate time difference in minutes
+        const diffMs = doseTime - now;
+        const diffMinutes = diffMs / (1000 * 60);
+        
+        // If medication time has passed by more than 30 minutes, 
+        // consider it for tomorrow (unless it's marked as missed)
+        if (diffMinutes < -30 && getMedicationStatus(time) === 'missed') {
           doseTime.setDate(doseTime.getDate() + 1);
         }
         
         const timeDiff = doseTime - now;
-        if (timeDiff < minTimeDiff) {
+        if (timeDiff > 0 && timeDiff < minTimeDiff) {
           minTimeDiff = timeDiff;
           nextMed = { 
             name: med.name, 
             time: time,
-            formattedTime: formatTo12Hour(hours, minutes)
+            formattedTime: formatTo12Hour(hours, minutes),
+            status: getMedicationStatus(time)
           };
         }
       });
     });
+    
+    // If no upcoming medication, check for pending ones
+    if (!nextMed) {
+      medications.forEach(med => {
+        med.doseTimes.forEach(time => {
+          if ((med.takenTimes || []).includes(time)) return; // Skip taken doses
+          
+          const status = getMedicationStatus(time);
+          if (status === 'pending') {
+            const [hours, minutes] = time.split(':').map(Number);
+            nextMed = { 
+              name: med.name, 
+              time: time,
+              formattedTime: formatTo12Hour(hours, minutes),
+              status: 'pending'
+            };
+            return; // Break the loop
+          }
+        });
+      });
+    }
     
     return nextMed;
   };
@@ -301,10 +384,19 @@ const Home = ({ navigation }) => {
     }
     
     const status = getMedicationStatus(time);
+    
     if (status === 'missed') {
       return (
         <View style={styles.statusIconMissed}>
           <MaterialIcons name="close" size={12} color="#fff" />
+        </View>
+      );
+    }
+    
+    if (status === 'pending') {
+      return (
+        <View style={styles.statusIconPending}>
+          <MaterialIcons name="access-time" size={12} color="#fff" />
         </View>
       );
     }
@@ -315,6 +407,120 @@ const Home = ({ navigation }) => {
       </View>
     );
   };
+
+  // Load medication status on app startup
+  useEffect(() => {
+    console.log("Loading medication status");
+    
+    const loadMedicationStatus = async () => {
+      try {
+        const today = new Date().toDateString();
+        console.log("Today's date:", today);
+        
+        // Check if the day has changed since last app open
+        const lastOpenDate = await AsyncStorage.getItem('last_open_date');
+        console.log("Last open date:", lastOpenDate);
+        
+        // FORCE RESET if day has changed
+        if (lastOpenDate && lastOpenDate !== today) {
+          console.log("DAY CHANGED - Forcing medication reset");
+          // Clear all medication data for today
+          await AsyncStorage.removeItem('medications_' + today);
+          
+          // Reset medications to initial state
+          const resetMedications = initialMedications.map(med => ({
+            ...med,
+            takenTimes: [],
+            takenCount: 0,
+            completed: false
+          }));
+          
+          // Save the reset state for today
+          await AsyncStorage.setItem('medications_' + today, JSON.stringify(resetMedications));
+          setMedications(resetMedications);
+          
+          // Update the last open date
+          await AsyncStorage.setItem('last_open_date', today);
+          console.log("Reset completed and saved for today:", today);
+          return; // Exit early since we've already set the medications
+        }
+        
+        // If no day change detected, proceed with normal loading
+        const storedData = await AsyncStorage.getItem('medications_' + today);
+        
+        if (storedData) {
+          // If we have data for today, use it
+          console.log("Found today's medication data");
+          const storedMedications = JSON.parse(storedData);
+          setMedications(storedMedications);
+        } else {
+          // If no data for today, reset using the original configuration
+          console.log("No data found for today - Creating new medication data");
+          const resetMedications = initialMedications.map(med => ({
+            ...med,
+            takenTimes: [],
+            takenCount: 0,
+            completed: false
+          }));
+          
+          // Save the reset state for today
+          await AsyncStorage.setItem('medications_' + today, JSON.stringify(resetMedications));
+          setMedications(resetMedications);
+        }
+        
+        // Always update the last open date
+        await AsyncStorage.setItem('last_open_date', today);
+      } catch (error) {
+        console.log('Error loading medication status', error);
+      }
+    };
+    
+    loadMedicationStatus();
+    
+    // Midnight check for day change
+    const setupMidnightReset = () => {
+      const now = new Date();
+      const night = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1, // tomorrow
+        0, 0, 0 // midnight
+      );
+      const msToMidnight = night.getTime() - now.getTime();
+      
+      console.log(`Scheduling midnight reset in ${Math.round(msToMidnight/1000/60)} minutes`);
+      
+      // Set timeout for midnight
+      const midnightTimeout = setTimeout(() => {
+        console.log("MIDNIGHT REACHED - Resetting medications");
+        loadMedicationStatus(); // Force reload at midnight
+        
+        // Set up next day's timeout
+        setupMidnightReset();
+      }, msToMidnight);
+      
+      return midnightTimeout;
+    };
+    
+    // Set up midnight reset
+    const midnightTimeout = setupMidnightReset();
+    
+    // Additional check for day changes while app is running
+    const dayChangeInterval = setInterval(async () => {
+      const lastOpenDate = await AsyncStorage.getItem('last_open_date');
+      const today = new Date().toDateString();
+      
+      if (lastOpenDate !== today) {
+        console.log("Day change detected during app runtime");
+        loadMedicationStatus(); // Force reload
+      }
+    }, 60000); // Check every minute
+    
+    return () => {
+      clearInterval(dayChangeInterval);
+      clearTimeout(midnightTimeout);
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -392,30 +598,56 @@ const Home = ({ navigation }) => {
                     navigation.navigate("DoctorProfile", { doctor })
                   }
                 >
-                  <View style={styles.circleWrapper}>
-                    <View style={styles.circleOne}></View>
-                    <View style={styles.circleTwo}></View>
-                  </View>
+                  <View style={styles.greenWave} />
+                  <View style={styles.orangeBubble} />
+                  <View style={styles.greenBar} />
+                  <View style={styles.orangeDot} />
+                  
+                  <View style={styles.doctorImageBorder}>
+                    <View style={styles.doctorImageContainer}>
                   <Image
                     source={
                       doctor.doctorImage && doctor.doctorImage !== "null"
-                        ? { uri: doctor.doctorImage }
+                            ? { uri: `${BASE_URL}/${doctor.doctorImage}` }
                         : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
                     }
                     style={styles.doctorImage}
+                        resizeMode="cover"
                   />
+                    </View>
+                  </View>
+                  
+                  <View style={styles.doctorContent}>
                   <View style={styles.doctorInfo}>
                     <Text style={styles.doctorName}>
-                      {doctor.doctorName || "Dr. Unknown"}
+                        {doctor.doctorName || "UnKnown"}
                     </Text>
-                    <Text style={styles.doctorSpecialization}>
-                      {doctor.field || "General"}
+                      <Text style={styles.doctorSpecialty}>
+                        {doctor.field || "Internal Medicine"}
                     </Text>
-                    <Text style={styles.doctorSpecialization}>
+                      
+                      <View style={styles.infoRow}>
+                        <MaterialIcons name="location-on" size={12} color="#666" />
+                        <Text style={styles.infoText}>
                       {doctor.clinic && doctor.clinic.length > 0
                         ? doctor.clinic[0].clinicArea
-                        : "Clinic Area Not Available"}
+                            : "Nasr City"}
                     </Text>
+                      </View>
+                      
+                      <View style={styles.infoRow}>
+                        <MaterialIcons name="history" size={12} color="#666" />
+                        <Text style={styles.infoText}>8+ years experience</Text>
+                      </View>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.statusBadge}>
+                    <View style={styles.starContainer}>
+                      <Icon name="star" size={10} color="#FD9B63" />
+                      <Text style={styles.ratingText}>4.8</Text>
+                    </View>
+                    <Text style={styles.availableText}>{doctor.price || doctor.consultationFee || "500"}LE</Text>
                   </View>
                 </TouchableOpacity>
               ))
@@ -440,120 +672,53 @@ const Home = ({ navigation }) => {
             showsHorizontalScrollIndicator={false}
             style={styles.medicationCardsScroll}
           >
-            {/* First Paracetamol - 9:00 AM */}
-            <TouchableOpacity style={styles.medicationCardItem} onPress={() => toggleMedication(1, "09:00")}>
-              <Text style={styles.pillName}>Paracetamol</Text>
-              <Text style={styles.pillTime}>9:00 AM</Text>
-              <View style={styles.pillStatus}>
-                {(medications[0].takenTimes || []).includes("09:00") ? (
-                  <>
-                    <View style={[styles.statusIcon, styles.statusIconTaken]}>
-                      <MaterialIcons name="check" size={10} color="#fff" />
-                    </View>
-                    <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
-                  </>
-                ) : (
-                  <>
-                    <View style={[styles.statusIcon, styles.statusIconMissed]}>
-                      <MaterialIcons name="close" size={10} color="#fff" />
-                    </View>
-                    <Text style={[styles.pillStatusText, styles.statusTextMissed]}>missed</Text>
-                  </>
-                )}
-              </View>
-            </TouchableOpacity>
-
-            {/* Second Paracetamol - 13:00 PM */}
-            <TouchableOpacity style={styles.medicationCardItem} onPress={() => toggleMedication(1, "13:00")}>
-              <Text style={styles.pillName}>Paracetamol</Text>
-              <Text style={styles.pillTime}>13:00 PM</Text>
-              <View style={styles.pillStatus}>
-                {(medications[0].takenTimes || []).includes("13:00") ? (
-                  <>
-                    <View style={[styles.statusIcon, styles.statusIconTaken]}>
-                      <MaterialIcons name="check" size={10} color="#fff" />
-                    </View>
-                    <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
-                  </>
-                ) : (
-                  <>
-                    <View style={[styles.statusIcon, styles.statusIconMissed]}>
-                      <MaterialIcons name="close" size={10} color="#fff" />
-                    </View>
-                    <Text style={[styles.pillStatusText, styles.statusTextMissed]}>missed</Text>
-                  </>
-                )}
-              </View>
-            </TouchableOpacity>
-
-            {/* Third Paracetamol - 17:00 PM */}
-            <TouchableOpacity style={styles.medicationCardItem} onPress={() => toggleMedication(1, "17:00")}>
-              <Text style={styles.pillName}>Paracetamol</Text>
-              <Text style={styles.pillTime}>17:00 PM</Text>
-              <View style={styles.pillStatus}>
-                {(medications[0].takenTimes || []).includes("17:00") ? (
-                  <>
-                    <View style={[styles.statusIcon, styles.statusIconTaken]}>
-                      <MaterialIcons name="check" size={10} color="#fff" />
-                    </View>
-                    <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
-                  </>
-                ) : (
-                  <>
-                    <View style={[styles.statusIcon, styles.statusIconMissed]}>
-                      <MaterialIcons name="close" size={10} color="#fff" />
-                    </View>
-                    <Text style={[styles.pillStatusText, styles.statusTextMissed]}>missed</Text>
-                  </>
-                )}
-              </View>
-            </TouchableOpacity>
-
-            {/* First Amoxicillin - 8:00 AM */}
-            <TouchableOpacity style={styles.medicationCardItem} onPress={() => toggleMedication(2, "08:00")}>
-              <Text style={styles.pillName}>Amoxicillin</Text>
-              <Text style={styles.pillTime}>8:00 AM</Text>
-              <View style={styles.pillStatus}>
-                {(medications[1].takenTimes || []).includes("08:00") ? (
-                  <>
-                    <View style={[styles.statusIcon, styles.statusIconTaken]}>
-                      <MaterialIcons name="check" size={10} color="#fff" />
-                    </View>
-                    <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
-                  </>
-                ) : (
-                  <>
-                    <View style={[styles.statusIcon, styles.statusIconMissed]}>
-                      <MaterialIcons name="close" size={10} color="#fff" />
-                    </View>
-                    <Text style={[styles.pillStatusText, styles.statusTextMissed]}>missed</Text>
-                  </>
-                )}
-              </View>
-            </TouchableOpacity>
-
-            {/* Second Amoxicillin - 14:00 PM */}
-            <TouchableOpacity style={styles.medicationCardItem} onPress={() => toggleMedication(2, "14:00")}>
-              <Text style={styles.pillName}>Amoxicillin</Text>
-              <Text style={styles.pillTime}>14:00 PM</Text>
-              <View style={styles.pillStatus}>
-                {(medications[1].takenTimes || []).includes("14:00") ? (
-                  <>
-                    <View style={[styles.statusIcon, styles.statusIconTaken]}>
-                      <MaterialIcons name="check" size={10} color="#fff" />
-                    </View>
-                    <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
-                  </>
-                ) : (
-                  <>
-                    <View style={[styles.statusIcon, styles.statusIconMissed]}>
-                      <MaterialIcons name="close" size={10} color="#fff" />
-                    </View>
-                    <Text style={[styles.pillStatusText, styles.statusTextMissed]}>missed</Text>
-                  </>
-                )}
+            {getSortedMedicationDoses().map((dose, index) => (
+              <TouchableOpacity 
+                key={`${dose.id}-${dose.time}`} 
+                style={styles.medicationCardItem} 
+                onPress={() => toggleMedication(dose.id, dose.time)}
+              >
+                <Text style={styles.pillName}>{dose.name}</Text>
+                <Text style={styles.pillTime}>{dose.formattedTime}</Text>
+                <View style={styles.pillStatus}>
+                  {dose.isTaken ? (
+                    <>
+                      <View style={[styles.statusIcon, styles.statusIconTaken]}>
+                        <MaterialIcons name="check" size={10} color="#fff" />
+                      </View>
+                      <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
+                    </>
+                  ) : (
+                    <>
+                      <View style={[
+                        styles.statusIcon, 
+                        dose.status === 'missed' ? styles.statusIconMissed : 
+                        dose.status === 'pending' ? styles.statusIconPending : 
+                        styles.statusIconUpcoming
+                      ]}>
+                        <MaterialIcons 
+                          name={
+                            dose.status === 'missed' ? "close" : 
+                            dose.status === 'pending' ? "access-time" : 
+                            "circle"
+                          } 
+                          size={10} 
+                          color="#fff" 
+                        />
+                      </View>
+                      <Text style={[
+                        styles.pillStatusText, 
+                        dose.status === 'missed' ? styles.statusTextMissed : 
+                        dose.status === 'pending' ? styles.statusTextPending : 
+                        styles.statusTextUpcoming
+                      ]}>
+                        {dose.status}
+                      </Text>
+                    </>
+                  )}
                 </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            ))}
           </ScrollView>
 
           {/* Progress indicator with fluid, ink-like fill */}

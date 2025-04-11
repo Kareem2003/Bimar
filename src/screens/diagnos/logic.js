@@ -10,7 +10,7 @@ import { ToastManager } from "../../helpers/ToastManager";
 // Set up axios with your base URL
 const api = axios.create({
   // Replace with your actual backend URL
-  baseURL: "http://192.168.100.14:3000", // Use your local IP if testing locally
+  baseURL: "http://192.168.1.3:3000", // Use your local IP if testing locally
   // or
   // baseURL: 'https://your-production-api.com',
   timeout: 10000,
