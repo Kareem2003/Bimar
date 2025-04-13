@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    marginTop: 55,
+    marginTop: 25,
     paddingHorizontal: 20,
     paddingBottom: 10,
     fontWeight: "bold",
@@ -161,7 +161,7 @@ export const styles = StyleSheet.create({
   // Modal Styles
 modalOverlay: {
   flex: 1,
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  backgroundColor: "rgba(0, 0, 0, 0.7)",
   justifyContent: "center",
   alignItems: "center",
 },
@@ -188,14 +188,7 @@ filterText: {
   color: "#333",
 },
 closeButton: {
-  marginTop: 15,
-  padding: 10,
-  backgroundColor: "#FD9B63",
-  borderRadius: 5,
-},
-closeButtonText: {
-  color: "#FFF",
-  fontSize: 16,
+  padding: 5,
 },
 cardScroll: {
   flexGrow: 0,
@@ -322,7 +315,108 @@ actionButtonText: {
   marginLeft: 8,
 },
 
+prescriptionButton: {
+  backgroundColor: '#3F51B5',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: 16,
+  borderRadius: 20,
+  width: '90%',
+  position: 'absolute',
+  bottom: 85,
+  alignSelf: 'center',
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  elevation: 5,
+},
+
 scrollContainer: {
   flex: 1,
-}
+},
+
+// Image Modal Styles
+imageModalContainer: {
+  width: "90%",
+  height: "80%",
+  backgroundColor: "#FFF",
+  borderRadius: 15,
+  overflow: "hidden",
+  elevation: 5,
+},
+imageModalHeader: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: 15,
+  borderBottomWidth: 1,
+  borderBottomColor: "#eee",
+},
+imageModalTitle: {
+  fontSize: 18,
+  fontWeight: "bold",
+  color: "#16423C",
+},
+// Image details container
+imageDetailsContainer: {
+  backgroundColor: "#f8f9fa",
+  padding: 12,
+  borderBottomWidth: 1,
+  borderBottomColor: "#e1e1e1",
+},
+imageDetailText: {
+  fontSize: 14,
+  color: "#333",
+  marginBottom: 4,
+},
+detailLabel: {
+  fontWeight: "bold",
+  color: "#16423C",
+},
+imageContainer: {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "#f8f9fa",
+  position: "relative",
+},
+modalImage: {
+  width: "100%",
+  height: "100%",
+},
+zoomControls: {
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: 10,
+  backgroundColor: "#f5f5f5",
+  borderTopWidth: 1,
+  borderTopColor: "#eee",
+},
+zoomButton: {
+  width: 40,
+  height: 40,
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "#fff",
+  borderRadius: 20,
+  marginHorizontal: 15,
+  elevation: 2,
+},
+zoomInstructions: {
+  position: "absolute",
+  bottom: 10,
+  left: 0,
+  right: 0,
+  alignItems: "center",
+  padding: 8,
+  backgroundColor: "rgba(0,0,0,0.5)",
+},
+zoomText: {
+  color: "#fff",
+  fontSize: 12,
+  fontWeight: "500",
+},
 });

@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
+    marginTop: 25,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },

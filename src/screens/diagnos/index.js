@@ -1,5 +1,5 @@
 import { styles } from "./style";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 import {
   View,
@@ -11,6 +11,10 @@ import {
   ScrollView,
   FlatList,
   ActivityIndicator,
+  Alert,
+  Modal,
+  Dimensions,
+  PanResponder
 } from "react-native";
 import { Button } from "react-native-paper";
 import AppButton from "../../components/AppButton";
@@ -19,6 +23,64 @@ import Logic from "./logic";
 
 const Diagnos = ({ navigation, route }) => {
   const diagnosis = route.params?.diagnosis;
+  
+  // Add state for modal
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedTitle, setSelectedTitle] = useState("");
+  const [selectedImageData, setSelectedImageData] = useState(null);
+  const [scale, setScale] = useState(1);
+  const lastScale = useRef(1);
+  const lastDistance = useRef(0);
+
+  // Pan responder for zoom functionality
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (event, gestureState) => {
+        // Handle pinch-to-zoom
+        if (event.nativeEvent.touches.length === 2) {
+          const touch1 = event.nativeEvent.touches[0];
+          const touch2 = event.nativeEvent.touches[1];
+          
+          if (touch1 && touch2) {
+            const dx = touch1.pageX - touch2.pageX;
+            const dy = touch1.pageY - touch2.pageY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (lastDistance.current === 0) {
+              lastDistance.current = distance;
+              return;
+            }
+            
+            const newScale = lastScale.current * (distance / lastDistance.current);
+            // Limit zoom range
+            if (newScale >= 0.5 && newScale <= 3) {
+              setScale(newScale);
+            }
+          }
+        }
+      },
+      onPanResponderEnd: () => {
+        lastScale.current = scale;
+        lastDistance.current = 0;
+      }
+    })
+  ).current;
+
+  console.log("Diagnosis data:", diagnosis);
+  console.log("Prescription data:", diagnosis?.prescription);
+  console.log("X-ray data:", diagnosis?.rawXrays);
+  console.log("Lab results data:", diagnosis?.rawLabResults);
+  console.log("Attachments:", diagnosis?.attachments);
+  
+  // Check if there's valid prescription data
+  const hasPrescription = !!(diagnosis?.prescription && 
+    typeof diagnosis.prescription === 'object' && 
+    Object.keys(diagnosis.prescription).length > 0);
+  
+  console.log("Has valid prescription data:", hasPrescription);
 
   if (!diagnosis) {
     return (
@@ -53,9 +115,123 @@ const Diagnos = ({ navigation, route }) => {
       doctorImage: diagnosis.image
     });
   };
+  
+  // Handle opening image in modal
+  const openImageModal = (image, title, rawData) => {
+    console.log("Opening image modal with:", { image, title, rawData });
+    setSelectedImage(image);
+    setSelectedTitle(title);
+    setSelectedImageData(rawData);
+    setScale(1); // Reset scale when opening new image
+    lastScale.current = 1;
+    lastDistance.current = 0;
+    setModalVisible(true);
+  };
+
+  // Reset zoom when closing the modal
+  const closeModal = () => {
+    setModalVisible(false);
+    setScale(1);
+    lastScale.current = 1;
+    lastDistance.current = 0;
+  };
 
   return (
     <View style={styles.container}>
+      {/* Image View Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.imageModalContainer}>
+            <View style={styles.imageModalHeader}>
+              <Text style={styles.imageModalTitle}>{selectedTitle}</Text>
+              <TouchableOpacity 
+                onPress={closeModal}
+                style={styles.closeButton}
+              >
+                <Icon name="close" size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
+            
+            {/* Display additional details if available */}
+            {selectedImageData && (
+              <View style={styles.imageDetailsContainer}>
+                {selectedImageData.description && (
+                  <Text style={styles.imageDetailText}>
+                    <Text style={styles.detailLabel}>Description: </Text>
+                    {selectedImageData.description}
+                  </Text>
+                )}
+                {selectedImageData.date && (
+                  <Text style={styles.imageDetailText}>
+                    <Text style={styles.detailLabel}>Date: </Text>
+                    {new Date(selectedImageData.date).toLocaleDateString()}
+                  </Text>
+                )}
+                {selectedImageData.doctor && (
+                  <Text style={styles.imageDetailText}>
+                    <Text style={styles.detailLabel}>Doctor: </Text>
+                    {selectedImageData.doctor}
+                  </Text>
+                )}
+              </View>
+            )}
+            
+            <View style={styles.imageContainer} {...panResponder.panHandlers}>
+              {selectedImage && (
+                <Image 
+                  source={selectedImage} 
+                  style={[
+                    styles.modalImage,
+                    { transform: [{ scale: scale }] }
+                  ]}
+                  resizeMode="contain"
+                  onError={(e) => {
+                    console.log("Error loading image:", e.nativeEvent.error);
+                    Alert.alert(
+                      "Image Error",
+                      "Could not load the image. The image URL might be invalid or the image might not exist anymore."
+                    );
+                  }}
+                />
+              )}
+              <View style={styles.zoomInstructions}>
+                <Text style={styles.zoomText}>
+                  Pinch with two fingers to zoom in/out
+                </Text>
+              </View>
+            </View>
+            {/* Zoom controls */}
+            <View style={styles.zoomControls}>
+              <TouchableOpacity 
+                style={styles.zoomButton}
+                onPress={() => {
+                  const newScale = Math.max(0.5, scale - 0.2);
+                  setScale(newScale);
+                  lastScale.current = newScale;
+                }}
+              >
+                <Icon name="remove-outline" size={24} color="#16423C" />
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.zoomButton}
+                onPress={() => {
+                  const newScale = Math.min(3, scale + 0.2);
+                  setScale(newScale);
+                  lastScale.current = newScale;
+                }}
+              >
+                <Icon name="add-outline" size={24} color="#16423C" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      
       <ScrollView style={styles.scrollContainer} contentContainerStyle={{paddingBottom: 120}}>
         {/* Header with back button */}
         <View style={[styles.header, { flexDirection: "row", alignItems: "center" }]}>
@@ -114,16 +290,38 @@ const Diagnos = ({ navigation, route }) => {
             <TouchableOpacity 
               key={attachment.id}
               style={styles.attachmentCard}
-              onPress={() => navigation.navigate(
-                attachment.type === "X-ray" ? "XrayScreen" : 
-                attachment.type === "Lab Results" ? "TestingResultScreen" : 
-                "PrescriptionScreen", 
-                { 
-                  title: attachment.type,
-                  time: attachment.time,
-                  attachmentId: attachment.id 
+              onPress={() => {
+                if (attachment.type === "X-ray") {
+                  // Open X-ray in modal instead of navigating
+                  openImageModal(attachment.imageSource || attachment.image, "X-ray Results", attachment.rawData);
+                } else if (attachment.type === "Lab Results") {
+                  // Open lab results in modal instead of navigating
+                  openImageModal(attachment.imageSource || attachment.image, "Laboratory Test Results", attachment.rawData);
+                } else if (attachment.type === "Prescription") {
+                  // Use our hasPrescription check to determine what to do
+                  if (hasPrescription) {
+                    console.log("Navigating to prescription screen with:", diagnosis.prescription);
+                    navigation.navigate("PrescriptionScreen", {
+                      prescription: diagnosis.prescription
+                    });
+                  } else {
+                    // Alert user that no prescription data exists
+                    Alert.alert(
+                      "No Prescription Data",
+                      "No prescription has been issued for this diagnosis yet.",
+                      [
+                        { text: "OK", onPress: () => console.log("OK Pressed") }
+                      ]
+                    );
+                  }
+                } else {
+                  navigation.navigate("PrescriptionScreen", { 
+                    title: attachment.type,
+                    time: attachment.time,
+                    attachmentId: attachment.id 
+                  });
                 }
-              )}
+              }}
             >
               <Image 
                 source={attachment.image}

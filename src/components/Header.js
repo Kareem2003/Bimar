@@ -9,7 +9,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 
 // Updated Header Component
-const Header = ({ header, onPress, marginTop }) => (
+const Header = ({ header, onPress, marginTop = 25 }) => (
   <View style={[headerStyles.header, { marginTop: marginTop }]}>
     <TouchableOpacity onPress={onPress} style={headerStyles.backButton}>
       <Icon name="chevron-back" size={24} color="#000" />
