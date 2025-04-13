@@ -7,19 +7,40 @@ import Logic from "./logic";
 import AppButton from "../../components/AppButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../../helpers/constants/staticKeys";
-import { BASE_URL } from "../../helpers/constants/config";
-import Header from "../../components/Header";
+import ACTION_TYPES from "../../reducers/actionTypes";
 
 const DoctorProfile = ({ navigation, route }) => {
-  const doctor = route.params.doctor;
-  const { state, sendSelectedDateToDB } = Logic(navigation); // Get function from Logic
-  const [selectedDate, setSelectedDate] = useState(null); // Fix useState
-  const [userInfo, setUserInfo] = useState(null);
+  const { state, updateState, bookDoctorAppointment } = Logic(
+    navigation,
+    route
+  ); // Get function from Logic
   const handleDateSelection = (date) => {
-    setSelectedDate(date); // Store the formatted date in YYYY-MM-DD format
-    console.log("Selected Date: ", date);
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "selectedDate",
+        value: date,
+      },
+    ]);
   };
 
+  // const fetchUserInfo = async () => {
+  //   try {
+  //     const userData = await AsyncStorage.getItem(USERINFO);
+  //     if (userData) {
+  //       const parsedData = JSON.parse(userData);
+  //       setUserInfo(parsedData); // Store user info
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching user info:", error);
+  //   }
+  // };
+  // // Fetch user info from AsyncStorage
+  // useEffect(() => {
+  //   fetchUserInfo();
+  // }, []);
+
+  //   console.log("user:", userInfo.id);
 
   return (
     <ScrollView style={styles.container}>
@@ -31,87 +52,99 @@ const DoctorProfile = ({ navigation, route }) => {
         >
           <Icon name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Doctor Profile</Text>
+        <View style={styles.headerTitleContainer}>
+          <Text style={styles.headerTitle}>Doctor Profile</Text>
+        </View>
       </View>
       {/* Doctor Profile Section */}
       <View style={styles.profileSection}>
-        {doctor.doctorImage && doctor.doctorImage !== "null" ? (
-          <Image 
-            source={{ uri: `${BASE_URL}/${doctor.doctorImage}` }}
-            style={styles.profileImage}
-          />
-        ) : (
-          <View style={[styles.profileImage, { backgroundColor: '#f5f5f5', justifyContent: 'center', alignItems: 'center' }]}>
-            <FontAwesome name="user-md" size={80} color="#16423C" />
-          </View>
-        )}
+        <Image
+          source={
+            state.doctor?.doctorImage && state.doctor.doctorImage !== "null"
+              ? { uri: state.doctor.doctorImage }
+              : require("../../assets/images/WhatsApp Image 2023-07-23 at 15.23.54.jpg")
+          }
+          style={styles.profileImage}
+        />
         <Text style={styles.doctorName}>
-          {doctor.doctorName || "Dr. Unknown"}
+          {state.doctor?.doctorName || "Dr. Unknown"}
         </Text>
-        <Text style={styles.specialization}>{doctor.field || "General"}</Text>
-
-        {/* Rating Badge */}
-        <View style={styles.ratingBadge}>
-          <Icon name="star" size={16} color="#FD9B63" />
-          <Text style={styles.ratingText}>4.5</Text>
-          <Text style={styles.reviewCount}>100 Reviews</Text>
-        </View>
+        <Text style={styles.specialization}>
+          {state.doctor?.field || "General"}
+        </Text>
+        {state.doctor ? (
+          <View style={styles.ratingBadge}>
+            <Icon name="star" size={16} color="#FD9B63" />
+            <Text style={styles.ratingText}>4.5</Text>
+            <Text style={styles.reviewCount}>100 Reviews</Text>
+          </View>
+        ) : (
+          <Text>Loading doctor information...</Text>
+        )}
       </View>
 
       {/* About Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>About Doctor</Text>
         <Text style={styles.aboutText}>
-          {doctor.doctorName ? `Dr. ${doctor.doctorName}` : "The doctor"} is a
-          top specialist at{" "}
-          {doctor.clinic?.[0]?.clinicName || "London Bridge Hospital"}. He has
-          achieved several awards and recognition
+          {state.doctor
+            ? `Dr. ${state.doctor.doctorName} is a top specialist at ${
+                state.doctor.clinic?.[0]?.clinicName || "London Bridge Hospital"
+              }. He has achieved several awards and recognition`
+            : "Loading about information..."}
         </Text>
       </View>
 
       {/* Working Time Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Working Time</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {doctor.clinic?.[0]?.clinicWorkDays?.map((workDay, index) => {
-            const today = new Date();
-            const daysOfWeek = [
-              "Sunday",
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-            ];
-            const workDayIndex = daysOfWeek.indexOf(workDay.day);
+        {state.doctor?.clinic?.map((clinic, clinicIndex) => (
+          <View key={clinicIndex}>
+            <Text style={styles.clinicName}>{clinic.clinicAddress}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {clinic.clinicWorkDays?.map((workDay, index) => {
+                const today = new Date();
+                const daysOfWeek = [
+                  "Sunday",
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                ];
+                const workDayIndex = daysOfWeek.indexOf(workDay.day);
 
-            // Find the next occurrence of the selected workday
-            let actualDate = new Date(today);
-            actualDate.setDate(
-              today.getDate() + ((workDayIndex - today.getDay() + 7) % 7)
-            );
+                // Find the next occurrence of the selected workday
+                let actualDate = new Date(today);
+                actualDate.setDate(
+                  today.getDate() + ((workDayIndex - today.getDay() + 7) % 7)
+                );
 
-            // Convert to "YYYY-MM-DD" format
-            const formattedDate = actualDate.toISOString().split("T")[0];
+                // Convert to "YYYY-MM-DD" format
+                const formattedDate = actualDate.toISOString().split("T")[0];
 
-            return (
-              <TouchableOpacity
-                key={index}
-                onPress={() => handleDateSelection(formattedDate)}
-                style={[
-                  styles.workDayCard,
-                  selectedDate === formattedDate && styles.activeWorkDayCard,
-                ]}
-              >
-                <Text style={styles.workDayText}>{workDay.day}</Text>
-                <Text style={styles.workHoursText}>{workDay.workingHours}</Text>
-                <Text style={styles.dateText}>{formattedDate}</Text>
-                {/* Display actual date */}
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => handleDateSelection(formattedDate)}
+                    style={[
+                      styles.workDayCard,
+                      state.selectedDate === formattedDate &&
+                        styles.activeWorkDayCard,
+                    ]}
+                  >
+                    <Text style={styles.workDayText}>{workDay.day}</Text>
+                    <Text style={styles.workHoursText}>
+                      {workDay.workingHours}
+                    </Text>
+                    <Text style={styles.dateText}>{formattedDate}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        ))}
       </View>
 
       {/* Book Now Button */}
@@ -120,13 +153,11 @@ const DoctorProfile = ({ navigation, route }) => {
         buttonStyle={styles.bookButton}
         textStyle={{ color: "#FFFFFF", fontSize: 16, fontWeight: "bold" }}
         onPress={() => {
-          if (!selectedDate) {
+          if (!state.selectedDate) {
             alert("Please select a date first!");
             return;
           }
-          sendSelectedDateToDB(doctor._id, doctor.clinic[0]._id, selectedDate);
-
-          navigation.navigate("BookDate", { doctor, selectedDate });
+          bookDoctorAppointment();
         }}
       />
     </ScrollView>

@@ -29,8 +29,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 
 const BookNow = ({ navigation, route }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const { state, updateState, handleNext, handleBack, maritalStatus } =
-    Logic(navigation);
+  const { state, updateState, handleBooking } = Logic(navigation, route);
 
   const renderHeader = () => (
     <View style={styles.header}>
@@ -40,10 +39,8 @@ const BookNow = ({ navigation, route }) => {
       >
         <Icon name="arrow-back" size={24} color="#333" />
       </TouchableOpacity>
-      <Text style={styles.headerTitle}>
-        <Text>Payment Methods</Text>
-      </Text>
-      <View style={styles.backButton} /> {/* Empty view for spacing */}
+      <Text style={styles.headerTitle}>Payment Methods</Text>
+      <View style={styles.backButton} />
     </View>
   );
   return (
@@ -60,27 +57,35 @@ const BookNow = ({ navigation, route }) => {
         <View style={styles.profile}>
           <Image
             style={styles.profileAvatar}
-            source={require("../../assets/images/WhatsApp Image 2023-07-23 at 15.23.54.jpg")}
+            source={
+              state.doctor?.doctorImage && state.doctor.doctorImage !== "null"
+                ? { uri: state.doctor.doctorImage }
+                : require("../../assets/images/WhatsApp Image 2023-07-23 at 15.23.54.jpg")
+            }
           />
         </View>
       </View>
       <View style={{ margin: 30 }}>
-        <Text style={{ fontSize: 15, color: "#16423C" }}>Dr. Bellamy N</Text>
+        <Text style={{ fontSize: 15, color: "#16423C" }}>
+          {state.doctor ? state.doctor.doctorName : "Doctor not available"}
+        </Text>
         <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 5 }}>
-          £320.45
+          £ {state.price}
         </Text>
       </View>
       <View style={{ margin: 30 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <Text style={{ fontSize: 15, color: "slategray" }}>Sub total</Text>
-          <Text style={{ fontSize: 15, color: "slategray" }}>£316.55</Text>
+          <Text style={{ fontSize: 15, color: "slategray" }}>
+            £ {state.price}
+          </Text>
         </View>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <Text style={{ fontSize: 15, color: "slategray", marginTop: 5 }}>
             Tax
           </Text>
           <Text style={{ fontSize: 15, color: "slategray", marginTop: 5 }}>
-            £3.45
+            £ 4.99
           </Text>
         </View>
       </View>
@@ -90,17 +95,12 @@ const BookNow = ({ navigation, route }) => {
             Total
           </Text>
           <Text style={{ fontSize: 15, color: "slate", marginTop: 5 }}>
-            £320.45
+            £ {state.price + 4.99}
           </Text>
         </View>
       </View>
-      <View style={{ margin: 'auto' }}>
-        <AppButton 
-          title="Book Now" 
-          onPress={() => {
-            navigation.navigate("BookDate");
-          }} 
-        />
+      <View style={{ margin: "auto" }}>
+        <AppButton title="Book Now" onPress={handleBooking} />
       </View>
     </View>
   );

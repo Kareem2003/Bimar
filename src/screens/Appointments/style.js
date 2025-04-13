@@ -1,289 +1,171 @@
 import { Dimensions } from "react-native";
 import { primary } from "../../styles/colors";
+
 export const styles = {
   container: {
     flex: 1,
-    backgroundColor: "#E9EFEC",
+    backgroundColor: "#F5F7FA",
   },
-  backgroundContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    zIndex: -1,
+  filterContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
   },
-  header: {
-    alignItems: "center",
-    marginTop: 55,
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-    fontWeight: "bold",
-  },
-  greeting: {
-    fontSize: 24,
-    color: "#000",
-  },
-  subGreeting: {
-    fontSize: 16,
-    color: "#000",
-    marginBottom: 10,
-  },
-  //Health Journey Banner
-  healthCard: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-    backgroundColor: "#16423C",
-    borderRadius: 20,
-    height: 130,
-    overflow: "hidden",
-  },
-  banner: {
-    flex: 1,
-    justifyContent: "center",
-    // iOS shadow properties
+  filterButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: "#FFF",
+    marginRight: 8,
+    elevation: 2,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 9 },
-    shadowOpacity: 0.5,
-    shadowRadius: 7,
-    // Android shadow property
-    //elevation: 5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
-  CircleBackground: {
-    backgroundColor: "#6A9C89",
-    borderRadius: 55,
-    width: 110,
-    height: 110,
-    position: "absolute",
-    top: -1,
-    left: 5,
-    justifyContent: "center",
-    alignItems: "center",
+  activeFilterButton: {
+    backgroundColor: "#16423C",
+    shadowColor: "#16423C",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
-  bannerImage: {
-    width: 120,
-    height: 120,
-    position: "absolute",
-    bottom: -1,
-  },
-  bannerAllText: {
-    flex: 1,
-    marginLeft: 80,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bannerText: {
+  filterButtonText: {
     fontSize: 13,
-    fontWeight: "bold",
+    color: "#666",
+    fontWeight: "600",
+  },
+  activeFilterButtonText: {
     color: "#FFF",
   },
-  bannerSubText: {
-    fontSize: 14,
-    color: "#FD9B63",
-    marginTop: 5,
+  appointmentsContainer: {
+    padding: 20,
   },
-  // Search Bar
-  searchContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 10,
-  },
-
-  searchBarWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFF",
-    borderRadius: 25,
-    elevation: 2,
-  },
-
-  searchBar: {
+  loadingContainer: {
     flex: 1,
-    paddingLeft: 20,
-    height: 40,
-    fontSize: 16,
-    color: "#0000",
-  },
-
-  filterIconWrapper: {
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 15,
-    height: 40,
   },
-  //Services Section
-  servicesSection: {
-    marginVertical: 20,
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorText: {
+    color: "#C62828",
+    fontSize: 16,
+    textAlign: "center",
+  },
+  actionButton: {
+    marginTop: 12,
+    borderRadius: 12,
+    paddingVertical: 10,
+    backgroundColor: "#F0F4F8",
+  },
+  actionButtonText: {
+    color: "#16423C",
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  appointmentCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    marginBottom: 20,
+    overflow: "hidden",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 15,
+    borderWidth: 0,
+    transform: [{ scale: 1 }],
+  },
+  cardHeader: {
+    paddingTop: 20,
     paddingHorizontal: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-    flexDirection: "row",
-    justifyContent: "space-between", 
-    alignItems: "center", 
-  },
-  showMoreText: {
-    color: "#FD9B63",
-  },
-  serviceCards: {
     flexDirection: "row",
     justifyContent: "space-between",
-  },
-  serviceCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 10,
     alignItems: "center",
-    justifyContent: "center",
-    padding: 10,
-    width: "45%",
-    elevation: 2,
-    // iOS shadow properties
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 7 },
-    shadowOpacity: 0.2,
-    shadowRadius: 9,
-    // Android shadow property
-    //elevation: 5,
   },
-  cardText: {
-    fontSize: 14,
-    color: "#000",
-    marginTop: 10,
-  },
-  // doctor section
-  doctorSection: {
-    marginVertical: 20,
-    paddingHorizontal: 20,
-  },
-  UpcomingCard: {
-    backgroundColor: "#FFF",
-    margin: "auto",
-    marginBottom: 15,
-    borderRadius: 10,
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
     elevation: 3,
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
-    width: "95%",
-    height: 150,
-    overflow: "hidden",
-  },
-  PastBookingCard: {
-    backgroundColor: "#FFF",
-    margin: "auto",
-    marginBottom: 15,
-    borderRadius: 10,
-    elevation: 3,
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
-    width: "95%",
-    height: 150,
-    overflow: "hidden",
-  },
-  circleWrapper: {
-    position: "absolute",
-    top: -10,
-    left: -10,
-    zIndex: -1,
-  },
-  circleOne: {
-    position: "absolute",
-    width: 110,
-    height: 110,
-    backgroundColor: "#16423C",
-    borderRadius: 55,
-    top: 30,
-    left: 10,
-    opacity: 0.6,
-    // iOS shadow properties
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 7 },
-    shadowOpacity: 0.7,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
     shadowRadius: 4,
-    // Android shadow property
-    //elevation: 5,
   },
-  circleTwo: {
-    position: "absolute",
-    width: 70,
-    height: 70,
-    backgroundColor: "#16423C",
-    borderRadius: 35,
-    top: 15,
-    left: 60,
+  statusText: {
+    fontSize: 12,
+    fontWeight: "700",
   },
-  doctorImage: {
-    position: "absolute",
-    width: 100,
-    height: 150,
+  cardContent: {
+    padding: 16,
   },
   doctorInfo: {
-    justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  doctorImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    marginRight: 16,
+    backgroundColor: "#E8ECF1",
+  },
+  doctorDetails: {
     flex: 1,
-    paddingLeft: 110,
   },
   doctorName: {
-    fontSize: 12,
-    
-    color: "#777777",
-    marginBottom: 5,
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1A202C",
+    marginBottom: 4,
   },
-  doctorSpecialization: {
+  specialty: {
     fontSize: 14,
-    color: "#333",
+    color: "#718096",
   },
-  bottomNav: {
+  appointmentDetails: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: "#16423C",
-    width: "100%",
-    height: 60,
+    flexWrap: "wrap",
+    gap: 12,
   },
-  navButton: {
+  detailRow: {
+    flexDirection: "row",
     alignItems: "center",
-    paddingBottom: 15,
+    backgroundColor: "#F9FAFB",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
-
-  // Modal Styles
-modalOverlay: {
-  flex: 1,
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
-  justifyContent: "center",
-  alignItems: "center",
-},
-modalContainer: {
-  width: "80%",
-  backgroundColor: "#FFF",
-  borderRadius: 10,
-  padding: 20,
-  alignItems: "center",
-},
-modalTitle: {
-  fontSize: 18,
-  fontWeight: "bold",
-  marginBottom: 15,
-},
-filterOption: {
-  padding: 10,
-  width: "100%",
-  borderBottomWidth: 1,
-  borderBottomColor: "#E9EFEC",
-},
-filterText: {
-  fontSize: 16,
-  color: "#333",
-},
-closeButton: {
-  marginTop: 15,
-  padding: 10,
-  backgroundColor: "#FD9B63",
-  borderRadius: 5,
-},
-closeButtonText: {
-  color: "#FFF",
-  fontSize: 16,
-},
-
+  detailText: {
+    fontSize: 13,
+    color: "#4A5568",
+    marginLeft: 8,
+  },
+  cancelButton: {
+    marginTop: 16,
+    backgroundColor: "#FEE2E2",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#FECACA",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cancelButtonText: {
+    color: "#DC2626",
+    fontSize: 13,
+    fontWeight: "600",
+    marginLeft: 6,
+  },
 };

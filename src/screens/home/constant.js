@@ -4,4 +4,5 @@ export const INITIAL_STATE = {
   loading: false,
   error: null,
   userName: '',
+  userinfo: {},
 };

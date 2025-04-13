@@ -13,7 +13,6 @@ const BookDate = ({ navigation }) => {
     handleBooking(day.dateString);
   };
 
-  console.log("Selected Date:", state.selectedDate);
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkTheme ? "#222" : "#fff" }]}>

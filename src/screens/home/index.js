@@ -524,7 +524,7 @@ const Home = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView 
+      <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
@@ -535,7 +535,6 @@ const Home = ({ navigation }) => {
             <MenuButton navigation={navigation} />
             <Text style={styles.greeting}>Hi, {state.userName || "User"}</Text>
           </View>
-          <Text style={styles.subGreeting}>How are you feeling today!</Text>
         </View>
 
         {/* Health Journey Banner */}
@@ -602,52 +601,62 @@ const Home = ({ navigation }) => {
                   <View style={styles.orangeBubble} />
                   <View style={styles.greenBar} />
                   <View style={styles.orangeDot} />
-                  
+
                   <View style={styles.doctorImageBorder}>
                     <View style={styles.doctorImageContainer}>
-                  <Image
-                    source={
-                      doctor.doctorImage && doctor.doctorImage !== "null"
+                      <Image
+                        source={
+                          doctor.doctorImage && doctor.doctorImage !== "null"
                             ? { uri: `${BASE_URL}/${doctor.doctorImage}` }
-                        : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
-                    }
-                    style={styles.doctorImage}
+                            : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
+                        }
+                        style={styles.doctorImage}
                         resizeMode="cover"
-                  />
+                      />
                     </View>
                   </View>
-                  
+
                   <View style={styles.doctorContent}>
-                  <View style={styles.doctorInfo}>
-                    <Text style={styles.doctorName}>
+                    <View style={styles.doctorInfo}>
+                      <Text style={styles.doctorName}>
                         {doctor.doctorName || "UnKnown"}
-                    </Text>
+                      </Text>
                       <Text style={styles.doctorSpecialty}>
                         {doctor.field || "Internal Medicine"}
-                    </Text>
-                      
+                      </Text>
+
                       <View style={styles.infoRow}>
-                        <MaterialIcons name="location-on" size={12} color="#666" />
+                        <MaterialIcons
+                          name="location-on"
+                          size={12}
+                          color="#666"
+                        />
                         <Text style={styles.infoText}>
-                      {doctor.clinic && doctor.clinic.length > 0
-                        ? doctor.clinic[0].clinicArea
+                          {doctor.clinic && doctor.clinic.length > 0
+                            ? doctor.clinic[0].clinicArea
                             : "Nasr City"}
-                    </Text>
+                        </Text>
                       </View>
-                      
+
                       <View style={styles.infoRow}>
                         <MaterialIcons name="history" size={12} color="#666" />
                         <Text style={styles.infoText}>8+ years experience</Text>
                       </View>
                     </View>
                   </View>
-                  
+
                   <View style={styles.statusBadge}>
                     <View style={styles.starContainer}>
                       <Icon name="star" size={10} color="#FD9B63" />
                       <Text style={styles.ratingText}>4.8</Text>
                     </View>
-                    <Text style={styles.availableText}>{doctor.price || doctor.consultationFee || "500"}LE</Text>
+                    <Text style={styles.availableText}>
+                      {doctor.clinic &&
+                      doctor.clinic.length > 0 &&
+                      doctor.clinic[0].Price
+                        ? `${doctor.clinic[0].Price}LE`
+                        : "__LE"}
+                    </Text>
                   </View>
                 </TouchableOpacity>
               ))
@@ -662,7 +671,12 @@ const Home = ({ navigation }) => {
           <View style={styles.medicationHeader}>
             <Text style={styles.medicationTitle}>Today's medication</Text>
             <Text style={styles.medicationSubtext}>
-              You've taken {medications.reduce((sum, med) => sum + (med.takenTimes?.length || 0), 0)} out of 5 meds today!
+              You've taken{" "}
+              {medications.reduce(
+                (sum, med) => sum + (med.takenTimes?.length || 0),
+                0
+              )}{" "}
+              out of 5 meds today!
             </Text>
           </View>
 
@@ -673,9 +687,9 @@ const Home = ({ navigation }) => {
             style={styles.medicationCardsScroll}
           >
             {getSortedMedicationDoses().map((dose, index) => (
-              <TouchableOpacity 
-                key={`${dose.id}-${dose.time}`} 
-                style={styles.medicationCardItem} 
+              <TouchableOpacity
+                key={`${dose.id}-${dose.time}`}
+                style={styles.medicationCardItem}
                 onPress={() => toggleMedication(dose.id, dose.time)}
               >
                 <Text style={styles.pillName}>{dose.name}</Text>
@@ -686,32 +700,46 @@ const Home = ({ navigation }) => {
                       <View style={[styles.statusIcon, styles.statusIconTaken]}>
                         <MaterialIcons name="check" size={10} color="#fff" />
                       </View>
-                      <Text style={[styles.pillStatusText, styles.statusTextTaken]}>taken</Text>
+                      <Text
+                        style={[styles.pillStatusText, styles.statusTextTaken]}
+                      >
+                        taken
+                      </Text>
                     </>
                   ) : (
                     <>
-                      <View style={[
-                        styles.statusIcon, 
-                        dose.status === 'missed' ? styles.statusIconMissed : 
-                        dose.status === 'pending' ? styles.statusIconPending : 
-                        styles.statusIconUpcoming
-                      ]}>
-                        <MaterialIcons 
+                      <View
+                        style={[
+                          styles.statusIcon,
+                          dose.status === "missed"
+                            ? styles.statusIconMissed
+                            : dose.status === "pending"
+                            ? styles.statusIconPending
+                            : styles.statusIconUpcoming,
+                        ]}
+                      >
+                        <MaterialIcons
                           name={
-                            dose.status === 'missed' ? "close" : 
-                            dose.status === 'pending' ? "access-time" : 
-                            "circle"
-                          } 
-                          size={10} 
-                          color="#fff" 
+                            dose.status === "missed"
+                              ? "close"
+                              : dose.status === "pending"
+                              ? "access-time"
+                              : "circle"
+                          }
+                          size={10}
+                          color="#fff"
                         />
                       </View>
-                      <Text style={[
-                        styles.pillStatusText, 
-                        dose.status === 'missed' ? styles.statusTextMissed : 
-                        dose.status === 'pending' ? styles.statusTextPending : 
-                        styles.statusTextUpcoming
-                      ]}>
+                      <Text
+                        style={[
+                          styles.pillStatusText,
+                          dose.status === "missed"
+                            ? styles.statusTextMissed
+                            : dose.status === "pending"
+                            ? styles.statusTextPending
+                            : styles.statusTextUpcoming,
+                        ]}
+                      >
                         {dose.status}
                       </Text>
                     </>
@@ -725,43 +753,52 @@ const Home = ({ navigation }) => {
           <View style={styles.progressRow}>
             <View style={styles.progressCircleContainer}>
               <View style={styles.progressBackground} />
-              
-              {calculateProgress() > 0 && (
-                calculateProgress() >= 100 ? (
+
+              {calculateProgress() > 0 &&
+                (calculateProgress() >= 100 ? (
                   // Special case for 100% - fully filled circle
-                  <View style={{
-                    position: 'absolute',
-                    width: 65,
-                    height: 65,
-                    borderRadius: 32.5,
-                    backgroundColor: '#6A9C89',
-                    zIndex: 5
-                  }} />
+                  <View
+                    style={{
+                      position: "absolute",
+                      width: 65,
+                      height: 65,
+                      borderRadius: 32.5,
+                      backgroundColor: "#6A9C89",
+                      zIndex: 5,
+                    }}
+                  />
                 ) : (
                   // For 1-99%, show a fluid circular progress
-                  <View style={{
-                    position: 'absolute',
-                    width: 65,
-                    height: 65,
-                    overflow: 'hidden',
-                    borderRadius: 32.5,
-                  }}>
-                    <View style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
+                  <View
+                    style={{
+                      position: "absolute",
                       width: 65,
-                      height: `${calculateProgress()}%`,
-                      backgroundColor: '#6A9C89',
-                      borderTopLeftRadius: calculateProgress() > 90 ? 0 : 32.5,
-                      borderTopRightRadius: calculateProgress() > 90 ? 0 : 32.5,
-                    }} />
+                      height: 65,
+                      overflow: "hidden",
+                      borderRadius: 32.5,
+                    }}
+                  >
+                    <View
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        width: 65,
+                        height: `${calculateProgress()}%`,
+                        backgroundColor: "#6A9C89",
+                        borderTopLeftRadius:
+                          calculateProgress() > 90 ? 0 : 32.5,
+                        borderTopRightRadius:
+                          calculateProgress() > 90 ? 0 : 32.5,
+                      }}
+                    />
                   </View>
-                )
-              )}
-              
+                ))}
+
               <View style={styles.progressInnerCircle}>
-                <Text style={styles.progressPercentage}>{calculateProgress()}%</Text>
+                <Text style={styles.progressPercentage}>
+                  {calculateProgress()}%
+                </Text>
               </View>
             </View>
 
@@ -769,12 +806,13 @@ const Home = ({ navigation }) => {
               <Text style={styles.progressText}>Complete</Text>
               {getNextMedication() ? (
                 <Text style={styles.nextMedicationText}>
-                  Next: {getNextMedication().name} - {getNextMedication().formattedTime}
-                        </Text>
+                  Next: {getNextMedication().name} -{" "}
+                  {getNextMedication().formattedTime}
+                </Text>
               ) : (
                 <Text style={styles.nextMedicationText}>
                   All medications taken for today!
-                          </Text>
+                </Text>
               )}
             </View>
           </View>

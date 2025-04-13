@@ -1,29 +1,33 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E9EFEC',
+    backgroundColor: "#E9EFEC",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-    marginTop: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#C4DAD2",
+    justifyContent: "space-between",
+    paddingTop: 30,
   },
   backButton: {
-    padding: 8,
+    paddingLeft: 20,
+  },
+  headerTitleContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingRight: 40,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   profileSection: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 24,
-    backgroundColor: '#C4DAD2',
+    backgroundColor: "#C4DAD2",
     borderBottomLeftRadius: 120,
     borderBottomRightRadius: 120,
   },
@@ -35,37 +39,37 @@ export const styles = StyleSheet.create({
   },
   doctorName: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   specialization: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginBottom: 16,
   },
   ratingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     padding: 8,
     borderRadius: 20,
     elevation: 2,
   },
   ratingText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginHorizontal: 4,
   },
   reviewCount: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   section: {
     padding: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 10,
   },
   aboutText: {
@@ -97,13 +101,19 @@ export const styles = StyleSheet.create({
     color: "#FD9B63",
     fontSize: 13,
     fontWeight: "bold",
-  },  
+  },
   bookButton: {
-    backgroundColor: '#16423C',
+    backgroundColor: "#16423C",
     paddingVertical: 16,
     borderRadius: 20,
-    alignSelf: 'center',
-    width: '60%',
+    alignSelf: "center",
+    width: "60%",
     marginTop: 10,
+  },
+  clinicName: {
+    color: "#FD9B63",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginVertical: 10,
   },
 });

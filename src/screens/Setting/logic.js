@@ -14,6 +14,7 @@ import {
 } from "../../helpers/constants/staticKeys";
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
+import axios from "axios";
 
 const maritalStatus = [
   { label: "Bachelor", value: "0" },
@@ -59,7 +60,8 @@ const Logic = (navigation) => {
     try {
       await AsyncStorage.clear();
       console.log('AsyncStorage cleared');
-      
+      // Remove all headers in axios as cookie
+      axios.defaults.headers.common['Cookie'] = '';
       navigation.replace('Login');
     } catch (error) {
       console.error('Error clearing AsyncStorage:', error);

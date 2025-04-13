@@ -1,230 +1,169 @@
-import { styles } from "./style";
-import React, { useState } from "react";
-import Icon from "react-native-vector-icons/FontAwesome";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Image,
   ScrollView,
+  ActivityIndicator,
+  Animated,
+  Easing,
+  Alert,
 } from "react-native";
+import { styles } from "./style";
+import Logic from "./logic";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { Button } from "react-native-paper";
 import AppButton from "../../components/AppButton";
 import Header from "../../components/Header";
 import withUserDataUpdates from "../../helpers/withUserDataUpdates";
+import moment from "moment";
+import { BASE_URL } from "../../helpers/constants/config";
+import { cancelAppointment } from "../../service/AppointmentServices";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const Appointments = ({ navigation }) => {
-  const [activeIcon, setActiveIcon] = useState(null); // State to track active icon
+  const { state, handleStatusFilter, handleCancelAppointment } =
+    Logic(navigation);
 
-  const handlePress = (iconName) => {
-    setActiveIcon(iconName); // Update the active icon
+  const renderAppointmentCard = (appointment) => {
+    const statusColors = {
+      Completed: { bg: "#E8F5E9", text: "#2E7D32", icon: "check-circle" },
+      Cancelled: { bg: "#FFEBEE", text: "#C62828", icon: "times-circle" },
+      Pending: { bg: "#FFF3E0", text: "#EF6C00", icon: "hourglass-half" },
+    };
+
+    const status = appointment.status || "Pending";
+    const colors = statusColors[status] || statusColors.Pending;
+
+    return (
+      <View style={styles.appointmentCard}>
+        <View style={styles.cardHeader}>
+          <Text style={{ fontSize: 13, color: "#718096" }}>
+            {moment(appointment.appointmentDate).format("MMM D, YYYY")}
+          </Text>
+          <View style={[styles.statusBadge, { backgroundColor: colors.bg }]}>
+            <Text style={[styles.statusText, { color: colors.text }]}>
+              <Icon name={colors.icon} size={12} /> {status}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.cardContent}>
+          <View style={styles.doctorInfo}>
+            <Image
+              source={
+                appointment.doctorId?.doctorImage
+                  ? { uri: `${BASE_URL}/${appointment.doctorId.doctorImage}` }
+                  : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
+              }
+              style={styles.doctorImage}
+            />
+            <View style={styles.doctorDetails}>
+              <Text style={styles.doctorName}>
+                {appointment.doctorId?.doctorName || "Unknown Doctor"}
+              </Text>
+              <Text style={styles.specialty}>
+                {appointment.doctorId?.field || "Specialty not specified"}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.appointmentDetails}>
+            <View style={styles.detailRow}>
+              <Icon name="clock-o" size={14} color="#718096" />
+              <Text style={styles.detailText}>
+                {moment(appointment.appointmentTime).format("h:mm A")}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Icon name="stethoscope" size={14} color="#718096" />
+              <Text style={styles.detailText}>
+                {appointment.bookingType || "General Visit"}
+              </Text>
+            </View>
+          </View>
+
+          {appointment.status === "Pending" && (
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => handleCancelAppointment(appointment._id)}
+            >
+              <Ionicons name="close-circle-outline" size={16} color="#DC2626" />
+              <Text style={styles.cancelButtonText}>Cancel Appointment</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
   };
 
-  const upcoming = [
-    {
-      id: 1,
-      name: "DR. Mona",
-      specialization: "Consultation Eye",
-
-      image: require("../../assets/images/woman-doctor-wearing-lab-coat-with-stethoscope-isolated.png"),
-      review: 70,
-      rate: 3.5,
-      time: "8:00 BM",
-    },
-    {
-      id: 2,
-      name: "DR. Ahmed",
-      specialization: "Tes Swap Anti Gen",
-
-      image: require("../../assets/images/portrait-hansome-young-male-doctor-man.png"),
-      review: 55,
-      rate: 4.5,
-      time: "10:00 AM",
-    },
-  ];
-  const pastBooking = [
-    {
-      id: 1,
-      name: "DR. Mona",
-      specialization: "Medichal Check Up",
-
-      image: require("../../assets/images/woman-doctor-wearing-lab-coat-with-stethoscope-isolated.png"),
-      review: 70,
-      rate: 3.5,
-      date: "14 March 2021",
-    },
-    {
-      id: 2,
-      name: "DR. Ahmed",
-      specialization: "Diagnostic Heart",
-
-      image: require("../../assets/images/portrait-hansome-young-male-doctor-man.png"),
-      review: 55,
-      rate: 4.5,
-      date: "9 March 2021",
-    },
-    {
-      id: 3,
-      name: "DR. Amira",
-      specialization: "Medichal Check Up",
-
-      image: require("../../assets/images/woman-doctor-wearing-lab-coat-with-stethoscope-isolated.png"),
-      review: 40,
-      rate: 4.3,
-      date: "6 March 2021",
-    },
-    {
-      id: 5,
-      name: "DR. Amr",
-      specialization: "Diagnostic Heart",
-      location: "Nasr City",
-      image: require("../../assets/images/portrait-hansome-young-male-doctor-man.png"),
-      review: 65,
-      rate: 4.5,
-      time: "10:00 AM",
-    },
-  ];
+  const renderStatusFilter = () => (
+    <View style={styles.filterContainer}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {["All", "Pending", "Completed", "Cancelled"].map((status) => (
+          <TouchableOpacity
+            key={status}
+            style={[
+              styles.filterButton,
+              state.selectedStatus === status && styles.activeFilterButton,
+            ]}
+            onPress={() => handleStatusFilter(status)}
+            activeOpacity={0.7}
+          >
+            <Text
+              style={[
+                styles.filterButtonText,
+                state.selectedStatus === status &&
+                  styles.activeFilterButtonText,
+              ]}
+            >
+              {status}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.container}>
-        {/* Header */}
         <Header
           marginTop={50}
           header={"Appointments"}
           onPress={() => navigation.navigate("Home")}
         />
 
-        {/* Search Bar */}
-        {/* <View style={styles.searchContainer}>
-          <View style={styles.searchBarWrapper}>
-            <TextInput style={styles.searchBar} placeholder="Search" />
-            <TouchableOpacity style={styles.filterIconWrapper}>
-              <Icon name="filter" size={25} color="#FD9B63" />
-            </TouchableOpacity>
+        {state.loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#16423C" />
           </View>
-        </View> */}
-
-        {/* Upcoming Section */}
-        <View style={styles.doctorSection}>
-          <View style={styles.sectionTitle}>
-            <Text style={styles.sectionTitle}>Upcoming</Text>
+        ) : state.error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{state.error}</Text>
           </View>
-          <ScrollView vertical={true} style={styles.cardScroll}>
-            {upcoming.map((doctor) => (
-              <TouchableOpacity key={doctor.id} style={styles.UpcomingCard}>
-                <View style={styles.circleWrapper}>
-                  <View style={styles.circleOne}></View>
+        ) : (
+          <>
+            {renderStatusFilter()}
+            <View style={styles.appointmentsContainer}>
+              {state.filteredAppointments.length > 0 ? (
+                state.filteredAppointments.map((appointment) => (
+                  <View key={appointment._id}>
+                    {renderAppointmentCard(appointment)}
+                  </View>
+                ))
+              ) : (
+                <View style={{ alignItems: "center", padding: 20 }}>
+                  <Icon name="calendar-times-o" size={40} color="#CBD5E0" />
+                  <Text style={{ color: "#718096", marginTop: 10 }}>
+                    No appointments found
+                  </Text>
                 </View>
-                <Image source={doctor.image} style={styles.doctorImage} />
-                <View style={styles.doctorInfo}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.doctorSpecialization}>
-                      {doctor.specialization}
-                    </Text>
-                    <View style={{ flexDirection: "row", gap: 5 }}>
-                      <Text style={{ color: "#16423C" }}>{doctor.rate}</Text>
-                      <Icon name="star" size={20} color="#16423C" />
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.doctorName}>{doctor.name}</Text>
-                    <Text style={styles.doctorName}>{doctor.review} Rev</Text>
-                  </View>
-
-                  <Text style={{ color: "#777777" }}>{doctor.time}</Text>
-                  <View style={{ flexDirection: "row", gap: 10 }}>
-                    <AppButton
-                      title="Cancel"
-                      buttonStyle={{ width: 105, height: 40 }}
-                      textStyle={{ fontSize: 11 }}
-                    />
-                    <AppButton
-                      title="View"
-                      buttonStyle={{
-                        width: 105,
-                        height: 40,
-                        backgroundColor: "#16423C",
-                      }}
-                      textStyle={{ fontSize: 11, color: "#ffffff" }}
-                    />
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/*Past Booking Section */}
-        <View style={styles.doctorSection}>
-          <View style={styles.sectionTitle}>
-            <Text style={styles.sectionTitle}>Past Booking</Text>
-          </View>
-          <ScrollView vertical={true} style={styles.cardScroll}>
-            {pastBooking.map((doctor) => (
-              <TouchableOpacity key={doctor.id} style={styles.PastBookingCard}>
-                <View style={styles.circleWrapper}>
-                  <View style={styles.circleOne}></View>
-                </View>
-                <Image source={doctor.image} style={styles.doctorImage} />
-                <View style={styles.doctorInfo}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.doctorSpecialization}>
-                      {doctor.specialization}
-                    </Text>
-                    <View style={{ flexDirection: "row", gap: 5 }}>
-                      <Text style={{ color: "#16423C" }}>{doctor.rate}</Text>
-                      <Icon name="star" size={20} color="#16423C" />
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.doctorName}>{doctor.name}</Text>
-                    <Text style={styles.doctorName}>{doctor.review} Rev</Text>
-                  </View>
-
-                  <Text style={styles.doctorName}>{doctor.date}</Text>
-                  <View style={{ flexDirection: "row", gap: 10 }}>
-                    <AppButton
-                      title="Write a Review"
-                      buttonStyle={{ width: 105, height: 40 }}
-                      textStyle={{ fontSize: 11 }}
-                    />
-                    <AppButton
-                      title="Book Again"
-                      buttonStyle={{
-                        width: 105,
-                        height: 40,
-                        backgroundColor: "#16423C",
-                      }}
-                      textStyle={{ fontSize: 11, color: "#ffffff" }}
-                    />
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+              )}
+            </View>
+          </>
+        )}
       </ScrollView>
     </View>
   );

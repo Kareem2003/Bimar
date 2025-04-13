@@ -16,6 +16,7 @@ import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import { patientLogin } from "../../service/AuthServices";
 import { ToastManager } from "../../helpers/ToastManager";
+import axios from "axios";
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   const { updateState: updateCtxState } = useContext(Context);
@@ -56,7 +57,8 @@ const Logic = (navigation) => {
           });
           const cookies = res.headers["set-cookie"];
           const token = extractTokenFromCookies(cookies);
-          console.log("Login Success:", cookies);
+          // Set the cookie in the header to the new token
+          axios.defaults.headers.common["Cookie"] = `jwt=${token}`;
           // Store token in AsyncStorage using Promise chain
           if (token) {
             Promise.all([
@@ -72,7 +74,6 @@ const Logic = (navigation) => {
                 });
               });
           }
-          
         } else {
           ToastManager.notify("Login Failed!", {
             type: "error",

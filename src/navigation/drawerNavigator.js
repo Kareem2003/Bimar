@@ -34,7 +34,6 @@ const CustomDrawerContent = (props) => {
       };
 
       const currentRoute = getActiveRouteName(state);
-      console.log('Active Route (useFocusEffect):', currentRoute);
       
       if (currentRoute && currentRoute !== 'HomeNavigator') {
         setActiveRoute(currentRoute);
@@ -53,7 +52,6 @@ const CustomDrawerContent = (props) => {
       const userData = await AsyncStorage.getItem(USERINFO);
       if (userData) {
         const parsedData = JSON.parse(userData);
-        console.log('User Info:', parsedData);
         setUserInfo(parsedData);
       }
     } catch (error) {

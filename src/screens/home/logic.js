@@ -27,6 +27,11 @@ const Logic = (navigation) => {
             prop: "userName",
             value: userInfo.userName || "",
           },
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "userInfo",
+            value: userInfo || "",
+          },
         ]);
       }
     } catch (error) {

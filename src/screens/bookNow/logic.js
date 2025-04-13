@@ -14,55 +14,65 @@ import {
 } from "../../helpers/constants/staticKeys";
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
+import { bookDate } from "../../service/HomeServices";
+import { ToastManager } from "../../helpers/ToastManager";
 
-const maritalStatus = [
-  { label: "Bachelor", value: "0" },
-  { label: "Married", value: "1" },
-];
-
-
-
-const Logic = (navigation) => {
+const Logic = (navigation, route) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
- 
+
   const updateState = (payload) => {
     dispatch({ payload });
   };
 
-  const handleNext = () => {
-    const next = state.currentStep + 1;
+  const handleBooking = () => {
+    bookDate(
+      {
+        doctorId: state.doctor._id,
+        clinicId: state.doctor.clinic[0]._id,
+        appointmentDate: state.selectedDate,
+      },
+      (res) => {
+        ToastManager.notify(
+          `Booked successfully. Booking number: ${res.data.data.bookingNumber}`,
+          {
+            type: "success",
+          }
+        );
+      },
+      (err) => {
+        ToastManager.notify(err.data[0], {
+          type: "error",
+        });
+      },
+      () => {}
+    );
+  };
+
+  useEffect(() => {
+    console.log("route", route.params);
     updateState([
       {
         type: ACTION_TYPES.UPDATE_PROP,
-        prop: `currentStep`,
-        value: next,
+        prop: "doctor",
+        value: route.params.doctor,
       },
-    ]);
-  };
-
-  const handleBack = () => {
-    if (state.currentStep-1 < 1) {
-      state.setcurrentStep = navigation.navigate("Login");
-      return;
-    }
-    const prev = state.currentStep - 1;
-    updateState([
       {
         type: ACTION_TYPES.UPDATE_PROP,
-        prop: `currentStep`,
-        value: prev,
+        prop: "price",
+        value: route.params.doctor.clinic[0].Price,
+      },
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "selectedDate",
+        value: route.params.selectedDate,
       },
     ]);
-  };
-
-
+  }, []);
 
   return {
     state,
     updateState,
-    handleNext,
-    handleBack,
-    maritalStatus,
+    handleBooking,
   };
 };
 

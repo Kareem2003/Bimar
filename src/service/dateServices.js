@@ -1,4 +1,3 @@
-import { BASE_URL } from "../helpers/constants/config";
 import $securedAxios from "./axios";
 
 export const bookDate = (payload, onSuccess, onError, onComplete) => {
