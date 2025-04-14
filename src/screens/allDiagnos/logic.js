@@ -11,6 +11,7 @@ import {
 } from "../../helpers/constants/staticKeys";
 import { ToastManager } from "../../helpers/ToastManager";
 import { BASE_URL } from "../../helpers/constants/config";
+import $axios from "../../service/axios"; // Import the regular axios instance
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -19,12 +20,10 @@ const Logic = (navigation) => {
     dispatch({ payload });
   };
 
-  const api = axios.create({
+  // Create axios instance with minimal configuration
+  const api = $axios.create({
     baseURL: BASE_URL,
-    timeout: 10000,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    // timeout: 10000,
   });
 
   const navigateToDiagnosis = async (diagnosis) => {
@@ -49,15 +48,16 @@ const Logic = (navigation) => {
         return;
       }
 
-      // Set up auth headers
-      const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Cookie': `jwt=${token}`
-      };
+      console.log("Fetching diagnosis details...");
 
-      // Fetch the full diagnosis data with prescription
-      const response = await api.get(`/Diagnosis/patient/${userId}/diagnosis/${diagnosis.id}`, { headers });
+      // Set the token in headers just like in login logic
+      // $axios.defaults.headers.common["Cookie"] = `jwt=${token}`;
+      
+      // Give a short delay to ensure token is applied
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Use the app's axios instance to fetch the data
+      const response = await api.get(`/Diagnosis/patient/${userId}/diagnosis/${diagnosis.id}`);
       const fullDiagnosisData = response.data.data || response.data;
 
       // Create attachments array with actual image URLs from database
@@ -309,6 +309,9 @@ const Logic = (navigation) => {
     checkNetwork();
   }, []);
 
+  // Setup token in axios headers when component mounts and then fetch diagnoses
+
+
   const fetchAllDiagnoses = async () => {
     try {
       updateState([
@@ -319,25 +322,10 @@ const Logic = (navigation) => {
         },
       ]);
 
-      const token = await AsyncStorage.getItem(AUTHENTICATION_TOKEN);
-      if (!token) {
-        console.log("No token found - redirecting to login");
-        navigation.navigate("Login");
-        return;
-      }
-
-      const axiosConfig = {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Cookie': `jwt=${token}`
-        }
-      };
-
-      console.log("Fetching diagnoses...");
-      const response = await api.get('/Diagnosis', axiosConfig);
-      console.log("Raw API Response:", response.data);
-
+      // Fetch the data
+      const response = await api.get('/Diagnosis');
+      
+      console.log("respones",response)
       if (!response.data) {
         throw new Error('No data received from server');
       }
@@ -398,21 +386,12 @@ const Logic = (navigation) => {
         stack: error.stack
       });
 
-      if (error.response?.status === 401) {
-        await AsyncStorage.removeItem(AUTHENTICATION_TOKEN);
-        await AsyncStorage.removeItem(USERINFO);
-        ToastManager.notify("Session expired. Please login again.", {
-          type: "warning",
-        });
-        navigation.replace("Login");
-        return;
-      }
-
+      // For network errors, try a basic setup of empty data
       updateState([
         {
           type: ACTION_TYPES.UPDATE_PROP,
           prop: "error",
-          value: error.response?.data?.message || "Failed to fetch diagnoses",
+          value: "Could not load diagnoses. Please try again.",
         },
       ]);
     } finally {
@@ -425,44 +404,6 @@ const Logic = (navigation) => {
       ]);
     }
   };
-
-  const handleLogin = async (credentials) => {
-    try {
-      const response = await axios.post(
-        `${api.defaults.baseURL}/auth/login`,
-        credentials
-      );
-      const { token, user } = response.data;
-
-      await AsyncStorage.setItem("token", token);
-      await AsyncStorage.setItem("userData", JSON.stringify(user));
-
-      navigation.navigate("Home");
-    } catch (error) {
-      console.error("Login failed:", error);
-      updateState([
-        {
-          type: ACTION_TYPES.UPDATE_PROP,
-          prop: "error",
-          value: error.response?.data?.message || "Login failed",
-        },
-      ]);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem("token");
-      await AsyncStorage.removeItem("userData");
-      navigation.navigate("Login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllDiagnoses();
-  }, []);
 
   // Helper function to extract image source from different possible formats in database
   const getImageSource = (item) => {
@@ -527,14 +468,17 @@ const Logic = (navigation) => {
     }
   };
 
+
+  useEffect(() => {
+    fetchAllDiagnoses();
+  }, []);
   return {
     state,
     actions: {
       updateState,
       navigateToDiagnosis,
       navigateToChat,
-      handleLogin,
-      handleLogout,
+
     },
   };
 };

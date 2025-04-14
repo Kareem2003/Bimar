@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#C4DAD2",
     justifyContent: "space-between",
-    paddingTop: 30,
+    paddingTop: 45,
   },
   backButton: {
     paddingLeft: 20,

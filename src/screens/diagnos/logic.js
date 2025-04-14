@@ -6,11 +6,12 @@ import { INITIAL_STATE } from "./constant";
 import { AUTHENTICATION_TOKEN, USERINFO } from "../../helpers/constants/staticKeys";
 import axios from "axios";
 import { ToastManager } from "../../helpers/ToastManager";
+import { BASE_URL } from "../../helpers/constants/config";
 
 // Set up axios with your base URL
 const api = axios.create({
   // Replace with your actual backend URL
-  baseURL: "http://192.168.1.3:3000", // Use your local IP if testing locally
+  baseURL: BASE_URL, // Use your local IP if testing locally
   // or
   // baseURL: 'https://your-production-api.com',
   timeout: 10000,

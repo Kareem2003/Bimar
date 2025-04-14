@@ -2,103 +2,6 @@ import { Dimensions } from "react-native";
 import { primary } from "../../styles/colors";
 
 export const styles = {
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 10,
-  },
-  linksContainer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  link: {
-    color: "#F08900",
-    marginVertical: 5,
-  },
-  img: {
-    width: 55,
-    height: 55,
-  },
-  imageFill: {
-    width: 55,
-    height: 55,
-    borderRadius: 50,
-
-    margin: 5,
-  },
-  imgActive: {
-    width: 55,
-    height: 55,
-    borderRadius: 50,
-    backgroundColor: "#FD9B63",
-    margin: "auto",
-  },
-  circle: {
-    width: 55,
-    height: 55,
-    borderWidth: 1,
-    borderColor: "#FD9B63",
-    borderRadius: 50,
-    margin: "auto",
-  },
-  line: {
-    height: 2,
-    backgroundColor: "#000",
-    width: "20%",
-    margin: "auto",
-  },
-  lineActive: {
-    height: 2,
-    backgroundColor: "#FD9B63",
-    width: "20%",
-    margin: "auto",
-  },
-  label: {
-    marginTop: 8,
-    color: "#555",
-  },
-  
-  profile: {
-    marginTop: 15,
-    padding: 0,
-    margin: "auto",
-    borderRadius: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  profileAvatar: {
-    width: '50%',
-    height: 200,
-    borderRadius: 9999,
-    marginRight: 12,
-  },
-  profileName: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#292929",
-  },
-  profileHandle: {
-    marginTop: 2,
-    fontSize: 16,
-    fontWeight: "400",
-    color: "#858585",
-  },
- 
     container: {
       flex: 1,
       backgroundColor: "#f5f5f5",
@@ -109,6 +12,7 @@ export const styles = {
       justifyContent: "space-between",
       paddingHorizontal: 16,
       paddingVertical: 12,
+      marginTop: 40,
       borderBottomWidth: 1,
       borderBottomColor: "#eee",
       
@@ -124,4 +28,119 @@ export const styles = {
       alignItems: "center",
       justifyContent: "center",
     },
+    profileAvatar: {
+      width: 80,
+      height: 80,
+      borderRadius: 75,
+      borderWidth : 3,
+      borderColor : "#6A9C89",
+    },
+
+  // New doctor profile card styles
+  doctorProfileCard: {
+    flexDirection: "row",
+    backgroundColor: "#ffffff",
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 24,
+    borderRadius: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    alignItems: "center",
+  },
+  
+  doctorInfoContainer: {
+    marginLeft: 16,
+    flex: 1,
+  },
+  
+  doctorName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#16423C",
+    marginBottom: 8,
+  },
+  
+  doctorPrice: {
+    fontSize: 18,
+    fontWeight: "semi-bold",
+    color: "#333",
+  },
+  
+  // Pricing summary styles
+  pricingSummaryContainer: {
+    backgroundColor: "#ffffff",
+    padding: 20,
+    marginHorizontal: 16,
+    marginTop: 24,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  
+  summaryTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#16423C",
+    marginBottom: 16,
+  },
+  
+  pricingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  
+  pricingLabel: {
+    fontSize: 16,
+    color: "#666",
+  },
+  
+  pricingValue: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "500",
+  },
+  
+  divider: {
+    height: 1,
+    backgroundColor: "#eee",
+    marginVertical: 12,
+  },
+  
+  totalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 4,
+  },
+  
+  totalLabel: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  
+  totalValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#16423C",
+  },
+  
+  bookButtonContainer: {
+    marginHorizontal: 16,
+    marginTop: 32,
+    alignItems : "center"
+  },
 };

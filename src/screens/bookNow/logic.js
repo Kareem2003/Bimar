@@ -38,6 +38,7 @@ const Logic = (navigation, route) => {
             type: "success",
           }
         );
+        navigation.navigate("Home");
       },
       (err) => {
         ToastManager.notify(err.data[0], {

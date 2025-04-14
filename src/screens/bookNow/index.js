@@ -26,7 +26,7 @@ import PhoneInputBox from "../../components/PhoneInputBox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../../helpers/constants/staticKeys";
 import Icon from "react-native-vector-icons/MaterialIcons";
-
+import { BASE_URL } from "../../helpers/constants/config";
 const BookNow = ({ navigation, route }) => {
   const { isDarkTheme } = useContext(ThemeContext);
   const { state, updateState, handleBooking } = Logic(navigation, route);
@@ -53,53 +53,47 @@ const BookNow = ({ navigation, route }) => {
       <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
       {renderHeader()}
 
-      <View alignItems="center">
-        <View style={styles.profile}>
-          <Image
-            style={styles.profileAvatar}
-            source={
-              state.doctor?.doctorImage && state.doctor.doctorImage !== "null"
-                ? { uri: state.doctor.doctorImage }
-                : require("../../assets/images/WhatsApp Image 2023-07-23 at 15.23.54.jpg")
-            }
-          />
-        </View>
-      </View>
-      <View style={{ margin: 30 }}>
-        <Text style={{ fontSize: 15, color: "#16423C" }}>
-          {state.doctor ? state.doctor.doctorName : "Doctor not available"}
-        </Text>
-        <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 5 }}>
-          £ {state.price}
-        </Text>
-      </View>
-      <View style={{ margin: 30 }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={{ fontSize: 15, color: "slategray" }}>Sub total</Text>
-          <Text style={{ fontSize: 15, color: "slategray" }}>
-            £ {state.price}
+      <View style={styles.doctorProfileCard}>
+        <Image
+          style={styles.profileAvatar}
+          source={
+            state.doctor?.doctorImage && state.doctor.doctorImage !== "null"
+              ? { uri: `${BASE_URL}/${state.doctor.doctorImage}` }
+              : require("../../assets/images/WhatsApp Image 2023-07-23 at 15.23.54.jpg")
+          }
+        />
+        <View style={styles.doctorInfoContainer}>
+          <Text style={styles.doctorName}>
+            {state.doctor ? state.doctor.doctorName : "Doctor not available"}
           </Text>
-        </View>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={{ fontSize: 15, color: "slategray", marginTop: 5 }}>
-            Tax
-          </Text>
-          <Text style={{ fontSize: 15, color: "slategray", marginTop: 5 }}>
-            £ 4.99
+          <Text style={styles.doctorPrice}>
+          {state.price} LE 
           </Text>
         </View>
       </View>
-      <View style={{ margin: 30 }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={{ fontSize: 15, color: "slate", marginTop: 5 }}>
-            Total
-          </Text>
-          <Text style={{ fontSize: 15, color: "slate", marginTop: 5 }}>
-            £ {state.price + 4.99}
-          </Text>
+
+      <View style={styles.pricingSummaryContainer}>
+        <Text style={styles.summaryTitle}>Pricing Summary</Text>
+        
+        <View style={styles.pricingRow}>
+          <Text style={styles.pricingLabel}>Sub total</Text>
+          <Text style={styles.pricingValue}>{state.price} LE</Text>
+        </View>
+        
+        <View style={styles.pricingRow}>
+          <Text style={styles.pricingLabel}>Tax</Text>
+          <Text style={styles.pricingValue}>4.99 LE </Text>
+        </View>
+        
+        <View style={styles.divider} />
+        
+        <View style={styles.totalRow}>
+          <Text style={styles.totalLabel}>Total</Text>
+          <Text style={styles.totalValue}>{state.price + 4.99} LE</Text>
         </View>
       </View>
-      <View style={{ margin: "auto" }}>
+      
+      <View style={styles.bookButtonContainer}>
         <AppButton title="Book Now" onPress={handleBooking} />
       </View>
     </View>

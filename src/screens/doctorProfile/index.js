@@ -8,6 +8,7 @@ import AppButton from "../../components/AppButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../../helpers/constants/staticKeys";
 import ACTION_TYPES from "../../reducers/actionTypes";
+import { BASE_URL } from "../../helpers/constants/config";
 
 const DoctorProfile = ({ navigation, route }) => {
   const { state, updateState, bookDoctorAppointment } = Logic(
@@ -61,7 +62,7 @@ const DoctorProfile = ({ navigation, route }) => {
         <Image
           source={
             state.doctor?.doctorImage && state.doctor.doctorImage !== "null"
-              ? { uri: state.doctor.doctorImage }
+              ? { uri: `${BASE_URL}/${state.doctor.doctorImage}` }
               : require("../../assets/images/WhatsApp Image 2023-07-23 at 15.23.54.jpg")
           }
           style={styles.profileImage}

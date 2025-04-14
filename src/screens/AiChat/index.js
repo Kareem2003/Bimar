@@ -160,7 +160,7 @@ const AiChatScreen = ({ navigation }) => {
               <Text
                 style={{
                   fontSize: 20,
-                  marginTop: 20,
+                  marginTop: 70,
                   color: "#16423C",
                   textAlign: "center",
                 }}
