@@ -8,6 +8,7 @@ import {
 import { ToastManager } from "../../helpers/ToastManager";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import moment from "moment";
+import { Alert } from "react-native";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -130,43 +131,58 @@ const Logic = (navigation) => {
   };
 
   const handleCancelAppointment = (bookingId) => {
-    updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: "loading",
-        value: true,
-      },
-    ]);
+    Alert.alert(
+      "Cancel Appointment",
+      "Are you sure you want to cancel this appointment?",
+      [
+        {
+          text: "No",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            updateState([
+              {
+                type: ACTION_TYPES.UPDATE_PROP,
+                prop: "loading",
+                value: true,
+              },
+            ]);
 
-    cancelAppointment(
-      bookingId,
-      () => {
-        ToastManager.notify("Appointment cancelled successfully", {
-          type: "success",
-        });
-        fetchAppointments();
-      },
-      (error) => {
-        ToastManager.notify("Failed to cancel appointment", {
-          type: "error",
-        });
-        updateState([
-          {
-            type: ACTION_TYPES.UPDATE_PROP,
-            prop: "error",
-            value: error?.message || "Failed to cancel appointment",
+            cancelAppointment(
+              bookingId,
+              () => {
+                ToastManager.notify("Appointment cancelled successfully", {
+                  type: "success",
+                });
+                fetchAppointments();
+              },
+              (error) => {
+                ToastManager.notify("Failed to cancel appointment", {
+                  type: "error",
+                });
+                updateState([
+                  {
+                    type: ACTION_TYPES.UPDATE_PROP,
+                    prop: "error",
+                    value: error?.message || "Failed to cancel appointment",
+                  },
+                ]);
+              },
+              () => {
+                updateState([
+                  {
+                    type: ACTION_TYPES.UPDATE_PROP,
+                    prop: "loading",
+                    value: false,
+                  },
+                ]);
+              }
+            );
           },
-        ]);
-      },
-      () => {
-        updateState([
-          {
-            type: ACTION_TYPES.UPDATE_PROP,
-            prop: "loading",
-            value: false,
-          },
-        ]);
-      }
+        },
+      ]
     );
   };
 

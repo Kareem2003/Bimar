@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import Logic from "./logic";
 import { BASE_URL } from "../../helpers/constants/config";
+import Header from "../../components/Header";
 
 const Doctors = ({ navigation }) => {
   const { state, filterDoctors, searchDoctors } = Logic(navigation);
@@ -94,7 +95,7 @@ const Doctors = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header with back button */}
-      <View
+      {/* <View
         style={[styles.header, { flexDirection: "row", alignItems: "center" }]}
       >
         <TouchableOpacity
@@ -104,7 +105,12 @@ const Doctors = ({ navigation }) => {
           <Icon name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Doctors</Text>
-      </View>
+      </View> */}
+      <Header
+        marginTop={40}
+        header={"Doctors"}
+        onPress={() => navigation.goBack()}
+      />
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>

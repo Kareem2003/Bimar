@@ -41,7 +41,7 @@ const RateApp = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: isDarkTheme ? primaryDark : primaryLight }}>
       <Header
-        marginTop={0}
+        marginTop={40}
         header={"Rate App"}
         onPress={() => navigation.goBack()}
       />

@@ -131,7 +131,7 @@ export const styles = {
     paddingHorizontal: 20,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
     flexDirection: "row",
@@ -536,13 +536,13 @@ export const styles = {
     shadowRadius: 10,
     elevation: 4,
   },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#333",
-    marginBottom: 16,
-    letterSpacing: 0.5,
-  },
+  // sectionTitle: {
+  //   fontSize: 22,
+  //   fontWeight: "700",
+  //   color: "#333",
+  //   marginBottom: 16,
+  //   letterSpacing: 0.5,
+  // },
   // Medication list styles
   medicationListContainer: {
     paddingVertical: 15,
@@ -938,6 +938,8 @@ export const styles = {
   },
   medicationCardsScroll: {
     marginBottom: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 2,
   },
   medicationCardItem: {
     backgroundColor: "#FFFFFF",

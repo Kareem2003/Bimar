@@ -1,44 +1,37 @@
-import React, { useContext, useEffect } from "react";
-import {
-  View,
-  Image,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-} from "react-native";
-import { ThemeContext } from "../../contexts/themeContext";
-import { styles } from "./style";
-import AppInput from "../../components/AppInput";
+import React, { useContext } from "react";
+import { ScrollView, Text, View } from "react-native";
 import AppButton from "../../components/AppButton";
-import OTPInput from "../../components/OTPInput";
-import AuthTitles from "../../components/AuthTitles";
-import { primaryDark, primaryLight } from "../../styles/colors";
-import Logic from "./logic";
-import ACTION_TYPES from "../../reducers/actionTypes";
-import FontAwsome from "react-native-vector-icons/FontAwesome";
-import ProfilePicture from "../../components/ProfilePicture";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import AppInput from "../../components/AppInput";
 import DropdownComponent from "../../components/DropdownComponent";
-import PhoneInputBox from "../../components/PhoneInputBox";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { USERINFO } from "../../helpers/constants/staticKeys";
 import Header from "../../components/Header";
-import { GENDER_OPTIONS, BLOOD_TYPE_OPTIONS } from "./constant";
+import PhoneInputBox from "../../components/PhoneInputBox";
+import ProfilePicture from "../../components/ProfilePicture";
+import { ThemeContext } from "../../contexts/themeContext";
+import ACTION_TYPES from "../../reducers/actionTypes";
+import { primaryDark, primaryLight } from "../../styles/colors";
+import { BLOOD_TYPE_OPTIONS, GENDER_OPTIONS } from "./constant";
+import Logic from "./logic";
+import { styles } from "./style";
 
 const Profile = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const { state, updateState, handleNext, handleBack, handleSave, handleImageSelect } =
-    Logic(navigation);
+  const {
+    state,
+    updateState,
+    handleNext,
+    handleBack,
+    handleSave,
+    handleImageSelect,
+  } = Logic(navigation);
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDarkTheme ? primaryDark : primaryLight }}>
-      <Header
-        marginTop={50}
-        header={state.currentStep === 2 ? "MyProfile" : "Profile"}
-        onPress={handleBack}
-      />
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: isDarkTheme ? primaryDark : primaryLight,
+      }}
+    >
+      <Header marginTop={50} header={"MyProfile"} onPress={handleBack} />
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}>
         <View
           style={[
@@ -46,260 +39,105 @@ const Profile = ({ navigation }) => {
             { backgroundColor: isDarkTheme ? primaryDark : primaryLight },
           ]}
         >
-          {state.currentStep === 1 && (
-            <View>
-              <View>
+          <View>
+            <View style={{ alignItems: "center" }}>
+              <View
+                style={{
+                  alignItems: "center",
+                }}
+              >
                 <ProfilePicture
-                  profileName={state.userName || ""}
-                  profileHandle={state.userEmail || ""}
                   profileImage={state.profileImage || ""}
-                  layout="row"
-                  clickable={false}
-                  size={60}
+                  onImageChange={handleImageSelect}
+                  layout="center"
+                  clickable={true}
                 />
               </View>
-
-              <AppButton
-                title="Edit Profile"
-                onPress={handleNext}
-                buttonStyle={{
-                  backgroundColor: primaryDark,
-                  alignSelf: "flex-start",
-                  width: 100,
-                  height: 35,
-                  marginLeft: 100,
-                  marginTop: 5,
-                  marginBottom: 10,
-                }}
-                textStyle={{ color: "#fff", fontSize: 10 }}
-              />
-              <TouchableOpacity
-                style={{
-                  insetBlockStart: 30,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: 80,
-                  marginTop: 20,
-                }}
-                onPress={() => navigation.navigate("Appointments")}
-              >
-                <Image source={require("../../assets/images/calendarIcon.png")} />
-                <Text>
-                  <Text>Appointments</Text>
-                </Text>
-
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={{
-                  insetBlockStart: 30,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: 80,
-                  marginTop: 20,
-                }}
-                onPress={() => navigation.navigate("Diagnos")}
-              >
-                <Image
-                  source={require("../../assets/images/MedicalRecordIcon.png")}
-                />
-                <Text>
-                  <Text>My Diagnosis</Text>
-                </Text>
-
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-
-              <View style={{ marginTop: 50 }}>
-                <Image
-                  style={{ width: "100%", height: 1, marginTop: 20 }}
-                  source={require("../../assets/images/lineImage.png")}
-                />
-              </View>
-              <TouchableOpacity
-                style={{
-                  insetBlockStart: 30,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: 80,
-                  marginTop: 20,
-                }}
-                onPress={() => console.log("Medical records")}
-              >
-                <Image source={require("../../assets/images/VirusIcon.png")} />
-                <Text>
-                  <Text>Medical records</Text>
-                </Text>
-
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={{
-                  insetBlockStart: 30,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: 80,
-                  marginTop: 20,
-                }}
-                onPress={() => console.log("My Doctors")}
-              >
-                <Image
-                  source={require("../../assets/images/StethoscopeIcon.png")}
-                />
-                <Text>
-                  <Text>My Doctors</Text>
-                </Text>
-
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={{
-                  insetBlockStart: 30,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: 80,
-                  marginTop: 20,
-                }}
-                onPress={() => console.log("Location")}
-              >
-                <Image source={require("../../assets/images/LocationIcon.png")} />
-                <Text>
-                  <Text>Location</Text>
-                </Text>
-                <Text> {">"} </Text>
-              </TouchableOpacity>
-
-              <View style={{ marginTop: 50 }}>
-                <Image
-                  style={{ width: "100%", height: 1, marginTop: 20 }}
-                  source={require("../../assets/images/lineImage.png")}
-                />
-              </View>
-              <TouchableOpacity
-                style={{
-                  insetBlockStart: 30,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: 80,
-                  marginTop: 20,
-                }}
-                onPress={() => navigation.navigate("Settings")}
-              >
-                <Image source={require("../../assets/images/SettingsIcon.png")} />
-                <Text>
-                  <Text>Settings</Text>
-                </Text>
-                <Text> {">"} </Text>
-              </TouchableOpacity>
             </View>
-          )}
-
-          {state.currentStep === 2 && (
             <View>
-              <View style={{ alignItems: "center" }}>
-                <View
-                  style={{
-                    alignItems: "center",
-                    marginBottom: 30,
-                    marginBlockStart: 0,
-                  }}
-                >
-                  <ProfilePicture
-                    profileImage={state.profileImage || ""}
-                    onImageChange={handleImageSelect}
-                    layout="center"
-                    clickable={true}
-                  />
-                </View>
-              </View>
-              <Text style={{ fontSize: 20, marginBottom: 20, marginTop: -50 }}>Edit Profile</Text>
-              <View>
-                <Text style={styles.label}>Name</Text>
-                <AppInput
-                  term={state.formData.userName}
-                  onChangeText={(text) => {
-                    updateState([
-                      {
-                        type: ACTION_TYPES.UPDATE_PROP,
-                        prop: 'formData.userName',
-                        value: text
-                      }
-                    ]);
-                  }}
-                  placeholder="Enter your name"
-                />
-                <Text style={styles.label}>Email</Text>
-                <AppInput
-                  term={state.formData.userEmail}
-                  onChangeText={(text) => {
-                    updateState([
-                      {
-                        type: ACTION_TYPES.UPDATE_PROP,
-                        prop: 'formData.userEmail',
-                        value: text
-                      }
-                    ]);
-                  }}
-                  placeholder="Enter your email"
-                />
-                <Text style={styles.label}>Weight</Text>
-                <AppInput 
-                  term={state.formData.personalRecords.userWeight}
-                  onChangeText={(text) => {
-                    updateState([
-                      {
-                        type: ACTION_TYPES.UPDATE_PROP,
-                        prop: 'formData.personalRecords.userWeight',
-                        value: text
-                      }
-                    ]);
-                  }}
-                  placeholder="Enter your weight (kg)"
-                  keyboardType="numeric"
-                />
-                <Text style={styles.label}>Height</Text>
-                <AppInput 
-                  term={state.formData.personalRecords.userHeight}
-                  onChangeText={(text) => {
-                    updateState([
-                      {
-                        type: ACTION_TYPES.UPDATE_PROP,
-                        prop: 'formData.personalRecords.userHeight',
-                        value: text
-                      }
-                    ]);
-                  }}
-                  placeholder="Enter your height (cm)"
-                  keyboardType="numeric"
-                />
-                <Text style={styles.label}>Phone</Text>
-                <PhoneInputBox
-                  value={state.formData.userPhone}
-                  onChangeText={(text) => {
-                    updateState([
-                      {
-                        type: ACTION_TYPES.UPDATE_PROP,
-                        prop: 'formData.userPhone',
-                        value: text
-                      }
-                    ]);
-                  }}
-                />
+              <Text style={styles.label}>Name</Text>
+              <AppInput
+                term={state.formData.userName}
+                onChangeText={(text) => {
+                  updateState([
+                    {
+                      type: ACTION_TYPES.UPDATE_PROP,
+                      prop: "formData.userName",
+                      value: text,
+                    },
+                  ]);
+                }}
+                placeholder="Enter your name"
+              />
+              <Text style={styles.label}>Email</Text>
+              <AppInput
+                term={state.formData.userEmail}
+                onChangeText={(text) => {
+                  updateState([
+                    {
+                      type: ACTION_TYPES.UPDATE_PROP,
+                      prop: "formData.userEmail",
+                      value: text,
+                    },
+                  ]);
+                }}
+                placeholder="Enter your email"
+              />
+              <Text style={styles.label}>Weight</Text>
+              <AppInput
+                term={state.formData.personalRecords.userWeight}
+                onChangeText={(text) => {
+                  updateState([
+                    {
+                      type: ACTION_TYPES.UPDATE_PROP,
+                      prop: "formData.personalRecords.userWeight",
+                      value: text,
+                    },
+                  ]);
+                }}
+                placeholder="Enter your weight (kg)"
+                keyboardType="numeric"
+              />
+              <Text style={styles.label}>Height</Text>
+              <AppInput
+                term={state.formData.personalRecords.userHeight}
+                onChangeText={(text) => {
+                  updateState([
+                    {
+                      type: ACTION_TYPES.UPDATE_PROP,
+                      prop: "formData.personalRecords.userHeight",
+                      value: text,
+                    },
+                  ]);
+                }}
+                placeholder="Enter your height (cm)"
+                keyboardType="numeric"
+              />
+              <Text style={styles.label}>Phone</Text>
+              <PhoneInputBox
+                value={state.formData.userPhone}
+                onChangeText={(text) => {
+                  updateState([
+                    {
+                      type: ACTION_TYPES.UPDATE_PROP,
+                      prop: "formData.userPhone",
+                      value: text,
+                    },
+                  ]);
+                }}
+              />
               <View>
                 <Text style={styles.label}>Date of Birth</Text>
-                <AppInput 
+                <AppInput
                   keyboardType="default"
                   term={state.formData.personalRecords.DateOfBirth}
                   onChangeText={(text) => {
                     updateState([
                       {
                         type: ACTION_TYPES.UPDATE_PROP,
-                        prop: 'formData.personalRecords.DateOfBirth',
-                        value: text
-                      }
+                        prop: "formData.personalRecords.DateOfBirth",
+                        value: text,
+                      },
                     ]);
                   }}
                   placeholder="YYYY-MM-DD"
@@ -312,37 +150,37 @@ const Profile = ({ navigation }) => {
                     updateState([
                       {
                         type: ACTION_TYPES.UPDATE_PROP,
-                        prop: 'formData.personalRecords.Gender',
-                        value: item.value
-                      }
+                        prop: "formData.personalRecords.Gender",
+                        value: item.value,
+                      },
                     ]);
                   }}
                   placeholder="Select gender"
                 />
                 <Text style={styles.label}>City</Text>
-                <AppInput 
+                <AppInput
                   term={state.formData.personalRecords.City}
                   onChangeText={(text) => {
                     updateState([
                       {
                         type: ACTION_TYPES.UPDATE_PROP,
-                        prop: 'formData.personalRecords.City',
-                        value: text
-                      }
+                        prop: "formData.personalRecords.City",
+                        value: text,
+                      },
                     ]);
                   }}
                   placeholder="Enter your city"
                 />
                 <Text style={styles.label}>Area</Text>
-                <AppInput 
+                <AppInput
                   term={state.formData.personalRecords.Area}
                   onChangeText={(text) => {
                     updateState([
                       {
                         type: ACTION_TYPES.UPDATE_PROP,
-                        prop: 'formData.personalRecords.Area',
-                        value: text
-                      }
+                        prop: "formData.personalRecords.Area",
+                        value: text,
+                      },
                     ]);
                   }}
                   placeholder="Enter your area"
@@ -355,9 +193,9 @@ const Profile = ({ navigation }) => {
                     updateState([
                       {
                         type: ACTION_TYPES.UPDATE_PROP,
-                        prop: 'formData.medicalRecord.bloodType',
-                        value: item.value
-                      }
+                        prop: "formData.medicalRecord.bloodType",
+                        value: item.value,
+                      },
                     ]);
                   }}
                   placeholder="Select blood type"
@@ -376,9 +214,8 @@ const Profile = ({ navigation }) => {
                   textStyle={{ color: "#fff", fontSize: 16 }}
                 />
               </View>
-              </View>
             </View>
-          )}
+          </View>
         </View>
       </ScrollView>
     </View>

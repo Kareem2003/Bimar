@@ -583,7 +583,11 @@ const Home = ({ navigation }) => {
               <Text style={styles.showMoreText}>Show More</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal={true} style={styles.cardScroll}>
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            style={{ padding: 5 }}
+          >
             {state.loading ? (
               <ActivityIndicator size="large" color="#FD9B63" />
             ) : state.error ? (
