@@ -15,7 +15,7 @@ export const cancelAppointment = (
   onComplete
 ) => {
   $securedAxios
-    .delete(`/bookings/${bookingId}`)
+    .patch(`/bookings/${bookingId}`)
     .then(onSuccess)
     .catch(onError)
     .finally(onComplete);
