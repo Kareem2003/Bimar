@@ -1,7 +1,7 @@
-import $axios from "./axios";
+import { $securedAxios } from "./axios";
 
 export const allAppointments = (payload, onSuccess, onError, onComplete) => {
-  $axios
+  $securedAxios
     .get("/bookings", payload)
     .then(onSuccess)
     .catch(onError)
@@ -14,7 +14,7 @@ export const cancelAppointment = (
   onError,
   onComplete
 ) => {
-  $axios
+  $securedAxios
     .delete(`/bookings/${bookingId}`)
     .then(onSuccess)
     .catch(onError)

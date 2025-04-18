@@ -11,7 +11,7 @@ import {
 } from "../../helpers/constants/staticKeys";
 import { ToastManager } from "../../helpers/ToastManager";
 import { BASE_URL } from "../../helpers/constants/config";
-import $axios from "../../service/axios"; // Import the regular axios instance
+import { $securedAxios } from "../../service/axios";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -19,12 +19,6 @@ const Logic = (navigation) => {
   const updateState = (payload) => {
     dispatch({ payload });
   };
-
-  // Create axios instance with minimal configuration
-  const api = $axios.create({
-    baseURL: BASE_URL,
-    // timeout: 10000,
-  });
 
   const navigateToDiagnosis = async (diagnosis) => {
     try {
@@ -50,14 +44,13 @@ const Logic = (navigation) => {
 
       console.log("Fetching diagnosis details...");
 
-      // Set the token in headers just like in login logic
-      // $axios.defaults.headers.common["Cookie"] = `jwt=${token}`;
+     
       
       // Give a short delay to ensure token is applied
       await new Promise(resolve => setTimeout(resolve, 200));
       
       // Use the app's axios instance to fetch the data
-      const response = await api.get(`/Diagnosis/patient/${userId}/diagnosis/${diagnosis.id}`);
+      const response = await $securedAxios.get(`/Diagnosis/patient/${userId}/diagnosis/${diagnosis.id}`);
       const fullDiagnosisData = response.data.data || response.data;
 
       // Create attachments array with actual image URLs from database
@@ -309,7 +302,7 @@ const Logic = (navigation) => {
     checkNetwork();
   }, []);
 
-  // Setup token in axios headers when component mounts and then fetch diagnoses
+
 
 
   const fetchAllDiagnoses = async () => {
@@ -323,9 +316,7 @@ const Logic = (navigation) => {
       ]);
 
       // Fetch the data
-      const response = await api.get('/Diagnosis');
-      
-      console.log("respones",response)
+      const response = await $securedAxios.get('/Diagnosis');
       if (!response.data) {
         throw new Error('No data received from server');
       }

@@ -1,5 +1,6 @@
 import { BASE_URL } from "../helpers/constants/config";
 import $axios from "./axios";
+import { $securedAxios } from "./axios";
 
 export const patientLogin = (payload, onSuccess, onError, onComplete) => {
   $axios
@@ -111,11 +112,11 @@ export const updatePatient = (id, payload, onSuccess, onError, onComplete) => {
     },
   };
 
-  $axios
+  $securedAxios
     .patch(`/patientsAuth/${id}`, requestData)
     .then((response) => {
       if (response.data && response.data.data === "Updated Successfulyy") {
-        $axios
+        $securedAxios
           .get(`/patientsAuth/${id}`)
           .then((userResponse) => {
             onSuccess({

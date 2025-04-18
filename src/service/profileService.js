@@ -1,10 +1,9 @@
-import $axios from "./axios";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 import { AUTHENTICATION_TOKEN, USERINFO } from "../helpers/constants/staticKeys";
 import { ToastManager } from "../helpers/ToastManager";
-import axios from "axios";
 import { BASE_URL } from "../helpers/constants/config";
 import { Platform } from "react-native";
+import { $securedAxios } from "./axios";
 
 
 export const uploadImage = async (imageUri, success, error, complete) => {
@@ -60,7 +59,6 @@ export const uploadImage = async (imageUri, success, error, complete) => {
     const config = {
       headers: {
         'Content-Type': 'multipart/form-data',
-        'Cookie': `jwt=${token}`
       },
       method: 'PATCH',
       url: `${BASE_URL}/patientsAuth/update-profile-picture`,
@@ -71,7 +69,7 @@ export const uploadImage = async (imageUri, success, error, complete) => {
     
     // console.log("Request config:", { ... }); // Remove log (potentially sensitive)
 
-    const response = await axios(config);
+    const response = await $securedAxios(config);
     // console.log("Upload response:", response.data); // Remove log
 
     if (response.data && response.data.status === 'success') {

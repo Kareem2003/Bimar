@@ -60,9 +60,9 @@ const Logic = (navigation, route) => {
         }
 
         // Set up headers
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        api.defaults.headers.common['Cookie'] = `jwt=${token}`;
-        api.defaults.withCredentials = true;
+        // api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        // api.defaults.headers.common['Cookie'] = `jwt=${token}`;
+        // api.defaults.withCredentials = true;
 
         // Use the correct endpoint format with the full path
         const response = await api.get(`/Diagnosis/patient/${userId}/diagnosis/${diagnosisId}`);
@@ -136,16 +136,6 @@ const Logic = (navigation, route) => {
           headers: error.config?.headers,
           userInfo: await AsyncStorage.getItem(USERINFO) // Add this for debugging
         });
-        
-        if (error.response?.status === 401) {
-          await AsyncStorage.removeItem(AUTHENTICATION_TOKEN);
-          await AsyncStorage.removeItem(USERINFO);
-          ToastManager.notify(error.response?.data?.message || "Session expired. Please login again.", {
-            type: "warning",
-          });
-          navigation.replace("Login");
-          return;
-        }
 
         updateState([
           {

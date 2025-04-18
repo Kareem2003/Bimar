@@ -1,9 +1,9 @@
 // src/services/diagnoseServices.js
 import { BASE_URL } from "../helpers/constants/config";
-import $axios from "./axios";
+import { $securedAxios } from "./axios";
 
 export const getPatientDiagnosis = (payload, onSuccess, onError, onComplete) => {
-  $axios
+  $securedAxios
     .get("/Diagnosis",payload)
     .then(response => onSuccess(response.data))
     .catch(onError)

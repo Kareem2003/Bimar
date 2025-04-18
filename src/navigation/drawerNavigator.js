@@ -5,7 +5,7 @@ import { softPurpleColor, primaryColor, secondaryColor, textColor, backgroundCol
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { AUTHENTICATION_TOKEN, USERINFO } from '../helpers/constants/staticKeys';
+import { USERINFO } from '../helpers/constants/staticKeys';
 import { useNavigationState, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { BASE_URL } from '../helpers/constants/config';
 import { subscribeToUserData, USER_DATA_EVENTS } from '../helpers/UserDataManager';

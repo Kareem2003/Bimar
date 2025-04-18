@@ -1,5 +1,6 @@
 import { BASE_URL } from "../helpers/constants/config";
 import $axios from "./axios";
+import { $securedAxios } from "./axios";
 export const getDoctors = (payload, onSuccess, onError, onComplete) => {
   $axios
     .get("/doctor/doctors")
@@ -9,7 +10,7 @@ export const getDoctors = (payload, onSuccess, onError, onComplete) => {
 };
 
 export const bookDate = (payload, onSuccess, onError, onComplete) => {
-  $axios
+  $securedAxios
     .post("/bookings", payload)
     .then(onSuccess)
     .catch(onError)
