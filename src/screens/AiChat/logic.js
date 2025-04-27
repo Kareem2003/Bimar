@@ -9,12 +9,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../../helpers/constants/staticKeys";
 import {
   getChest,
+  getDigestive,
+  getEyes,
   getGeneral,
   getHead,
-  getLimb,
+  getLimbs,
+  getMental,
+  getMusculoskeletal,
+  getPregnancy,
   getSkin,
   getSpecialistDoctor,
   getStomach,
+  getThroatMouth,
+  getUrinaryReproductive,
   predictSpecialist,
 } from "../../service/aiChatServices";
 
@@ -64,6 +71,26 @@ const Logic = (navigation) => {
       () => {}
     );
 
+    getEyes(
+      {},
+      (response) => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "eyes",
+            value: response.data,
+          },
+        ]);
+      },
+      (error) => {
+        console.log("error", error);
+        ToastManager.notify("Error fetching eyes symptoms", {
+          type: "error",
+        });
+      },
+      () => {}
+    );
+
     getChest(
       {},
       (response) => {
@@ -78,6 +105,126 @@ const Logic = (navigation) => {
       (error) => {
         console.log("error", error);
         ToastManager.notify("Error fetching chest symptoms", {
+          type: "error",
+        });
+      },
+      () => {}
+    );
+
+    getUrinaryReproductive(
+      {},
+      (response) => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "urinaryReproductive",
+            value: response.data,
+          },
+        ]);
+      },
+      (error) => {
+        console.log("error", error);
+        ToastManager.notify("Error fetching urinary/reproductive symptoms", {
+          type: "error",
+        });
+      },
+      () => {}
+    );
+
+    getMusculoskeletal(
+      {},
+      (response) => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "musculoskeletal",
+            value: response.data,
+          },
+        ]);
+      },
+      (error) => {
+        console.log("error", error);
+        ToastManager.notify("Error fetching musculoskeletal symptoms", {
+          type: "error",
+        });
+      },
+      () => {}
+    );
+
+    getGeneral(
+      {},
+      (response) => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "general",
+            value: response.data,
+          },
+        ]);
+      },
+      (error) => {
+        console.log("error", error);
+        ToastManager.notify("Error fetching general symptoms", {
+          type: "error",
+        });
+      },
+      () => {}
+    );
+
+    getPregnancy(
+      {},
+      (response) => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "pregnancy",
+            value: response.data,
+          },
+        ]);
+      },
+      (error) => {
+        console.log("error", error);
+        ToastManager.notify("Error fetching pregnancy symptoms", {
+          type: "error",
+        });
+      },
+      () => {}
+    );
+
+    getDigestive(
+      {},
+      (response) => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "digestive",
+            value: response.data,
+          },
+        ]);
+      },
+      (error) => {
+        console.log("error", error);
+        ToastManager.notify("Error fetching digestive symptoms", {
+          type: "error",
+        });
+      },
+      () => {}
+    );
+
+    getThroatMouth(
+      {},
+      (response) => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "throatMouth",
+            value: response.data,
+          },
+        ]);
+      },
+      (error) => {
+        console.log("error", error);
+        ToastManager.notify("Error fetching throat/mouth symptoms", {
           type: "error",
         });
       },
@@ -104,20 +251,20 @@ const Logic = (navigation) => {
       () => {}
     );
 
-    getLimb(
+    getMental(
       {},
       (response) => {
         updateState([
           {
             type: ACTION_TYPES.UPDATE_PROP,
-            prop: "limb",
+            prop: "mental",
             value: response.data,
           },
         ]);
       },
       (error) => {
         console.log("error", error);
-        ToastManager.notify("Error fetching limb symptoms", {
+        ToastManager.notify("Error fetching mental symptoms", {
           type: "error",
         });
       },
@@ -144,20 +291,20 @@ const Logic = (navigation) => {
       () => {}
     );
 
-    getGeneral(
+    getLimbs(
       {},
       (response) => {
         updateState([
           {
             type: ACTION_TYPES.UPDATE_PROP,
-            prop: "general",
+            prop: "limbs",
             value: response.data,
           },
         ]);
       },
       (error) => {
         console.log("error", error);
-        ToastManager.notify("Error fetching general symptoms", {
+        ToastManager.notify("Error fetching limb symptoms", {
           type: "error",
         });
       },

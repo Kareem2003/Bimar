@@ -8,9 +8,63 @@ export const getHead = (payload, onSuccess, onError, onComplete) => {
     .catch(onError)
     .finally(onComplete);
 };
+export const getEyes = (payload, onSuccess, onError, onComplete) => {
+  $securedAxios
+    .get("/symptoms/eyes")
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};
 export const getChest = (payload, onSuccess, onError, onComplete) => {
   $securedAxios
     .get("/symptoms/chest")
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};
+export const getUrinaryReproductive = (
+  payload,
+  onSuccess,
+  onError,
+  onComplete
+) => {
+  $securedAxios
+    .get("/symptoms/urinary-reproductive")
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};
+export const getMusculoskeletal = (payload, onSuccess, onError, onComplete) => {
+  $securedAxios
+    .get("/symptoms/musculoskeletal")
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};
+export const getGeneral = (payload, onSuccess, onError, onComplete) => {
+  $securedAxios
+    .get("/symptoms/general")
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};
+export const getPregnancy = (payload, onSuccess, onError, onComplete) => {
+  $securedAxios
+    .get("/symptoms/pregnancy")
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};
+export const getDigestive = (payload, onSuccess, onError, onComplete) => {
+  $securedAxios
+    .get("/symptoms/digestive")
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};
+export const getThroatMouth = (payload, onSuccess, onError, onComplete) => {
+  $securedAxios
+    .get("/symptoms/throat-mouth")
     .then(onSuccess)
     .catch(onError)
     .finally(onComplete);
@@ -22,9 +76,9 @@ export const getSkin = (payload, onSuccess, onError, onComplete) => {
     .catch(onError)
     .finally(onComplete);
 };
-export const getLimb = (payload, onSuccess, onError, onComplete) => {
+export const getMental = (payload, onSuccess, onError, onComplete) => {
   $securedAxios
-    .get("/symptoms/limb")
+    .get("/symptoms/mental")
     .then(onSuccess)
     .catch(onError)
     .finally(onComplete);
@@ -36,9 +90,9 @@ export const getStomach = (payload, onSuccess, onError, onComplete) => {
     .catch(onError)
     .finally(onComplete);
 };
-export const getGeneral = (payload, onSuccess, onError, onComplete) => {
+export const getLimbs = (payload, onSuccess, onError, onComplete) => {
   $securedAxios
-    .get("/symptoms/general")
+    .get("/symptoms/limbs")
     .then(onSuccess)
     .catch(onError)
     .finally(onComplete);

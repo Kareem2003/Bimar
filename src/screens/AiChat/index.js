@@ -79,9 +79,44 @@ const AiChatScreen = ({ navigation }) => {
           onPress={() => handleCardClick("head")}
         />
         <SymptomCard
+          text={"Eyes"}
+          iconName="eye-outline"
+          onPress={() => handleCardClick("eyes")}
+        />
+        <SymptomCard
           text={"Chest"}
           iconName="heart-outline"
           onPress={() => handleCardClick("chest")}
+        />
+        <SymptomCard
+          text={"Urinary/Reproductive"}
+          iconName="female-male-outline"
+          onPress={() => handleCardClick("urinaryReproductive")}
+        />
+        <SymptomCard
+          text={"Musculoskeletal"}
+          iconName="body-outline"
+          onPress={() => handleCardClick("musculoskeletal")}
+        />
+        <SymptomCard
+          text={"General"}
+          iconName="thermometer-outline"
+          onPress={() => handleCardClick("general")}
+        />
+        <SymptomCard
+          text={"Pregnancy"}
+          iconName="woman-outline"
+          onPress={() => handleCardClick("pregnancy")}
+        />
+        <SymptomCard
+          text={"Digestive"}
+          iconName="nutrition-outline"
+          onPress={() => handleCardClick("digestive")}
+        />
+        <SymptomCard
+          text={"Throat/Mouth"}
+          iconName="chatbubble-outline"
+          onPress={() => handleCardClick("throatMouth")}
         />
         <SymptomCard
           text={"Skin"}
@@ -89,9 +124,9 @@ const AiChatScreen = ({ navigation }) => {
           onPress={() => handleCardClick("skin")}
         />
         <SymptomCard
-          text={"Limb"}
-          iconName="walk-outline"
-          onPress={() => handleCardClick("limb")}
+          text={"Mental"}
+          iconName="happy-outline"
+          onPress={() => handleCardClick("mental")}
         />
         <SymptomCard
           text={"Stomach"}
@@ -99,9 +134,9 @@ const AiChatScreen = ({ navigation }) => {
           onPress={() => handleCardClick("stomach")}
         />
         <SymptomCard
-          text={"General"}
-          iconName="body-outline"
-          onPress={() => handleCardClick("general")}
+          text={"Limbs"}
+          iconName="walk-outline"
+          onPress={() => handleCardClick("limbs")}
         />
       </View>
 

@@ -13,13 +13,26 @@
         {
           "photosPermission": "The app needs access to your photos to set your profile picture."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./src/assets/images/logo.png",
+          "color": "#ffffff",
+          "sounds": [
+            "./src/assets/sounds/heartbeat.mp3"
+          ],
+          "mode": "production"
+        }
       ]
     ],
     "permissions": [
       "CAMERA",
       "READ_EXTERNAL_STORAGE",
       "WRITE_EXTERNAL_STORAGE",
-      "MEDIA_LIBRARY"
+      "MEDIA_LIBRARY",
+      "NOTIFICATIONS",
+      "USER_FACING_NOTIFICATIONS"
     ],
     "ios": {
       "requireFullScreen": true,
@@ -27,18 +40,42 @@
         "NSHealthShareUsageDescription": "This app reads your step count data.",
         "NSHealthUpdateUsageDescription": "This app updates your step count data.",
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload profile pictures.",
-        "NSCameraUsageDescription": "This app needs access to your camera to take profile pictures."
+        "NSCameraUsageDescription": "This app needs access to your camera to take profile pictures.",
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       },
       "usesHealthKit": true
     },
     "android": {
       "package": "com.anonymous.Bimar",
+      "googleServicesFile": "./google-services.json",
+      "googleServices": {
+        "projectId": "bimar-a720b"
+      },
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.MEDIA_LIBRARY"
-      ]
-    }
+        "android.permission.MEDIA_LIBRARY",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.VIBRATE",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "useNextNotificationsApi": true
+    },
+    "notification": {
+      "icon": "./src/assets/images/logo.png",
+      "color": "#ffffff",
+      "iosDisplayInForeground": true,
+      "androidMode": "default",
+      "androidCollapsedTitle": "./src/assets/images/logo.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "64485872-86ce-4247-bb26-20e386de1f0b"
+      }
+    },
+    "owner": "kareem061"
   }
 }

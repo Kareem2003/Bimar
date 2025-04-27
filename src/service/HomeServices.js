@@ -16,3 +16,11 @@ export const bookDate = (payload, onSuccess, onError, onComplete) => {
     .catch(onError)
     .finally(onComplete);
 };
+
+export const getMedication = (payload, onSuccess, onError, onComplete) => {
+  $axios
+    .get("/medication/track")
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};
