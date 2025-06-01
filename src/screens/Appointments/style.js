@@ -1,7 +1,7 @@
-import { Dimensions } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 import { primary } from "../../styles/colors";
 
-export const styles = {
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F7FA",
@@ -44,6 +44,7 @@ export const styles = {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
   },
   errorContainer: {
     flex: 1,
@@ -52,7 +53,7 @@ export const styles = {
     padding: 20,
   },
   errorText: {
-    color: "#C62828",
+    color: "#DC2626",
     fontSize: 16,
     textAlign: "center",
   },
@@ -168,4 +169,98 @@ export const styles = {
     fontWeight: "600",
     marginLeft: 6,
   },
-};
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    maxHeight: "80%",
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#16423C",
+  },
+  receiptContent: {
+    paddingBottom: 40,
+  },
+  receiptSection: {
+    backgroundColor: "#F8FAFC",
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#16423C",
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
+    paddingBottom: 10,
+  },
+  receiptRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  receiptLabel: {
+    fontSize: 15,
+    color: "#64748B",
+    flex: 1,
+  },
+  receiptValue: {
+    fontSize: 15,
+    color: "#334155",
+    fontWeight: "500",
+    flex: 2,
+    textAlign: "right",
+  },
+  paymentRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
+  },
+  loadingContainer: {
+    padding: 50,
+    alignItems: "center",
+  },
+  errorContainer: {
+    padding: 30,
+    alignItems: "center",
+  },
+  errorText: {
+    color: "#DC2626",
+    fontSize: 16,
+    textAlign: "center",
+  },
+});

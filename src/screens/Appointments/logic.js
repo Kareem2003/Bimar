@@ -4,6 +4,7 @@ import { INITIAL_STATE } from "./constant";
 import {
   allAppointments,
   cancelAppointment,
+  getReceiptDetails,
 } from "../../service/AppointmentServices";
 import { ToastManager } from "../../helpers/ToastManager";
 import ACTION_TYPES from "../../reducers/actionTypes";
@@ -186,6 +187,76 @@ const Logic = (navigation) => {
     );
   };
 
+  const handleViewReceipt = (appointmentId) => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "showReceiptModal",
+        value: true,
+      },
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "loading",
+        value: true,
+      },
+    ]);
+
+    getReceiptDetails(
+      appointmentId,
+      (response) => {
+        if (response?.data?.data) {
+          updateState([
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "receiptData",
+              value: response.data.data,
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "loading",
+              value: false,
+            },
+          ]);
+        }
+      },
+      (error) => {
+        console.error("Receipt Error:", error);
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "loading",
+            value: false,
+          },
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "error",
+            value: error?.message || "Failed to fetch receipt details",
+          },
+        ]);
+      }
+    );
+  };
+
+  const handleCloseReceipt = () => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "showReceiptModal",
+        value: false,
+      },
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "receiptData",
+        value: null,
+      },
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "error",
+        value: null,
+      },
+    ]);
+  };
+
   useEffect(() => {
     fetchAppointments();
   }, []);
@@ -195,6 +266,8 @@ const Logic = (navigation) => {
     updateState,
     handleStatusFilter,
     handleCancelAppointment,
+    handleViewReceipt,
+    handleCloseReceipt,
   };
 };
 

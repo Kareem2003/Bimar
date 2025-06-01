@@ -20,3 +20,11 @@ export const cancelAppointment = (
     .catch(onError)
     .finally(onComplete);
 };
+
+export const getReceiptDetails = (appointmentId, onSuccess, onError, onComplete) => {
+  $securedAxios
+    .get(`/bookings/receipt/${appointmentId}`)
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};

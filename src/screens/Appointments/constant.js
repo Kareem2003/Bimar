@@ -6,4 +6,6 @@ export const INITIAL_STATE = {
   selectedStatus: "All",
   loading: false,
   error: null,
+  receiptData: null,
+  showReceiptModal: false,
 };

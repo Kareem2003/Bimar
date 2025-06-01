@@ -9,6 +9,7 @@ import {
   Animated,
   Easing,
   Alert,
+  Modal,
 } from "react-native";
 import { styles } from "./style";
 import Logic from "./logic";
@@ -23,8 +24,13 @@ import { cancelAppointment } from "../../service/AppointmentServices";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const Appointments = ({ navigation }) => {
-  const { state, handleStatusFilter, handleCancelAppointment } =
-    Logic(navigation);
+  const {
+    state,
+    handleStatusFilter,
+    handleCancelAppointment,
+    handleViewReceipt,
+    handleCloseReceipt,
+  } = Logic(navigation);
 
   const renderAppointmentCard = (appointment) => {
     const statusColors = {
@@ -37,7 +43,10 @@ const Appointments = ({ navigation }) => {
     const colors = statusColors[status] || statusColors.Pending;
 
     return (
-      <View style={styles.appointmentCard}>
+      <TouchableOpacity
+        onPress={() => handleViewReceipt(appointment._id)}
+        style={styles.appointmentCard}
+      >
         <View style={styles.cardHeader}>
           <Text style={{ fontSize: 13, color: "#718096" }}>
             {moment(appointment.appointmentDate).format("MMM D, YYYY")}
@@ -94,7 +103,7 @@ const Appointments = ({ navigation }) => {
             </TouchableOpacity>
           )}
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -125,6 +134,177 @@ const Appointments = ({ navigation }) => {
       </ScrollView>
     </View>
   );
+
+  const renderReceiptModal = () => {
+    return (
+      <Modal
+        visible={state.showReceiptModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={handleCloseReceipt}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Receipt</Text>
+              <TouchableOpacity
+                onPress={handleCloseReceipt}
+                style={{
+                  padding: 8,
+                  backgroundColor: "#F1F5F9",
+                  borderRadius: 20,
+                }}
+              >
+                <Icon name="times" size={20} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              style={styles.receiptContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {state.loading ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color="#16423C" />
+                </View>
+              ) : !state.receiptData ? (
+                <View style={styles.errorContainer}>
+                  <Icon name="file-text-o" size={40} color="#DC2626" />
+                  <Text style={styles.errorText}>No receipt data available</Text>
+                </View>
+              ) : (
+                <View style={styles.receiptContainer}>
+                  <View style={styles.receiptSection}>
+                    <Text style={styles.sectionTitle}>Receipt Details</Text>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Receipt Number</Text>
+                      <Text style={styles.receiptValue}>
+                        {state.receiptData?.receiptNumber || "Not Available"}
+                      </Text>
+                    </View>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Issue Date</Text>
+                      <Text style={styles.receiptValue}>
+                        {moment(state.receiptData?.issueDate).format(
+                          "MMM D, YYYY h:mm A"
+                        )}
+                      </Text>
+                    </View>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Appointment</Text>
+                      <Text style={styles.receiptValue}>
+                        {moment(state.receiptData?.appointmentDate).format(
+                          "MMM D, YYYY h:mm A"
+                        )}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.receiptSection}>
+                    <Text style={styles.sectionTitle}>Doctor Information</Text>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Name</Text>
+                      <Text style={styles.receiptValue}>
+                        Dr. {state.receiptData?.doctor?.name}
+                      </Text>
+                    </View>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Specialization</Text>
+                      <Text style={styles.receiptValue}>
+                        {state.receiptData?.doctor?.specialization}
+                      </Text>
+                    </View>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Email</Text>
+                      <Text style={styles.receiptValue}>
+                        {state.receiptData?.doctor?.email}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.receiptSection}>
+                    <Text style={styles.sectionTitle}>Clinic Details</Text>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Name</Text>
+                      <Text style={styles.receiptValue}>
+                        {state.receiptData?.clinic?.name}
+                      </Text>
+                    </View>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Address</Text>
+                      <Text style={styles.receiptValue}>
+                        {state.receiptData?.clinic?.address}
+                      </Text>
+                    </View>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Location</Text>
+                      <Text style={styles.receiptValue}>
+                        {state.receiptData?.clinic?.area},{" "}
+                        {state.receiptData?.clinic?.city}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={[styles.receiptSection, { marginBottom: 30 }]}>
+                    <Text style={styles.sectionTitle}>Payment Details</Text>
+                    <View style={styles.paymentRow}>
+                      <Text style={styles.receiptLabel}>Base Price</Text>
+                      <Text style={styles.receiptValue}>
+                        ${state.receiptData?.payment?.basePrice || 0}
+                      </Text>
+                    </View>
+                    <View style={styles.paymentRow}>
+                      <Text style={styles.receiptLabel}>Tax Amount</Text>
+                      <Text style={styles.receiptValue}>
+                        ${state.receiptData?.payment?.taxAmount || 0}
+                      </Text>
+                    </View>
+                    <View style={[styles.paymentRow, { borderBottomWidth: 0 }]}>
+                      <Text
+                        style={[
+                          styles.receiptLabel,
+                          { fontWeight: "600", color: "#334155" },
+                        ]}
+                      >
+                        Total Amount
+                      </Text>
+                      <Text
+                        style={[
+                          styles.receiptValue,
+                          { color: "#16423C", fontSize: 18 },
+                        ]}
+                      >
+                        $
+                        {state.receiptData?.payment?.totalAmount ||
+                          state.receiptData?.payment?.basePrice ||
+                          0}
+                      </Text>
+                    </View>
+                    <View style={{ alignItems: "flex-end", marginTop: 10 }}>
+                      <View
+                        style={{
+                          backgroundColor: "#E8F5E9",
+                          paddingVertical: 6,
+                          paddingHorizontal: 12,
+                          borderRadius: 20,
+                        }}
+                      >
+                        <Text style={{ color: "#2E7D32", fontSize: 14 }}>
+                          Paid via{" "}
+                          {state.receiptData?.payment?.paymentMethod ||
+                            "Not Specified"}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -165,6 +345,7 @@ const Appointments = ({ navigation }) => {
           </>
         )}
       </ScrollView>
+      {renderReceiptModal()}
     </View>
   );
 };
