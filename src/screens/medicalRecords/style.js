@@ -334,4 +334,178 @@ export const styles = {
     marginBottom: 10,
     marginLeft: 10,
   },
+  
+  // Edit Modal Styles
+  editModalContainer: {
+    width: 350,
+    height: 650,
+    backgroundColor: "#FFF",
+    borderRadius: 15,
+    overflow: "hidden",
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#6A9C89",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    height: 60,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#FFF",
+    flex: 1,
+  },
+  closeIcon: {
+    padding: 5,
+  },
+  modalContent: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  currentDataSection: {
+    marginVertical: 15,
+    padding: 15,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 10,
+  },
+  editSection: {
+    marginBottom: 20,
+    paddingBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+  },
+  currentDataText: {
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 20,
+  },
+  modalFooter: {
+    flexDirection: "row",
+    padding: 15,
+    backgroundColor: "#f9f9f9",
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: 70,
+    paddingBottom: 15,
+  },
+  modalButton: {
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: "#ccc",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+    marginRight: 8,
+    height: 40,
+  },
+  cancelButtonText: {
+    color: "#666",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  updateButton: {
+    flex: 1,
+    marginLeft: 8,
+    backgroundColor: "#6A9C89",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 40,
+  },
+  
+  // Array Field Styles
+  arrayFieldContainer: {
+    marginVertical: 10,
+  },
+  arrayFieldTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+  },
+  arrayItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  arrayInputContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
+  arrayInput: {
+    width: "100%",
+    minWidth: 200,
+  },
+  removeButton: {
+    backgroundColor: "#ffe6e6",
+    padding: 8,
+    borderRadius: 6,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#e8f5e8",
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 5,
+    borderWidth: 1,
+    borderColor: "#6A9C89",
+    borderStyle: "dashed",
+  },
+  addButtonText: {
+    marginLeft: 8,
+    color: "#6A9C89",
+    fontWeight: "bold",
+  },
+  
+  // Personal Info Styles
+  inputGroup: {
+    marginVertical: 8,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 5,
+  },
+  personalInput: {
+    width: "100%",
+    minWidth: 200,
+  },
+  selectInput: {
+    width: "100%",
+    minWidth: 200,
+    marginVertical: 5,
+  },
 };

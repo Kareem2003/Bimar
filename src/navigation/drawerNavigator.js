@@ -117,7 +117,7 @@ const CustomDrawerContent = (props) => {
              activeRoute !== 'AiChatScreen' && activeRoute !== 'MyDiagnoses' && 
              activeRoute !== 'Settings' && activeRoute !== 'Doctors' && 
              activeRoute !== 'Terms' && activeRoute !== 'RateApp' && 
-             activeRoute !== 'Profile');
+             activeRoute !== 'Profile' && activeRoute !== 'MedicalRecords');
     }
     return activeRoute === routeName;
   };
@@ -175,6 +175,13 @@ const CustomDrawerContent = (props) => {
         >
           <Icon name="medkit" size={20} color={isRouteActive('MyDiagnoses') ? softPurpleColor : '#666'} />
           <Text style={[styles.drawerItemText, isRouteActive('MyDiagnoses') && styles.activeDrawerItemText]}>My Diagnoses</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.drawerItem, isRouteActive('MedicalRecords') && styles.activeDrawerItem]} 
+          onPress={() => handleNavigation('MedicalRecords')}
+        >
+          <Icon name="folder" size={20} color={isRouteActive('MedicalRecords') ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, isRouteActive('MedicalRecords') && styles.activeDrawerItemText]}>My Records</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={[styles.drawerItem, isRouteActive('Settings') && styles.activeDrawerItem]} 
