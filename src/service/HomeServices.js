@@ -9,6 +9,14 @@ export const getDoctors = (payload, onSuccess, onError, onComplete) => {
     .finally(onComplete);
 };
 
+export const getDoctorRating = (doctorId, onSuccess, onError, onComplete) => {
+  $axios
+    .get(`/rate/${doctorId}`)
+    .then(onSuccess)
+    .catch(onError)
+    .finally(onComplete);
+};
+
 export const bookDate = (payload, onSuccess, onError, onComplete) => {
   $securedAxios
     .post("/bookings", payload)

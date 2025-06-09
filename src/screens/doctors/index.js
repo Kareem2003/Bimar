@@ -216,9 +216,11 @@ const Doctors = ({ navigation }) => {
               </View>
               <View style={styles.ratingContainer}>
                 <Text style={styles.ratingScore}>
-                  4.5 <Icon name="star" size={16} color="#FD9B63" />
+                  {doctor.averageRating ? doctor.averageRating.toFixed(1) : "N/A"} <Icon name="star" size={16} color="#FD9B63" />
                 </Text>
-                <Text style={styles.reviewCount}>100 Reviews</Text>
+                <Text style={styles.reviewCount}>
+                  {doctor.totalRatings ? `${doctor.totalRatings} Reviews` : "No Reviews"}
+                </Text>
               </View>
             </TouchableOpacity>
           ))

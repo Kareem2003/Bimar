@@ -652,7 +652,9 @@ const Home = ({ navigation }) => {
                   <View style={styles.statusBadge}>
                     <View style={styles.starContainer}>
                       <Icon name="star" size={10} color="#FD9B63" />
-                      <Text style={styles.ratingText}>4.8</Text>
+                      <Text style={styles.ratingText}>
+                        {doctor.averageRating ? doctor.averageRating.toFixed(1) : "N/A"}
+                      </Text>
                     </View>
                     <Text style={styles.availableText}>
                       {doctor.clinic &&

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useReducer } from "react";
 import { reducer } from "../../reducers/reducer";
 import { INITIAL_STATE } from "./constant";
-import { getDoctors } from "../../service/HomeServices";
+import { getDoctors, getDoctorRating } from "../../service/HomeServices";
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import { ToastManager } from "../../helpers/ToastManager";
@@ -64,6 +64,48 @@ const Logic = (navigation) => {
     };
   }, []);
 
+  const fetchDoctorRatings = async (doctors) => {
+    try {
+      const doctorPromises = doctors.map(async (doctor) => {
+        return new Promise((resolve) => {
+          const doctorId = doctor._id || doctor.id;
+          getDoctorRating(
+            doctorId,
+            (response) => {
+              if (response?.data?.data?.doctor) {
+                resolve({
+                  ...doctor,
+                  averageRating: response.data.data.doctor.averageRating || 0,
+                  totalRatings: response.data.data.doctor.totalRatings || 0,
+                });
+              } else {
+                resolve({
+                  ...doctor,
+                  averageRating: 0,
+                  totalRatings: 0,
+                });
+              }
+            },
+            (error) => {
+              console.log(`Failed to fetch rating for doctor ${doctorId}:`, error);
+              resolve({
+                ...doctor,
+                averageRating: 0,
+                totalRatings: 0,
+              });
+            }
+          );
+        });
+      });
+
+      const doctorsWithRatings = await Promise.all(doctorPromises);
+      return doctorsWithRatings;
+    } catch (error) {
+      console.error("Error fetching doctor ratings:", error);
+      return doctors; // Return original doctors if rating fetch fails
+    }
+  };
+
   const fetchDoctors = () => {
     updateState([
       {
@@ -75,13 +117,18 @@ const Logic = (navigation) => {
 
     getDoctors(
       {},
-      (response) => {
+      async (response) => {
         if (response?.data?.data) {
+          const doctors = response.data.data;
+          
+          // Fetch ratings for all doctors
+          const doctorsWithRatings = await fetchDoctorRatings(doctors);
+          
           updateState([
             {
               type: ACTION_TYPES.UPDATE_PROP,
               prop: "doctors",
-              value: response.data.data,
+              value: doctorsWithRatings,
             },
           ]);
         } else {

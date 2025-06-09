@@ -76,8 +76,12 @@ const DoctorProfile = ({ navigation, route }) => {
         {state.doctor ? (
           <View style={styles.ratingBadge}>
             <Icon name="star" size={16} color="#FD9B63" />
-            <Text style={styles.ratingText}>4.5</Text>
-            <Text style={styles.reviewCount}>100 Reviews</Text>
+            <Text style={styles.ratingText}>
+              {state.doctor.averageRating ? state.doctor.averageRating.toFixed(1) : "N/A"}
+            </Text>
+            <Text style={styles.reviewCount}>
+              {state.doctor.totalRatings ? `${state.doctor.totalRatings} Reviews` : "No Reviews"}
+            </Text>
           </View>
         ) : (
           <Text>Loading doctor information...</Text>
