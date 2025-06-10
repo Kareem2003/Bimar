@@ -1,13 +1,20 @@
 import { useContext, useEffect, useReducer } from "react";
 import { reducer } from "../../reducers/reducer";
 import { INITIAL_STATE } from "./constant";
-import { getDoctors, getDoctorRating } from "../../service/HomeServices";
+import {
+  getDoctors,
+  getMedication,
+  getDoctorRating,
+} from "../../service/HomeServices";
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import { ToastManager } from "../../helpers/ToastManager";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { USERINFO } from "../../helpers/constants/staticKeys";
-import { subscribeToUserData, USER_DATA_EVENTS } from "../../helpers/UserDataManager";
+import {
+  subscribeToUserData,
+  USER_DATA_EVENTS,
+} from "../../helpers/UserDataManager";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -45,8 +52,11 @@ const Logic = (navigation) => {
     const profileUnsubscribe = subscribeToUserData(
       USER_DATA_EVENTS.PROFILE_UPDATED,
       (updatedData) => {
-        console.log('Home logic received profile update:', updatedData.userName);
-        
+        console.log(
+          "Home logic received profile update:",
+          updatedData.userName
+        );
+
         // Update the userName in state
         updateState([
           {
@@ -57,7 +67,7 @@ const Logic = (navigation) => {
         ]);
       }
     );
-    
+
     // Cleanup subscription on unmount
     return () => {
       profileUnsubscribe();
@@ -165,12 +175,132 @@ const Logic = (navigation) => {
     );
   };
 
+  // Update the fetchMedicean function in Logic.js
+  const fetchMedications = () => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "loading",
+        value: true,
+      },
+    ]);
+
+    getMedication(
+      {},
+      (response) => {
+        if (response?.data?.data) {
+          console.log(response.data.data);
+          // Transform API data to match component structure
+          const initialMedications = response.data.data.map((med, index) => ({
+            id: med._id || med.id || `${med.medication}-${Date.now()}`,
+            name: med.medication,
+            times: med.frequency,
+            dose: med.dosage,
+            doseTimes: med.times,
+            takenCount: 0,
+            takenTimes: [],
+          }));
+
+          updateState([
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "initialMedications",
+              value: initialMedications,
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "loading",
+              value: false,
+            },
+          ]);
+        }
+      },
+      (error) => {
+        ToastManager.notify("Error fetching medications", {
+          type: "error",
+        });
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "error",
+            value: error?.message || "Failed to fetch medications",
+          },
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "loading",
+            value: false,
+          },
+        ]);
+      }
+    );
+  };
+
+  const saveMedicines = async (medicines) => {
+    try {
+      const dataToSave = {
+        date: new Date().toISOString().split("T")[0], // Save only "YYYY-MM-DD"
+        medicines: medicines,
+      };
+      const jsonValue = JSON.stringify(dataToSave);
+      await AsyncStorage.setItem("medicines", jsonValue);
+    } catch (e) {
+      console.error("Error saving medicines:", e);
+    }
+  };
+
+  const loadSavedMedicines = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("medicines");
+      if (jsonValue != null) {
+        const savedData = JSON.parse(jsonValue);
+        const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+
+        let medicinesToUse = savedData.medicines;
+
+        if (savedData.date !== today) {
+          // New day: reset takenCount and takenTimes
+          medicinesToUse = savedData.medicines.map((med) => ({
+            ...med,
+            takenCount: 0,
+            takenTimes: [],
+          }));
+        }
+
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "initialMedications",
+            value: medicinesToUse,
+          },
+        ]);
+
+        // After reset, save new clean medicines
+        if (savedData.date !== today) {
+          saveMedicines(medicinesToUse);
+        }
+      } else {
+        // No saved medicines, so fetch from API
+        fetchMedications();
+      }
+    } catch (e) {
+      console.error("Error loading medicines:", e);
+      fetchMedications();
+    }
+  };
+
   useEffect(() => {
     fetchDoctors();
     fetchUserInfo();
+    loadSavedMedicines();
   }, []);
 
-  return { state, updateState };
+  useEffect(() => {
+    if (state.initialMedications.length > 0) {
+      saveMedicines(state.initialMedications);
+    }
+  }, [state.initialMedications]);
+
+  return { state, updateState, saveMedicines };
 };
 
 export default Logic;

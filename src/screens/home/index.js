@@ -16,14 +16,14 @@ import LottieView from "lottie-react-native";
 import TypeWriterEffect from "react-native-typewriter-effect";
 import MenuButton from "../../components/menuButton";
 import StepCounter from "../../service/stepCounter";
-import Icon from 'react-native-vector-icons/FontAwesome';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import moment from 'moment';
+import Icon from "react-native-vector-icons/FontAwesome";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import moment from "moment";
 import { BASE_URL } from "../../helpers/constants/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Home = ({ navigation }) => {
-  const { state, updateState } = Logic(navigation);
+  const { state, updateState, saveMedicines } = Logic(navigation);
   const translateY = useRef(new Animated.Value(0)).current;
   const translateX = useRef(new Animated.Value(0)).current;
   const [selectedMedication, setSelectedMedication] = useState(null);
@@ -34,34 +34,6 @@ const Home = ({ navigation }) => {
   const timeIndicatorPosition = useRef(new Animated.Value(0)).current;
   const [activeMedicationIndex, setActiveMedicationIndex] = useState(null);
   const [expandAnim, setExpandAnim] = useState(new Animated.Value(0));
-
-  // Define the initial medication configuration outside of useState to use for resets
-  const initialMedications = [
-    {
-      id: 1,
-      name: "Paracetamol",
-      times: 3,
-      dose: 500,
-      doseTimes: ["09:00", "13:00", "17:00"],
-      completed: false,
-      takenCount: 0,
-      takenTimes: [],
-      image: require("../../assets/images/med1.png"),
-    },
-    {
-      id: 2,
-      name: "Amoxicillin",
-      times: 2,
-      dose: 250,
-      doseTimes: ["08:00", "14:00"],
-      completed: false,
-      takenCount: 0,
-      takenTimes: [],
-      image: require("../../assets/images/med2.png"),
-    },
-  ];
-
-  const [medications, setMedications] = useState(initialMedications);
 
   const calculateMedicationTimes = (times, firstDose) => {
     const [hours, minutes] = firstDose.split(":").map(Number);
@@ -78,25 +50,27 @@ const Home = ({ navigation }) => {
   // Function to sort medication doses by time
   const getSortedMedicationDoses = () => {
     const allDoses = [];
-    
-    medications.forEach(med => {
-      med.doseTimes.forEach(time => {
+
+    state.initialMedications.forEach((med) => {
+      med.doseTimes.forEach((time) => {
         allDoses.push({
           id: med.id,
           name: med.name,
           time: time,
-          formattedTime: formatTo12Hour(...time.split(':').map(Number)),
+          formattedTime: formatTo12Hour(...time.split(":").map(Number)),
           isTaken: (med.takenTimes || []).includes(time),
-          status: (med.takenTimes || []).includes(time) ? 'taken' : getMedicationStatus(time)
+          status: (med.takenTimes || []).includes(time)
+            ? "taken"
+            : getMedicationStatus(time),
         });
       });
     });
-    
+
     // Sort by time (HH:MM format)
     return allDoses.sort((a, b) => {
-      const [aHours, aMinutes] = a.time.split(':').map(Number);
-      const [bHours, bMinutes] = b.time.split(':').map(Number);
-      
+      const [aHours, aMinutes] = a.time.split(":").map(Number);
+      const [bHours, bMinutes] = b.time.split(":").map(Number);
+
       // First compare hours
       if (aHours !== bHours) {
         return aHours - bHours;
@@ -144,34 +118,39 @@ const Home = ({ navigation }) => {
   };
 
   const toggleMedication = async (medicationId, doseTime) => {
-    const updatedMedications = medications.map((med) => {
-        if (med.id === medicationId) {
-          const updatedTakenTimes = med.takenTimes || [];
-          const timeIndex = updatedTakenTimes.indexOf(doseTime);
+    const updatedMedications = state.initialMedications.map((med) => {
+      if (med.id === medicationId) {
+        const updatedTakenTimes = med.takenTimes || [];
+        const timeIndex = updatedTakenTimes.indexOf(doseTime);
 
-          if (timeIndex === -1) {
-            // Mark as taken
-            updatedTakenTimes.push(doseTime);
-          } else {
-            // Unmark as taken
-            updatedTakenTimes.splice(timeIndex, 1);
-          }
-
-          return {
-            ...med,
-            takenTimes: updatedTakenTimes,
-            takenCount: updatedTakenTimes.length,
-            completed: updatedTakenTimes.length >= med.times,
-          };
+        if (timeIndex === -1) {
+          // Mark as taken
+          updatedTakenTimes.push(doseTime);
+        } else {
+          // Unmark as taken
+          updatedTakenTimes.splice(timeIndex, 1);
         }
-        return med;
+
+        return {
+          ...med,
+          takenTimes: updatedTakenTimes,
+          takenCount: updatedTakenTimes.length,
+          completed: updatedTakenTimes.length >= med.times,
+        };
+      }
+      return med;
     });
 
-    setMedications(updatedMedications);
-    
-    // Store the taken status with today's date
-    const today = new Date().toDateString();
-    await AsyncStorage.setItem('medications_' + today, JSON.stringify(updatedMedications));
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "initialMedications",
+        value: updatedMedications,
+      },
+    ]);
+
+    // ❗ Save using Logic's saveMedicines, not manual AsyncStorage.setItem
+    await saveMedicines(updatedMedications);
   };
 
   const getTimeRemaining = (nextDoseTime) => {
@@ -240,7 +219,6 @@ const Home = ({ navigation }) => {
       wiggleAnimation.stop();
     };
   }, [translateY, translateX]);
-  
 
   useEffect(() => {
     // Update current time every minute
@@ -259,7 +237,7 @@ const Home = ({ navigation }) => {
         friction: 90,
         tension: 40,
       }).start();
-    }, 60000);
+    });
 
     // Initial position
     const hours = currentTime.getHours();
@@ -272,109 +250,115 @@ const Home = ({ navigation }) => {
 
   // Calculate medication status: upcoming, pending, or missed
   const getMedicationStatus = (time) => {
-    const [hours, minutes] = time.split(':').map(Number);
+    const [hours, minutes] = time.split(":").map(Number);
     const medicationTime = new Date();
     medicationTime.setHours(hours, minutes, 0);
-    
+
     const now = new Date();
-    
+
     // Calculate time difference in minutes
     const diffMs = medicationTime - now;
     const diffMinutes = diffMs / (1000 * 60);
-    
+
     // If the medication time is in the future but within 30 minutes, it's pending
     if (diffMinutes > 0 && diffMinutes <= 30) {
-      return 'pending';
+      return "pending";
     }
-    
+
     // If the medication time has passed by 30 minutes and not taken, mark as missed
     if (diffMinutes < -30) {
-      return 'missed';
+      return "missed";
     }
-    
+
     // If the medication time is in the future (more than 30 minutes), it's upcoming
     if (diffMinutes > 30) {
-      return 'upcoming';
+      return "upcoming";
     }
-    
+
     // If we're within +/- 30 minutes of medication time, it's pending
-    return 'pending';
+    return "pending";
   };
-  
+
   // Calculate progress percentage
   const calculateProgress = () => {
-    const totalDoses = medications.reduce((sum, med) => sum + med.doseTimes.length, 0);
-    const takenDoses = medications.reduce((sum, med) => sum + (med.takenTimes?.length || 0), 0);
-    
+    const totalDoses = state.initialMedications.reduce(
+      (sum, med) => sum + med.doseTimes.length,
+      0
+    );
+    const takenDoses = state.initialMedications.reduce(
+      (sum, med) => sum + (med.takenTimes?.length || 0),
+      0
+    );
+
     if (totalDoses === 0) return 0;
     return Math.round((takenDoses / totalDoses) * 100);
   };
-  
+
   // Find the next medication dose
   const getNextMedication = () => {
     const now = new Date();
     let nextMed = null;
     let minTimeDiff = Infinity;
-    
-    medications.forEach(med => {
-      med.doseTimes.forEach(time => {
+
+    state.initialMedications.forEach((med) => {
+      med.doseTimes.forEach((time) => {
         if ((med.takenTimes || []).includes(time)) return; // Skip taken doses
-        
-        const [hours, minutes] = time.split(':').map(Number);
+
+        const [hours, minutes] = time.split(":").map(Number);
         const doseTime = new Date();
         doseTime.setHours(hours, minutes, 0);
-        
+
         // Calculate time difference in minutes
         const diffMs = doseTime - now;
         const diffMinutes = diffMs / (1000 * 60);
-        
-        // If medication time has passed by more than 30 minutes, 
+
+        // If medication time has passed by more than 30 minutes,
         // consider it for tomorrow (unless it's marked as missed)
-        if (diffMinutes < -30 && getMedicationStatus(time) === 'missed') {
+        if (diffMinutes < -30 && getMedicationStatus(time) === "missed") {
           doseTime.setDate(doseTime.getDate() + 1);
         }
-        
+
         const timeDiff = doseTime - now;
         if (timeDiff > 0 && timeDiff < minTimeDiff) {
           minTimeDiff = timeDiff;
-          nextMed = { 
-            name: med.name, 
+          nextMed = {
+            name: med.name,
             time: time,
             formattedTime: formatTo12Hour(hours, minutes),
-            status: getMedicationStatus(time)
+            status: getMedicationStatus(time),
           };
         }
       });
     });
-    
+
     // If no upcoming medication, check for pending ones
     if (!nextMed) {
-      medications.forEach(med => {
-        med.doseTimes.forEach(time => {
+      state.initialMedications.forEach((med) => {
+        med.doseTimes.forEach((time) => {
           if ((med.takenTimes || []).includes(time)) return; // Skip taken doses
-          
+
           const status = getMedicationStatus(time);
-          if (status === 'pending') {
-            const [hours, minutes] = time.split(':').map(Number);
-            nextMed = { 
-              name: med.name, 
+          if (status === "pending") {
+            const [hours, minutes] = time.split(":").map(Number);
+            nextMed = {
+              name: med.name,
               time: time,
               formattedTime: formatTo12Hour(hours, minutes),
-              status: 'pending'
+              status: "pending",
             };
             return; // Break the loop
           }
         });
       });
     }
-    
+
     return nextMed;
   };
 
   // Function to render medication status icon
   const renderStatusIcon = (medication, time) => {
     const isTaken = (medication.takenTimes || []).includes(time);
-    
+
     if (isTaken) {
       return (
         <View style={styles.statusIconTaken}>
@@ -382,25 +366,25 @@ const Home = ({ navigation }) => {
         </View>
       );
     }
-    
+
     const status = getMedicationStatus(time);
-    
-    if (status === 'missed') {
+
+    if (status === "missed") {
       return (
         <View style={styles.statusIconMissed}>
           <MaterialIcons name="close" size={12} color="#fff" />
         </View>
       );
     }
-    
-    if (status === 'pending') {
+
+    if (status === "pending") {
       return (
         <View style={styles.statusIconPending}>
           <MaterialIcons name="access-time" size={12} color="#fff" />
         </View>
       );
     }
-    
+
     return (
       <View style={styles.statusIconUpcoming}>
         <MaterialIcons name="circle" size={12} color="#fff" />
@@ -411,43 +395,46 @@ const Home = ({ navigation }) => {
   // Load medication status on app startup
   useEffect(() => {
     console.log("Loading medication status");
-    
+
     const loadMedicationStatus = async () => {
       try {
         const today = new Date().toDateString();
         console.log("Today's date:", today);
-        
+
         // Check if the day has changed since last app open
-        const lastOpenDate = await AsyncStorage.getItem('last_open_date');
+        const lastOpenDate = await AsyncStorage.getItem("last_open_date");
         console.log("Last open date:", lastOpenDate);
-        
+
         // FORCE RESET if day has changed
         if (lastOpenDate && lastOpenDate !== today) {
           console.log("DAY CHANGED - Forcing medication reset");
           // Clear all medication data for today
-          await AsyncStorage.removeItem('medications_' + today);
-          
+          await AsyncStorage.removeItem("medications_" + today);
+
           // Reset medications to initial state
-          const resetMedications = initialMedications.map(med => ({
+          const resetMedications = state.initialMedications.map((med) => ({
             ...med,
             takenTimes: [],
             takenCount: 0,
-            completed: false
+            completed: false,
           }));
-          
+
           // Save the reset state for today
-          await AsyncStorage.setItem('medications_' + today, JSON.stringify(resetMedications));
+          await AsyncStorage.setItem(
+            "medications_" + today,
+            JSON.stringify(resetMedications)
+          );
           setMedications(resetMedications);
-          
+
           // Update the last open date
-          await AsyncStorage.setItem('last_open_date', today);
+          await AsyncStorage.setItem("last_open_date", today);
           console.log("Reset completed and saved for today:", today);
           return; // Exit early since we've already set the medications
         }
-        
+
         // If no day change detected, proceed with normal loading
-        const storedData = await AsyncStorage.getItem('medications_' + today);
-        
+        const storedData = await AsyncStorage.getItem("medications_" + today);
+
         if (storedData) {
           // If we have data for today, use it
           console.log("Found today's medication data");
@@ -456,27 +443,30 @@ const Home = ({ navigation }) => {
         } else {
           // If no data for today, reset using the original configuration
           console.log("No data found for today - Creating new medication data");
-          const resetMedications = initialMedications.map(med => ({
+          const resetMedications = state.initialMedications.map((med) => ({
             ...med,
             takenTimes: [],
             takenCount: 0,
-            completed: false
+            completed: false,
           }));
-          
+
           // Save the reset state for today
-          await AsyncStorage.setItem('medications_' + today, JSON.stringify(resetMedications));
+          await AsyncStorage.setItem(
+            "medications_" + today,
+            JSON.stringify(resetMedications)
+          );
           setMedications(resetMedications);
         }
-        
+
         // Always update the last open date
-        await AsyncStorage.setItem('last_open_date', today);
+        await AsyncStorage.setItem("last_open_date", today);
       } catch (error) {
-        console.log('Error loading medication status', error);
+        console.log("Error loading medication status", error);
       }
     };
-    
+
     loadMedicationStatus();
-    
+
     // Midnight check for day change
     const setupMidnightReset = () => {
       const now = new Date();
@@ -484,38 +474,44 @@ const Home = ({ navigation }) => {
         now.getFullYear(),
         now.getMonth(),
         now.getDate() + 1, // tomorrow
-        0, 0, 0 // midnight
+        0,
+        0,
+        0 // midnight
       );
       const msToMidnight = night.getTime() - now.getTime();
-      
-      console.log(`Scheduling midnight reset in ${Math.round(msToMidnight/1000/60)} minutes`);
-      
+
+      console.log(
+        `Scheduling midnight reset in ${Math.round(
+          msToMidnight / 1000 / 60
+        )} minutes`
+      );
+
       // Set timeout for midnight
       const midnightTimeout = setTimeout(() => {
         console.log("MIDNIGHT REACHED - Resetting medications");
         loadMedicationStatus(); // Force reload at midnight
-        
+
         // Set up next day's timeout
         setupMidnightReset();
       }, msToMidnight);
-      
+
       return midnightTimeout;
     };
-    
+
     // Set up midnight reset
     const midnightTimeout = setupMidnightReset();
-    
+
     // Additional check for day changes while app is running
     const dayChangeInterval = setInterval(async () => {
-      const lastOpenDate = await AsyncStorage.getItem('last_open_date');
+      const lastOpenDate = await AsyncStorage.getItem("last_open_date");
       const today = new Date().toDateString();
-      
+
       if (lastOpenDate !== today) {
         console.log("Day change detected during app runtime");
         loadMedicationStatus(); // Force reload
       }
     }, 60000); // Check every minute
-    
+
     return () => {
       clearInterval(dayChangeInterval);
       clearTimeout(midnightTimeout);
@@ -583,11 +579,7 @@ const Home = ({ navigation }) => {
               <Text style={styles.showMoreText}>Show More</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            style={{ padding: 5 }}
-          >
+          <ScrollView horizontal={true} style={styles.cardScroll}>
             {state.loading ? (
               <ActivityIndicator size="large" color="#FD9B63" />
             ) : state.error ? (
@@ -657,11 +649,7 @@ const Home = ({ navigation }) => {
                       </Text>
                     </View>
                     <Text style={styles.availableText}>
-                      {doctor.clinic &&
-                      doctor.clinic.length > 0 &&
-                      doctor.clinic[0].Price
-                        ? `${doctor.clinic[0].Price}LE`
-                        : "__LE"}
+                      {doctor.price || doctor.consultationFee || "500"}LE
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -678,11 +666,16 @@ const Home = ({ navigation }) => {
             <Text style={styles.medicationTitle}>Today's medication</Text>
             <Text style={styles.medicationSubtext}>
               You've taken{" "}
-              {medications.reduce(
+              {state.initialMedications.reduce(
                 (sum, med) => sum + (med.takenTimes?.length || 0),
                 0
               )}{" "}
-              out of 5 meds today!
+              out of{" "}
+              {state.initialMedications.reduce(
+                (sum, med) => sum + med.doseTimes.length,
+                0
+              )}{" "}
+              meds today!
             </Text>
           </View>
 

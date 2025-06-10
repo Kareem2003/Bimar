@@ -3,6 +3,7 @@ export const INITIAL_STATE = {
   doctors: [],
   loading: false,
   error: null,
-  userName: '',
+  userName: "",
   userinfo: {},
+  initialMedications: [],
 };
