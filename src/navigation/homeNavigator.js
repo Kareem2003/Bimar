@@ -25,6 +25,7 @@ import TestingResult from "../screens/testingResult"
 import Xray from "../screens/xRay"
 import MyDiagnoses from "../screens/allDiagnos"
 import MedicalRecords from "../screens/medicalRecords"
+import UploadFiles from "../screens/uploadFiles"
 import withUserDataUpdates from "../helpers/withUserDataUpdates";
 
 const Stack = createNativeStackNavigator();
@@ -67,6 +68,7 @@ const HomeNavigator = () => {
       <Stack.Screen name="Xray" component={Xray} />
       <Stack.Screen name="MyDiagnoses" component={MyDiagnoses} />
       <Stack.Screen name="MedicalRecords" component={MedicalRecords} />
+      <Stack.Screen name="UploadFiles" component={UploadFiles} />
     </Stack.Navigator>
   );
 };

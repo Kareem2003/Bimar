@@ -241,6 +241,8 @@ attachmentCard: {
 },
 
 attachmentIcon: {
+  width: 30,
+  height: 30,
   margin: 15,
 },
 
@@ -286,7 +288,7 @@ bottomButtonsRow: {
   right: 0,
   flexDirection: 'row',
   paddingHorizontal: 20,
-  justifyContent: 'space-between',
+  justifyContent: 'center',
 },
 
 actionButton: {
@@ -296,7 +298,7 @@ actionButton: {
   justifyContent: 'center',
   paddingVertical: 16,
   borderRadius: 20,
-  width: '48%',
+  width: '90%',
   shadowColor: "#000",
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.25,

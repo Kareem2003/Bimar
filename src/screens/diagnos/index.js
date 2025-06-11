@@ -1,5 +1,5 @@
 import { styles } from "./style";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 import {
   View,
@@ -14,15 +14,31 @@ import {
   Alert,
   Modal,
   Dimensions,
-  PanResponder
+  PanResponder,
+  RefreshControl,
+  Linking
 } from "react-native";
 import { Button } from "react-native-paper";
 import AppButton from "../../components/AppButton";
 import AuthTitles from "../../components/AuthTitles";
-import Logic from "./logic";
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AUTHENTICATION_TOKEN, USERINFO } from "../../helpers/constants/staticKeys";
+import axios from "axios";
+import { BASE_URL } from "../../helpers/constants/config";
+
+// Set up axios with your base URL
+const api = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 const Diagnos = ({ navigation, route }) => {
   const diagnosis = route.params?.diagnosis;
+  const diagnosisId = route.params?.diagnosisId;
   
   // Add state for modal
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,8 +46,182 @@ const Diagnos = ({ navigation, route }) => {
   const [selectedTitle, setSelectedTitle] = useState("");
   const [selectedImageData, setSelectedImageData] = useState(null);
   const [scale, setScale] = useState(1);
+  const [currentDiagnosis, setCurrentDiagnosis] = useState(diagnosis);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const lastScale = useRef(1);
   const lastDistance = useRef(0);
+
+  // Separate function to fetch diagnosis data without hooks
+  const fetchDiagnosisData = async () => {
+    if (!diagnosisId) return null;
+    
+    try {
+      const token = await AsyncStorage.getItem(AUTHENTICATION_TOKEN);
+      const userInfo = await AsyncStorage.getItem(USERINFO);
+      const user = userInfo ? JSON.parse(userInfo) : null;
+
+      if (!token || !user) {
+        navigation.navigate("Login");
+        return null;
+      }
+
+      const userId = user.id || user._id;
+      if (!userId) {
+        throw new Error('User ID not found in stored user info');
+      }
+
+      const response = await api.get(`/Diagnosis/patient/${userId}/diagnosis/${diagnosisId}`);
+      console.log("API Response:", response.data);
+
+      if (!response.data || !response.data.data) {
+        throw new Error('Invalid response format');
+      }
+
+      const diagnosisData = response.data.data;
+
+      // Process attachments from X-rays and Lab Results
+      const attachments = [];
+      
+      // Add X-rays as attachments
+      if (diagnosisData.Xray && Array.isArray(diagnosisData.Xray)) {
+        console.log("Processing X-rays:", diagnosisData.Xray);
+        diagnosisData.Xray.forEach((xray, index) => {
+          // Handle both object format and file path string format
+          const isFilePath = typeof xray === 'string';
+          const xrayData = isFilePath ? { filePath: xray } : xray;
+          
+          // Convert backslashes to forward slashes for URL construction
+          const filePath = isFilePath ? xray.replace(/\\/g, '/') : null;
+          const imageUri = isFilePath ? { uri: `${BASE_URL}/${filePath}` } : null;
+          
+          console.log(`X-ray ${index}:`, { isFilePath, filePath, imageUri });
+          
+          attachments.push({
+            id: `xray-${xrayData.id || index}`,
+            type: "X-ray",
+            image: require("../../assets/images/Xray.png"),
+            imageSource: xrayData.image ? { uri: xrayData.image } : (isFilePath ? { uri: `${BASE_URL}/${filePath}` } : null),
+            prescriptionName: `X-ray ${index + 1}`,
+            time: new Date(xrayData.date || diagnosisData.date).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            rawData: xrayData
+          });
+        });
+      }
+
+      // Add Lab Results as attachments
+      if (diagnosisData.labResults && Array.isArray(diagnosisData.labResults)) {
+        console.log("Processing Lab Results:", diagnosisData.labResults);
+        diagnosisData.labResults.forEach((labResult, index) => {
+          // Handle both object format and file path string format
+          const isFilePath = typeof labResult === 'string';
+          const labData = isFilePath ? { filePath: labResult } : labResult;
+          
+          // Convert backslashes to forward slashes for URL construction
+          const filePath = isFilePath ? labResult.replace(/\\/g, '/') : null;
+          const imageUri = isFilePath ? { uri: `${BASE_URL}/${filePath}` } : null;
+          
+          // Determine if the lab result is a PDF based on file extension or type
+          const isPdf = filePath?.toLowerCase().endsWith('.pdf') || labData.type === 'application/pdf';
+          
+          console.log(`Lab Result ${index}:`, { isFilePath, filePath, imageUri, type: "Lab Results", isPdf });
+          
+          attachments.push({
+            id: `lab-${labData.id || index}`,
+            type: "Lab Results",
+            image: require("../../assets/images/microscope.png"),
+            imageSource: labData.image ? { uri: labData.image } : (isFilePath ? { uri: `${BASE_URL}/${filePath}` } : null),
+            prescriptionName: `Lab Result ${index + 1}`,
+            time: new Date(labData.date || diagnosisData.date).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            rawData: labData,
+            isPdf: isPdf,
+            fileUrl: isFilePath ? `${BASE_URL}/${filePath}` : null
+          });
+        });
+      }
+
+      // Add Prescription as attachment if it exists
+      if (diagnosisData.prescription) {
+        console.log("Processing Prescription:", diagnosisData.prescription);
+        attachments.push({
+          id: "prescription-1",
+          type: "Prescription",
+          image: require("../../assets/images/pdf.png"),
+          prescriptionName: "Prescription",
+          time: new Date(diagnosisData.date).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          rawData: diagnosisData.prescription,
+          isPdf: true,
+          fileUrl: diagnosisData.prescription?.url || null
+        });
+      }
+
+      // Process the diagnosis details
+      const processedDiagnosis = {
+        id: diagnosisData.id || diagnosisData._id,
+        doctorId: diagnosisData.doctorId,
+        doctorName: diagnosisData.doctorName,
+        specialization: diagnosisData.specialization,
+        displayDate: diagnosisData.displayDate || new Date(diagnosisData.date).toLocaleDateString(),
+        date: diagnosisData.date,
+        time: new Date(diagnosisData.date).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        diagnosis: Array.isArray(diagnosisData.diagnosis) ? diagnosisData.diagnosis[0] : diagnosisData.diagnosis,
+        treatmentPlan: diagnosisData.treatmentPlan || '',
+        prescription: diagnosisData.prescription,
+        prescriptions: diagnosisData.prescription ? [diagnosisData.prescription] : [],
+        xrays: diagnosisData.Xray || [],
+        labResults: diagnosisData.labResults || [],
+        rawXrays: diagnosisData.Xray || [],
+        rawLabResults: diagnosisData.labResults || [],
+        notes: diagnosisData.notes || [],
+        attachments: attachments,
+        hasXray: diagnosisData.hasXray,
+        hasLabResults: diagnosisData.hasLabResults,
+        hasPrescription: diagnosisData.hasPrescription,
+        image: diagnosisData.doctorImage || require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
+      };
+
+      return processedDiagnosis;
+    } catch (error) {
+      console.error("Error fetching diagnosis:", error);
+      return null;
+    }
+  };
+
+  // Function to refresh diagnosis data
+  const refreshDiagnosisData = async () => {
+    if (!diagnosisId) return;
+    
+    setIsRefreshing(true);
+    try {
+      const updatedDiagnosis = await fetchDiagnosisData();
+      if (updatedDiagnosis) {
+        setCurrentDiagnosis(updatedDiagnosis);
+      }
+    } catch (error) {
+      console.error('Error refreshing diagnosis:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Use focus effect to refresh data when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      // Refresh data when screen comes into focus
+      refreshDiagnosisData();
+    }, [diagnosisId])
+  );
 
   // Pan responder for zoom functionality
   const panResponder = useRef(
@@ -69,20 +259,20 @@ const Diagnos = ({ navigation, route }) => {
     })
   ).current;
 
-  console.log("Diagnosis data:", diagnosis);
-  console.log("Prescription data:", diagnosis?.prescription);
-  console.log("X-ray data:", diagnosis?.rawXrays);
-  console.log("Lab results data:", diagnosis?.rawLabResults);
-  console.log("Attachments:", diagnosis?.attachments);
+  console.log("Current diagnosis data:", currentDiagnosis);
+  console.log("Prescription data:", currentDiagnosis?.prescription);
+  console.log("X-ray data:", currentDiagnosis?.rawXrays);
+  console.log("Lab results data:", currentDiagnosis?.rawLabResults);
+  console.log("Attachments:", currentDiagnosis?.attachments);
   
   // Check if there's valid prescription data
-  const hasPrescription = !!(diagnosis?.prescription && 
-    typeof diagnosis.prescription === 'object' && 
-    Object.keys(diagnosis.prescription).length > 0);
+  const hasPrescription = !!(currentDiagnosis?.prescription && 
+    typeof currentDiagnosis.prescription === 'object' && 
+    Object.keys(currentDiagnosis.prescription).length > 0);
   
   console.log("Has valid prescription data:", hasPrescription);
 
-  if (!diagnosis) {
+  if (!currentDiagnosis) {
     return (
       <View style={styles.container}>
         <Text style={{ color: "red" }}>No diagnosis data found</Text>
@@ -94,25 +284,28 @@ const Diagnos = ({ navigation, route }) => {
     // Navigate to doctor profile for booking
     navigation.navigate("DoctorProfile", { 
       doctor: {
-        id: diagnosis.doctorId,
-        name: diagnosis.doctorName,
-        specialization: diagnosis.specialization,
-        image: diagnosis.image
+        id: currentDiagnosis.doctorId,
+        name: currentDiagnosis.doctorName,
+        specialization: currentDiagnosis.specialization,
+        image: currentDiagnosis.image
       }
     });
   };
 
   const handleUpload = () => {
-    // Navigate to upload screen
-    navigation.navigate("UploadFiles", { diagnosisId: diagnosis.id });
+    // Navigate to upload screen with callback to refresh data
+    navigation.navigate("UploadFiles", { 
+      diagnosisId: currentDiagnosis.id,
+      onFilesAdded: refreshDiagnosisData
+    });
   };
 
   const handleChat = () => {
     // Navigate to chat with the doctor
     navigation.navigate("DoctorChat", {
-      doctorId: diagnosis.doctorId || diagnosis.id,
-      doctorName: diagnosis.doctorName,
-      doctorImage: diagnosis.image
+      doctorId: currentDiagnosis.doctorId || currentDiagnosis.id,
+      doctorName: currentDiagnosis.doctorName,
+      doctorImage: currentDiagnosis.image
     });
   };
   
@@ -232,7 +425,18 @@ const Diagnos = ({ navigation, route }) => {
         </View>
       </Modal>
       
-      <ScrollView style={styles.scrollContainer} contentContainerStyle={{paddingBottom: 120}}>
+      <ScrollView 
+        style={styles.scrollContainer} 
+        contentContainerStyle={{paddingBottom: 120}}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={refreshDiagnosisData}
+            colors={['#16423C']}
+            tintColor="#16423C"
+          />
+        }
+      >
         {/* Header with back button */}
         <View style={[styles.header, { flexDirection: "row", alignItems: "center" }]}>
           <TouchableOpacity
@@ -242,8 +446,11 @@ const Diagnos = ({ navigation, route }) => {
             <Icon name="chevron-back" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
-            {diagnosis.diagnosis || "Diagnosis Details"}
+            {currentDiagnosis.diagnosis || "Diagnosis Details"}
           </Text>
+          {isRefreshing && (
+            <ActivityIndicator size="small" color="#16423C" style={{ marginLeft: 10 }} />
+          )}
         </View>
 
         {/* Doctor Card */}
@@ -253,16 +460,16 @@ const Diagnos = ({ navigation, route }) => {
             onPress={handleBooking}
           >
             <Image 
-              source={diagnosis.image} 
+              source={currentDiagnosis.image} 
               style={styles.doctorImage}
             />
             <View style={styles.doctorInfo}>
-              <Text style={styles.doctorName}>{diagnosis.doctorName}</Text>
+              <Text style={styles.doctorName}>{currentDiagnosis.doctorName}</Text>
               <Text style={styles.doctorSpecialization}>
-                {diagnosis.specialization}
+                {currentDiagnosis.specialization}
               </Text>
               <Text style={styles.dateTime}>
-                {diagnosis.time} - {diagnosis.displayDate}
+                {currentDiagnosis.time} - {currentDiagnosis.displayDate}
               </Text>
             </View>
           </TouchableOpacity>
@@ -276,7 +483,7 @@ const Diagnos = ({ navigation, route }) => {
             nestedScrollEnabled={true}
           >
             <Text style={styles.notesText}>
-              {diagnosis.treatmentPlan || "No treatment plan available"}
+              {currentDiagnosis.treatmentPlan || "No treatment plan available"}
             </Text>
           </ScrollView>
         </View>
@@ -284,25 +491,36 @@ const Diagnos = ({ navigation, route }) => {
         {/* Attachments */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>
-            Attachments ({diagnosis.attachments?.length || 0})
+            Attachments ({currentDiagnosis.attachments?.length || 0})
           </Text>
-          {diagnosis.attachments?.map((attachment) => (
+          {currentDiagnosis.attachments?.map((attachment) => (
             <TouchableOpacity 
               key={attachment.id}
               style={styles.attachmentCard}
               onPress={() => {
                 if (attachment.type === "X-ray") {
-                  // Open X-ray in modal instead of navigating
+                  // Open X-ray in modal
                   openImageModal(attachment.imageSource || attachment.image, "X-ray Results", attachment.rawData);
                 } else if (attachment.type === "Lab Results") {
-                  // Open lab results in modal instead of navigating
-                  openImageModal(attachment.imageSource || attachment.image, "Laboratory Test Results", attachment.rawData);
+                  if (attachment.isPdf && attachment.fileUrl) {
+                    // Open PDF lab results externally
+                    Linking.openURL(attachment.fileUrl).catch(err => 
+                      Alert.alert("Error", "Could not open PDF. Please ensure you have a PDF viewer installed.")
+                    );
+                  } else {
+                    // Open image lab results in modal
+                    openImageModal(attachment.imageSource || attachment.image, "Laboratory Test Results", attachment.rawData);
+                  }
                 } else if (attachment.type === "Prescription") {
-                  // Use our hasPrescription check to determine what to do
-                  if (hasPrescription) {
-                    console.log("Navigating to prescription screen with:", diagnosis.prescription);
+                  // For prescriptions, also check for PDF and open externally if fileUrl exists
+                  if (attachment.isPdf && attachment.fileUrl) {
+                    Linking.openURL(attachment.fileUrl).catch(err => 
+                      Alert.alert("Error", "Could not open Prescription PDF. Please ensure you have a PDF viewer installed.")
+                    );
+                  } else if (hasPrescription) {
+                    console.log("Navigating to prescription screen with:", currentDiagnosis.prescription);
                     navigation.navigate("PrescriptionScreen", {
-                      prescription: diagnosis.prescription
+                      prescription: currentDiagnosis.prescription
                     });
                   } else {
                     // Alert user that no prescription data exists
@@ -353,13 +571,6 @@ const Diagnos = ({ navigation, route }) => {
           <Text style={styles.actionButtonText}>Upload Files</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.chatButton]}
-          onPress={handleChat}
-        >
-          <Icon name="chatbox-outline" size={20} color="#FFF" />
-          <Text style={styles.actionButtonText}>Go to Chat</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );

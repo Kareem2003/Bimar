@@ -403,13 +403,13 @@ const Logic = (navigation) => {
     // Handle the case where the item itself is the image path string
     if (typeof item === 'string') {
       console.log("Item is a string path, using with BASE_URL");
-      return { uri: `${BASE_URL}/${item}` };
+      return { uri: `${BASE_URL}/${item.replace(/\\/g, '/')}` };
     }
     
     // Check if the item has the image path stored directly
     if (item.image && typeof item.image === 'string') {
       console.log("Using image property with BASE_URL");
-      return { uri: `${BASE_URL}/${item.image}` };
+      return { uri: `${BASE_URL}/${item.image.replace(/\\/g, '/')}` };
     }
     
     // Check for common image path properties
@@ -420,7 +420,7 @@ const Logic = (navigation) => {
         if (item[prop].startsWith('http') || item[prop].startsWith('data:')) {
           return { uri: item[prop] };
         }
-        return { uri: `${BASE_URL}/${item[prop]}` };
+        return { uri: `${BASE_URL}/${item[prop].replace(/\\/g, '/')}` };
       }
     }
     
@@ -431,7 +431,7 @@ const Logic = (navigation) => {
       if (uri.startsWith('http') || uri.startsWith('data:')) {
         return { uri };
       }
-      return { uri: `${BASE_URL}/${uri}` };
+      return { uri: `${BASE_URL}/${uri.replace(/\\/g, '/')}` };
     }
     
     // Check if the item has a base64 encoded image
@@ -469,7 +469,7 @@ const Logic = (navigation) => {
       updateState,
       navigateToDiagnosis,
       navigateToChat,
-
+      fetchAllDiagnoses
     },
   };
 };

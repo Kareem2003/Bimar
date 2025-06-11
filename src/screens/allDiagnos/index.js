@@ -9,14 +9,28 @@ import {
   Image,
   ScrollView,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import Logic from "./logic";
+import { useFocusEffect } from '@react-navigation/native';
 
 const MyDiagnoses = ({ navigation }) => {
   const { state, actions } = Logic(navigation);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Filter diagnoses based on search query
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await actions.fetchAllDiagnoses();
+    setIsRefreshing(false);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      handleRefresh();
+    }, [])
+  );
+
   const filterDiagnoses = (diagnoses) => {
     if (!searchQuery) return diagnoses;
     return diagnoses.filter(diagnosis => 
@@ -25,7 +39,7 @@ const MyDiagnoses = ({ navigation }) => {
     );
   };
 
-  if (state.loading) {
+  if (state.loading && !isRefreshing) {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#FD9B63" />
@@ -35,7 +49,6 @@ const MyDiagnoses = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header with back button */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -44,9 +57,11 @@ const MyDiagnoses = ({ navigation }) => {
           <Icon name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Diagnoses</Text>
+        {isRefreshing && (
+          <ActivityIndicator size="small" color="#16423C" style={{ marginLeft: 10 }} />
+        )}
       </View>
 
-      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBarWrapper}>
           <TextInput
@@ -60,13 +75,21 @@ const MyDiagnoses = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Diagnoses List */}
-      <ScrollView style={styles.diagnosesList}>
+      <ScrollView 
+        style={styles.diagnosesList}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            colors={['#16423C']}
+            tintColor="#16423C"
+          />
+        }
+      >
         {state.error ? (
           <Text style={styles.errorText}>{state.error}</Text>
         ) : (
           <>
-            {/* Recent Diagnoses */}
             {filterDiagnoses(state.upcomingAppointments).length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Recent Diagnoses</Text>
@@ -112,7 +135,6 @@ const MyDiagnoses = ({ navigation }) => {
               </View>
             )}
 
-            {/* Past Diagnoses */}
             {filterDiagnoses(state.pastAppointments).length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Past Diagnoses</Text>
