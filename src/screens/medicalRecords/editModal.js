@@ -10,6 +10,7 @@ import {
   Platform,
   TextInput,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { styles } from './style';
 import AppInput from '../../components/AppInput';
 import AppSelect from '../../components/AppSelect';
@@ -24,6 +25,7 @@ const EditRecordModal = ({
   loading 
 }) => {
   const [formData, setFormData] = useState({});
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
     if (record && visible) {
@@ -176,6 +178,22 @@ const EditRecordModal = ({
     }
   };
 
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      // Format date as YYYY-MM-DD
+      const formattedDate = selectedDate.toISOString().split('T')[0];
+      handleInputChange('birthDateOfFirstChild', formattedDate);
+    }
+  };
+
+  const getCurrentDateValue = () => {
+    if (formData.birthDateOfFirstChild) {
+      return new Date(formData.birthDateOfFirstChild);
+    }
+    return new Date();
+  };
+
   const renderArrayField = (fieldName, title, placeholder) => {
     const items = formData[fieldName] || [];
     
@@ -265,12 +283,16 @@ const EditRecordModal = ({
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Birth Date of First Child</Text>
-              <AppInput
-                term={formData.birthDateOfFirstChild || ''}
-                placeholder="YYYY-MM-DD"
-                onChangeText={(value) => handleInputChange('birthDateOfFirstChild', value)}
-                inputWrapperStyle={styles.personalInput}
-              />
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(true)}
+              >
+                <AppInput
+                  term={formData.birthDateOfFirstChild || ''}
+                  placeholder="YYYY-MM-DD"
+                  inputWrapperStyle={styles.personalInput}
+                  editable={false}
+                />
+              </TouchableOpacity>
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Smoking</Text>
@@ -392,6 +414,14 @@ const EditRecordModal = ({
           </View>
         </KeyboardAvoidingView>
       </View>
+      {showDatePicker && (
+        <DateTimePicker
+          value={getCurrentDateValue()}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+        />
+      )}
     </Modal>
   );
 };

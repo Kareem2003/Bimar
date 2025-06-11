@@ -1,5 +1,6 @@
-import React, { useContext } from "react";
-import { ScrollView, Text, View } from "react-native";
+import React, { useContext, useState } from "react";
+import { ScrollView, Text, View, TouchableOpacity } from "react-native";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
 import DropdownComponent from "../../components/DropdownComponent";
@@ -15,6 +16,7 @@ import { styles } from "./style";
 
 const Profile = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const {
     state,
     updateState,
@@ -23,6 +25,28 @@ const Profile = ({ navigation }) => {
     handleSave,
     handleImageSelect,
   } = Logic(navigation);
+
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      // Format date as YYYY-MM-DD
+      const formattedDate = selectedDate.toISOString().split('T')[0];
+      updateState([
+        {
+          type: ACTION_TYPES.UPDATE_PROP,
+          prop: "formData.personalRecords.DateOfBirth",
+          value: formattedDate,
+        },
+      ]);
+    }
+  };
+
+  const getCurrentDateValue = () => {
+    if (state.formData.personalRecords.DateOfBirth) {
+      return new Date(state.formData.personalRecords.DateOfBirth);
+    }
+    return new Date();
+  };
 
   return (
     <View
@@ -128,20 +152,24 @@ const Profile = ({ navigation }) => {
               />
               <View>
                 <Text style={styles.label}>Date of Birth</Text>
-                <AppInput
-                  keyboardType="default"
-                  term={state.formData.personalRecords.DateOfBirth}
-                  onChangeText={(text) => {
-                    updateState([
-                      {
-                        type: ACTION_TYPES.UPDATE_PROP,
-                        prop: "formData.personalRecords.DateOfBirth",
-                        value: text,
-                      },
-                    ]);
-                  }}
-                  placeholder="YYYY-MM-DD"
-                />
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <AppInput
+                    keyboardType="default"
+                    term={state.formData.personalRecords.DateOfBirth}
+                    placeholder="YYYY-MM-DD"
+                    editable={false}
+                  />
+                </TouchableOpacity>
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={getCurrentDateValue()}
+                    mode="date"
+                    display="default"
+                    onChange={handleDateChange}
+                  />
+                )}
                 <Text style={styles.label}>Gender</Text>
                 <DropdownComponent
                   data={GENDER_OPTIONS}
