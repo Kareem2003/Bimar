@@ -35,6 +35,9 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# Configuration files with local settings
+src/helpers/constants/config.js
+
 #Platform directories
 /android
 /ios
