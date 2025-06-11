@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { reducer } from "../../reducers/reducer";
 import { INITIAL_STATE } from "./constant";
 import {
@@ -13,6 +13,8 @@ import { Alert } from "react-native";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  const [sortType, setSortType] = useState("date");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const updateState = (payload) => {
     dispatch({ payload });
@@ -45,6 +47,129 @@ const Logic = (navigation) => {
     );
   };
 
+  // New: Search function
+  const searchAppointments = (query) => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "searchQuery",
+        value: query,
+      },
+    ]);
+
+    applyAllFilters(query, state.selectedStatus, state.selectedAppointmentType, sortType, sortOrder, state.allAppointments);
+  };
+
+  // New: Filter by appointment type
+  const filterByAppointmentType = (type) => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "selectedAppointmentType",
+        value: type,
+      },
+    ]);
+
+    applyAllFilters(state.searchQuery, state.selectedStatus, type, sortType, sortOrder, state.allAppointments);
+  };
+
+  // New: Sort appointments
+  const sortAppointments = (type = sortType, order = sortOrder) => {
+    setSortType(type);
+    setSortOrder(order);
+
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "sortType",
+        value: type,
+      },
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "sortOrder",
+        value: order,
+      },
+    ]);
+
+    applyAllFilters(state.searchQuery, state.selectedStatus, state.selectedAppointmentType, type, order, state.allAppointments);
+  };
+
+  // New: Combined filter function
+  const applyAllFilters = (searchQuery = "", statusFilter = "All", appointmentType = "", sortType = "date", sortOrder = "desc", appointmentsData = null) => {
+    // Use provided data or fall back to state data
+    const sourceData = appointmentsData || state.allAppointments;
+    let filtered = [...sourceData];
+
+    // Apply status filter
+    if (statusFilter && statusFilter !== "All") {
+      filtered = filtered.filter(appointment => appointment.status === statusFilter);
+    }
+
+    // Apply appointment type filter
+    if (appointmentType) {
+      filtered = filtered.filter(appointment => 
+        appointment.bookingType?.toLowerCase().includes(appointmentType.toLowerCase())
+      );
+    }
+
+    // Apply search filter
+    if (searchQuery) {
+      const searchTerm = searchQuery.toLowerCase();
+      filtered = filtered.filter(appointment =>
+        appointment.doctorId?.doctorName?.toLowerCase().includes(searchTerm) ||
+        appointment.doctorId?.field?.toLowerCase().includes(searchTerm) ||
+        appointment.bookingType?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    // Apply sorting
+    switch (sortType) {
+      case "name":
+        filtered.sort((a, b) => {
+          const nameA = (a.doctorId?.doctorName || "").toLowerCase();
+          const nameB = (b.doctorId?.doctorName || "").toLowerCase();
+          if (nameA < nameB) return sortOrder === "asc" ? -1 : 1;
+          if (nameA > nameB) return sortOrder === "asc" ? 1 : -1;
+          return 0;
+        });
+        break;
+      case "time":
+        filtered.sort((a, b) => {
+          const timeA = moment(a.appointmentTime);
+          const timeB = moment(b.appointmentTime);
+          return sortOrder === "asc" ? timeA.diff(timeB) : timeB.diff(timeA);
+        });
+        break;
+      case "date":
+      default:
+        filtered.sort((a, b) => {
+          const dateA = moment(a.appointmentDate);
+          const dateB = moment(b.appointmentDate);
+          return sortOrder === "asc" ? dateA.diff(dateB) : dateB.diff(dateA);
+        });
+        break;
+    }
+
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "filteredAppointments",
+        value: filtered,
+      },
+    ]);
+  };
+
+  // New: Toggle sort modal
+  const toggleSortModal = () => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "showSortModal",
+        value: !state.showSortModal,
+      },
+    ]);
+  };
+
   const fetchAppointments = () => {
     updateState([
       {
@@ -59,11 +184,23 @@ const Logic = (navigation) => {
       (response) => {
         if (response?.data?.data) {
           const { upcoming, past } = categorizeAppointments(response.data.data);
+          const appointmentsData = response.data.data;
+          
+          // Apply initial sorting to the data
+          let initialFiltered = [...appointmentsData];
+          
+          // Apply default sorting (date desc)
+          initialFiltered.sort((a, b) => {
+            const dateA = moment(a.appointmentDate);
+            const dateB = moment(b.appointmentDate);
+            return dateB.diff(dateA); // desc order
+          });
+          
           updateState([
             {
               type: ACTION_TYPES.UPDATE_PROP,
               prop: "allAppointments",
-              value: response.data.data,
+              value: appointmentsData,
             },
             {
               type: ACTION_TYPES.UPDATE_PROP,
@@ -78,7 +215,7 @@ const Logic = (navigation) => {
             {
               type: ACTION_TYPES.UPDATE_PROP,
               prop: "filteredAppointments",
-              value: response.data.data,
+              value: initialFiltered,
             },
           ]);
         } else {
@@ -116,19 +253,15 @@ const Logic = (navigation) => {
   };
 
   const handleStatusFilter = (status) => {
-    const filtered = filterAppointments(state.allAppointments, status);
     updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: "filteredAppointments",
-        value: filtered,
-      },
       {
         type: ACTION_TYPES.UPDATE_PROP,
         prop: "selectedStatus",
         value: status,
       },
     ]);
+
+    applyAllFilters(state.searchQuery, status, state.selectedAppointmentType, sortType, sortOrder, state.allAppointments);
   };
 
   const handleCancelAppointment = (bookingId) => {
@@ -268,6 +401,15 @@ const Logic = (navigation) => {
     handleCancelAppointment,
     handleViewReceipt,
     handleCloseReceipt,
+    // New functions
+    searchAppointments,
+    filterByAppointmentType,
+    sortAppointments,
+    toggleSortModal,
+    sortType,
+    sortOrder,
+    setSortType,
+    setSortOrder,
   };
 };
 

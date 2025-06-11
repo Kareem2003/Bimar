@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   Easing,
   Alert,
   Modal,
+  TextInput,
 } from "react-native";
 import { styles } from "./style";
 import Logic from "./logic";
@@ -30,7 +31,43 @@ const Appointments = ({ navigation }) => {
     handleCancelAppointment,
     handleViewReceipt,
     handleCloseReceipt,
+    searchAppointments,
+    filterByAppointmentType,
+    sortAppointments,
+    toggleSortModal,
+    sortType,
+    sortOrder,
   } = Logic(navigation);
+
+  const [showTypeModal, setShowTypeModal] = useState(false);
+
+  const appointmentTypes = [
+    "All",
+    ...new Set(
+      state.allAppointments
+        .map((appointment) => appointment.bookingType)
+        .filter(Boolean)
+    ),
+  ];
+
+  const sortOptions = [
+    { label: "Date (Recent First)", type: "date", order: "desc" },
+    { label: "Date (Oldest First)", type: "date", order: "asc" },
+    { label: "Name (A-Z)", type: "name", order: "asc" },
+    { label: "Name (Z-A)", type: "name", order: "desc" },
+    { label: "Time (Early First)", type: "time", order: "asc" },
+    { label: "Time (Late First)", type: "time", order: "desc" },
+  ];
+
+  const handleSearch = (text) => {
+    searchAppointments(text);
+  };
+
+  const handleTypeSelect = (type) => {
+    const selectedType = type === "All" ? "" : type;
+    filterByAppointmentType(selectedType);
+    setShowTypeModal(false);
+  };
 
   const renderAppointmentCard = (appointment) => {
     const statusColors = {
@@ -82,7 +119,10 @@ const Appointments = ({ navigation }) => {
             <View style={styles.detailRow}>
               <Icon name="clock-o" size={14} color="#718096" />
               <Text style={styles.detailText}>
-                {moment(appointment.appointmentTime).format("h:mm A")}
+                {appointment.appointmentStartTime 
+                  ? moment(appointment.appointmentStartTime, 'HH:mm').format("h:mm A")
+                  : "Time not set"
+                }
               </Text>
             </View>
             <View style={styles.detailRow}>
@@ -107,32 +147,174 @@ const Appointments = ({ navigation }) => {
     );
   };
 
-  const renderStatusFilter = () => (
-    <View style={styles.filterContainer}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {["All", "Pending", "Completed", "Cancelled"].map((status) => (
-          <TouchableOpacity
-            key={status}
-            style={[
-              styles.filterButton,
-              state.selectedStatus === status && styles.activeFilterButton,
-            ]}
-            onPress={() => handleStatusFilter(status)}
-            activeOpacity={0.7}
-          >
-            <Text
+  const renderSearchAndFilters = () => (
+    <View style={styles.filtersContainer}>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBarWrapper}>
+          <TextInput
+            style={styles.searchBar}
+            placeholder="Search appointments, doctors, specialties..."
+            placeholderTextColor="#999"
+            onChangeText={handleSearch}
+            value={state.searchQuery}
+          />
+          <Ionicons name="search" size={20} color="#FD9B63" />
+        </View>
+      </View>
+
+      {/* All Filters in One Row */}
+      <View style={styles.allFiltersRow}>
+        {/* Status Filters */}
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.statusFiltersScroll}
+        >
+          {["All", "Pending", "Completed", "Cancelled"].map((status) => (
+            <TouchableOpacity
+              key={status}
               style={[
-                styles.filterButtonText,
-                state.selectedStatus === status &&
-                  styles.activeFilterButtonText,
+                styles.filterButton,
+                state.selectedStatus === status && styles.activeFilterButton,
               ]}
+              onPress={() => handleStatusFilter(status)}
+              activeOpacity={0.7}
             >
-              {status}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+              <Text
+                style={[
+                  styles.filterButtonText,
+                  state.selectedStatus === status &&
+                    styles.activeFilterButtonText,
+                ]}
+              >
+                {status}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Type Filter */}
+        <TouchableOpacity
+          style={styles.typeFilterButton}
+          onPress={() => setShowTypeModal(true)}
+        >
+          <Text style={styles.typeFilterButtonText}>
+            {state.selectedAppointmentType || "Type"}
+          </Text>
+          <Ionicons name="chevron-down" size={16} color="#FD9B63" />
+        </TouchableOpacity>
+
+        {/* Sort Button */}
+        <TouchableOpacity
+          style={styles.sortIconButton}
+          onPress={toggleSortModal}
+        >
+          <Ionicons name="funnel" size={20} color="#FD9B63" />
+          {(sortType !== "date" || sortOrder !== "desc") && (
+            <View style={styles.sortDotIndicator} />
+          )}
+        </TouchableOpacity>
+      </View>
     </View>
+  );
+
+  const renderStatusFilter = () => null;
+
+  const renderTypeFilterModal = () => (
+    <Modal
+      visible={showTypeModal}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={() => setShowTypeModal(false)}
+    >
+      <View style={styles.typeModalOverlay}>
+        <View style={styles.typeModalContent}>
+          <Text style={styles.typeModalTitle}>Select Appointment Type</Text>
+          <ScrollView>
+            {appointmentTypes.map((type, index) => {
+              const isSelected = 
+                (type === "All" && !state.selectedAppointmentType) ||
+                type === state.selectedAppointmentType;
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.typeModalItem,
+                    isSelected && styles.typeModalItemSelected,
+                  ]}
+                  onPress={() => handleTypeSelect(type)}
+                >
+                  <Text
+                    style={[
+                      styles.typeModalItemText,
+                      isSelected && styles.typeModalItemTextSelected,
+                    ]}
+                  >
+                    {type}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+          <TouchableOpacity
+            style={styles.typeCloseButton}
+            onPress={() => setShowTypeModal(false)}
+          >
+            <Text style={styles.typeCloseButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
+  const renderSortModal = () => (
+    <Modal
+      visible={state.showSortModal}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={toggleSortModal}
+    >
+      <View style={styles.sortModalOverlay}>
+        <View style={styles.sortModalContent}>
+          <Text style={styles.sortModalTitle}>Sort By</Text>
+          <ScrollView>
+            {sortOptions.map((option, idx) => {
+              const isSelected =
+                sortType === option.type && sortOrder === option.order;
+              return (
+                <TouchableOpacity
+                  key={idx}
+                  style={[
+                    styles.sortModalItem,
+                    isSelected && styles.sortModalItemSelected,
+                  ]}
+                  onPress={() => {
+                    sortAppointments(option.type, option.order);
+                    toggleSortModal();
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.sortModalItemText,
+                      isSelected && styles.sortModalItemTextSelected,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+          <TouchableOpacity
+            style={styles.sortCloseButton}
+            onPress={toggleSortModal}
+          >
+            <Text style={styles.sortCloseButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
   );
 
   const renderReceiptModal = () => {
@@ -325,7 +507,7 @@ const Appointments = ({ navigation }) => {
           </View>
         ) : (
           <>
-            {renderStatusFilter()}
+            {renderSearchAndFilters()}
             <View style={styles.appointmentsContainer}>
               {state.filteredAppointments.length > 0 ? (
                 state.filteredAppointments.map((appointment) => (
@@ -346,6 +528,8 @@ const Appointments = ({ navigation }) => {
         )}
       </ScrollView>
       {renderReceiptModal()}
+      {renderTypeFilterModal()}
+      {renderSortModal()}
     </View>
   );
 };
