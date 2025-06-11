@@ -13,6 +13,7 @@ import { primaryDark, primaryLight } from "../../styles/colors";
 import { BLOOD_TYPE_OPTIONS, GENDER_OPTIONS } from "./constant";
 import Logic from "./logic";
 import { styles } from "./style";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const Profile = ({ navigation }) => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -50,13 +51,13 @@ const Profile = ({ navigation }) => {
 
   return (
     <View
-      style={{
-        flex: 1,
-        backgroundColor: isDarkTheme ? primaryDark : primaryLight,
-      }}
+      style={[
+        styles.mainContainer,
+        { backgroundColor: isDarkTheme ? primaryDark : primaryLight },
+      ]}
     >
       <Header marginTop={50} header={"MyProfile"} onPress={handleBack} />
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View
           style={[
             styles.container,
@@ -64,12 +65,8 @@ const Profile = ({ navigation }) => {
           ]}
         >
           <View>
-            <View style={{ alignItems: "center" }}>
-              <View
-                style={{
-                  alignItems: "center",
-                }}
-              >
+            <View style={styles.profilePictureContainer}>
+              <View style={styles.profilePictureWrapper}>
                 <ProfilePicture
                   profileImage={state.profileImage || ""}
                   onImageChange={handleImageSelect}
@@ -155,10 +152,10 @@ const Profile = ({ navigation }) => {
                 <TouchableOpacity
                   onPress={() => setShowDatePicker(true)}
                 >
-                  <AppInput
-                    keyboardType="default"
-                    term={state.formData.personalRecords.DateOfBirth}
-                    placeholder="YYYY-MM-DD"
+                <AppInput
+                  keyboardType="default"
+                  term={state.formData.personalRecords.DateOfBirth}
+                  placeholder="YYYY-MM-DD"
                     editable={false}
                   />
                 </TouchableOpacity>
@@ -168,7 +165,7 @@ const Profile = ({ navigation }) => {
                     mode="date"
                     display="default"
                     onChange={handleDateChange}
-                  />
+                />
                 )}
                 <Text style={styles.label}>Gender</Text>
                 <DropdownComponent
@@ -232,15 +229,42 @@ const Profile = ({ navigation }) => {
                 <AppButton
                   title="Save"
                   onPress={handleSave}
-                  buttonStyle={{
-                    backgroundColor: primaryDark,
-                    width: "100%",
-                    height: 50,
-                    marginTop: 30,
-                    marginBottom: 100,
-                  }}
-                  textStyle={{ color: "#fff", fontSize: 16 }}
+                  buttonStyle={[
+                    styles.saveButton,
+                    { backgroundColor: primaryDark }
+                  ]}
+                  textStyle={styles.saveButtonText}
                 />
+
+                {/* Security Section */}
+                <View style={styles.securitySection}>
+                  <Text style={[styles.label, styles.securityHeader]}>
+                    Account Security
+                  </Text>
+                  <View style={styles.securityDivider} />
+                  
+                  <TouchableOpacity
+                    style={styles.changePasswordButton}
+                    onPress={() => navigation.navigate("forgetPassword")}
+                  >
+                    <View style={styles.changePasswordContent}>
+                      <Icon 
+                        name="lock-closed" 
+                        size={20} 
+                        color="#16423C" 
+                        style={styles.changePasswordIcon}
+                      />
+                      <Text style={styles.changePasswordText}>
+                        Change Password
+                      </Text>
+                    </View>
+                    <Icon 
+                      name="chevron-forward" 
+                      size={16} 
+                      color="#999" 
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </View>

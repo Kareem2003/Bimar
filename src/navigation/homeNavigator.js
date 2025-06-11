@@ -52,7 +52,7 @@ const HomeNavigator = () => {
         }}
       />
       <Stack.Screen name="Profile" component={Profile} />
-      <Stack.Screen name="Settings" component={Settingsscreen} />
+      {/* <Stack.Screen name="Settings" component={Settingsscreen} /> */}
       <Stack.Screen name="Terms" component={Terms} />
       <Stack.Screen name="RateApp" component={RateApp} />
       <Stack.Screen name="Doctors" component={Doctors} />

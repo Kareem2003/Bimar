@@ -7,6 +7,31 @@ export const styles = {
     alignItems: "center",
     backgroundColor: "#fff",
   },
+  // Main container styles
+  mainContainer: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  profilePictureContainer: {
+    alignItems: "center",
+  },
+  profilePictureWrapper: {
+    alignItems: "center",
+  },
+  // Save button styles
+  saveButton: {
+    width: "100%",
+    height: 50,
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
   title: {
     fontSize: 24,
     marginBottom: 24,
@@ -35,7 +60,6 @@ export const styles = {
     width: 55,
     height: 55,
     borderRadius: 50,
-
     margin: 5,
   },
   imgActive: {
@@ -68,5 +92,46 @@ export const styles = {
   label: {
     marginTop: 8,
     color: "#555",
+  },
+  // Security Section Styles
+  securitySection: {
+    marginTop: 1,
+    marginBottom: 20,
+  },
+  securityHeader: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#16423C",
+  },
+  securityDivider: {
+    height: 1,
+    backgroundColor: "#E0E0E0",
+    marginVertical: 10,
+  },
+  changePasswordButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#FFF",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  changePasswordContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  changePasswordIcon: {
+    marginRight: 15,
+  },
+  changePasswordText: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "500",
   },
 };

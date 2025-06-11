@@ -121,23 +121,6 @@ const Settingsscreen = ({ navigation }) => {
                 gap: 80,
                 marginTop: 20,
               }}
-              onPress={() => navigation.navigate("forgetPassword")}
-            >
-              <Image source={require("../../assets/images/password.png")} />
-              <Text>
-                <Text>Change Password</Text>
-              </Text>
-
-              <Text> {">"} </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                insetBlockStart: 30,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 80,
-                marginTop: 20,
-              }}
               onPress={() => navigation.navigate("RateApp")}
             >
               <Image source={require("../../assets/images/star.png")} />

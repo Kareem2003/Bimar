@@ -115,7 +115,8 @@ const CustomDrawerContent = (props) => {
     if (routeName === 'Home') {
       return activeRoute === 'Home' || (activeRoute !== 'Appointments' && 
              activeRoute !== 'AiChatScreen' && activeRoute !== 'MyDiagnoses' && 
-             activeRoute !== 'Settings' && activeRoute !== 'Doctors' && 
+            //  activeRoute !== 'Settings' && 
+            activeRoute !== 'Doctors' && 
              activeRoute !== 'Terms' && activeRoute !== 'RateApp' && 
              activeRoute !== 'Profile' && activeRoute !== 'MedicalRecords');
     }
@@ -163,6 +164,13 @@ const CustomDrawerContent = (props) => {
           <Text style={[styles.drawerItemText, isRouteActive('AiChatScreen') && styles.activeDrawerItemText]}>AI Chat</Text>
         </TouchableOpacity>
         <TouchableOpacity 
+          style={[styles.drawerItem, isRouteActive('Doctors') && styles.activeDrawerItem]} 
+          onPress={() => handleNavigation('Doctors')}
+        >
+          <Icon name="stethoscope" size={20} color={isRouteActive('Doctors') ? softPurpleColor : '#666'} />
+          <Text style={[styles.drawerItemText, isRouteActive('Doctors') && styles.activeDrawerItemText]}>Doctors</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
           style={[styles.drawerItem, isRouteActive('Appointments') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('Appointments')}
         >
@@ -183,20 +191,14 @@ const CustomDrawerContent = (props) => {
           <Icon name="folder" size={20} color={isRouteActive('MedicalRecords') ? softPurpleColor : '#666'} />
           <Text style={[styles.drawerItemText, isRouteActive('MedicalRecords') && styles.activeDrawerItemText]}>My Records</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
+        {/* <TouchableOpacity 
           style={[styles.drawerItem, isRouteActive('Settings') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('Settings')}
         >
           <Icon name="gear" size={20} color={isRouteActive('Settings') ? softPurpleColor : '#666'} />
           <Text style={[styles.drawerItemText, isRouteActive('Settings') && styles.activeDrawerItemText]}>Settings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.drawerItem, isRouteActive('Doctors') && styles.activeDrawerItem]} 
-          onPress={() => handleNavigation('Doctors')}
-        >
-          <Icon name="stethoscope" size={20} color={isRouteActive('Doctors') ? softPurpleColor : '#666'} />
-          <Text style={[styles.drawerItemText, isRouteActive('Doctors') && styles.activeDrawerItemText]}>Doctors</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        
         <TouchableOpacity 
           style={[styles.drawerItem, isRouteActive('Terms') && styles.activeDrawerItem]} 
           onPress={() => handleNavigation('Terms')}
