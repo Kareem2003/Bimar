@@ -78,4 +78,10 @@ export const styles = {
     fontSize: 14,
     textAlign: "center",
   },
+  linkRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+  },
 };

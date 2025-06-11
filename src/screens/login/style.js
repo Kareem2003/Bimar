@@ -28,4 +28,14 @@ export const styles = {
     color: "#007BFF",
     marginVertical: 5,
   },
+  guideText: {
+    color: "#888",
+    fontSize: 14,
+    marginHorizontal: 2,
+  },
+  forgotLink: {
+    color: "#FD9B63",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
 };

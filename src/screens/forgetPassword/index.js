@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -35,6 +35,34 @@ const ForgetPassword = ({ navigation }) => {
     handleResendOTP,
   } = Logic(navigation);
 
+  // Add cooldown state
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  // Cooldown timer effect
+  useEffect(() => {
+    let timer;
+    if (resendCooldown > 0) {
+      timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
+
+  // Add this useEffect after your other hooks
+  useEffect(() => {
+    if (state.currentStep === 2 && resendCooldown === 0) {
+      setResendCooldown(20);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.currentStep]);
+
+  // Handler for resend click
+  const handleResendClick = () => {
+    if (resendCooldown === 0) {
+      handleResendOTP();
+      setResendCooldown(20); // 20 seconds cooldown
+    }
+  };
+
   return (
     <View
       style={[
@@ -43,7 +71,7 @@ const ForgetPassword = ({ navigation }) => {
       ]}
     >
       {state.currentStep === 1 && (
-        <View style={{ marginBottom: 150 }}>
+        <View style={{ marginBottom: 150, alignItems: "center" }}>
           <AuthTitles
             isDarkTheme={isDarkTheme}
             text="Forget password!"
@@ -51,7 +79,7 @@ const ForgetPassword = ({ navigation }) => {
             description={true}
             descriptionText="Please enter your email to reset the password"
           />
-          <View style={{ marginTop: 80 }}>
+          <View style={{ marginTop: 80, alignItems: "center" }}>
             <AppInput
               term={state.formData.userEmail}
               onChangeText={(text) => updateFormData("userEmail", text)}
@@ -65,7 +93,7 @@ const ForgetPassword = ({ navigation }) => {
             <AppButton
               title="RESET PASSWORD"
               onPress={handleEmailValidation}
-              buttonStyle={{ marginTop: 50, margin: "auto" }}
+              buttonStyle={{ marginTop: 50 }}
             />
           </View>
         </View>
@@ -78,16 +106,17 @@ const ForgetPassword = ({ navigation }) => {
             text="Check your email"
             title={true}
             description={true}
-            descriptionText="We sent a reset link to username@gmail.com enter 5 digit code that mentioned in the email"
+            descriptionText={`We sent a reset link to ${state.formData.userEmail} enter 5 digit code that mentioned in the email`}
           />
-          <Text>{state.otpAsync}</Text>
-          <View style={{ marginTop: 80 }}>
+          <View style={{ marginTop: 80, alignItems: "center" }}>
             <OTPInput onVerify={handleVerifyOTP} />
+
+            <Text>{state.otpAsync}</Text>
 
             <AppButton
               title="VERIFY CODE"
               onPress={handleVerifyOTP}
-              buttonStyle={{ marginTop: 40, margin: "auto" }}
+              buttonStyle={{ marginTop: 40 }}
             />
           </View>
 
@@ -96,8 +125,20 @@ const ForgetPassword = ({ navigation }) => {
               <Text style={styles.linkText}>
                 Haven't received an email yet?
               </Text>
-              <TouchableOpacity onPress={handleResendOTP}>
-                <Text style={styles.resendText}>RESEND</Text>
+              <TouchableOpacity
+                onPress={handleResendClick}
+                disabled={resendCooldown > 0}
+              >
+                <Text
+                  style={[
+                    styles.resendText,
+                    resendCooldown > 0 && { opacity: 0.5 },
+                  ]}
+                >
+                  {resendCooldown > 0
+                    ? ` RESEND (${resendCooldown})`
+                    : " RESEND"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -105,7 +146,7 @@ const ForgetPassword = ({ navigation }) => {
       )}
 
       {state.currentStep === 3 && (
-        <View style={{ marginBottom: 150 }}>
+        <View style={{ marginBottom: 150, alignItems: "center" }}>
           <AuthTitles
             isDarkTheme={isDarkTheme}
             text="Set a new password"
@@ -113,7 +154,7 @@ const ForgetPassword = ({ navigation }) => {
             description={true}
             descriptionText="Create a new password. Ensure it differs from previous ones for security."
           />
-          <View style={{ marginTop: 80, margin: "auto" }}>
+          <View style={{ marginTop: 80, alignItems: "center" }}>
             <AppInput
               term={state.formData.userPassword}
               onChangeText={(text) => updateFormData("userPassword", text)}
@@ -154,7 +195,7 @@ const ForgetPassword = ({ navigation }) => {
             <AppButton
               title="UPDATE PASSWORD"
               onPress={handleUpdatePassword}
-              buttonStyle={{ marginTop: 50, margin: "auto" }}
+              buttonStyle={{ marginTop: 50 }}
             />
           </View>
         </View>

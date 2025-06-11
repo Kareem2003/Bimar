@@ -133,7 +133,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "red",
     opacity: 0.8,
-    alignSelf: "flex-end",
+    alignSelf: "flex-start", // changed from "flex-end" to "flex-start"
+    marginLeft: 12, // optional: aligns with input padding
   },
 });
 

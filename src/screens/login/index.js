@@ -40,7 +40,7 @@ const Login = ({ navigation }) => {
               },
             ]);
           }}
-          onSubmitEditing={() => state.form.passwordInput.focus()}
+          onSubmitEditing={() => state.passwordInput.focus()}
           incomPressible={false}
           iconName="user"
           iconSize={20}
@@ -78,13 +78,34 @@ const Login = ({ navigation }) => {
         onPress={handleLogin}
         buttonStyle={{ marginTop: 25 }}
       />
-      <View style={styles.linksContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate("forgetPassword")}>
-          <Text style={styles.link}>Forgot Password?</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("register")}>
-          <Text style={styles.link}>Register</Text>
-        </TouchableOpacity>
+      <View style={[styles.linksContainer, { marginTop: 20 }]}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text style={styles.guideText}>Need help?</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("forgetPassword")}
+          >
+            <Text style={styles.forgotLink}> Forgot Password!</Text>
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 6,
+          }}
+        >
+          <Text style={styles.guideText}>New here?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("register")}>
+            <Text style={styles.forgotLink}> Register Now</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
