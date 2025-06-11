@@ -39,7 +39,7 @@ const BookNow = ({ navigation, route }) => {
       >
         <Icon name="arrow-back" size={24} color="#333" />
       </TouchableOpacity>
-      <Text style={styles.headerTitle}>Payment Methods</Text>
+      <Text style={styles.headerTitle}>Receipt</Text>
       <View style={styles.backButton} />
     </View>
   );
@@ -66,33 +66,31 @@ const BookNow = ({ navigation, route }) => {
           <Text style={styles.doctorName}>
             {state.doctor ? state.doctor.doctorName : "Doctor not available"}
           </Text>
-          <Text style={styles.doctorPrice}>
-          {state.price} LE 
-          </Text>
+          <Text style={styles.doctorPrice}>{state.price} LE</Text>
         </View>
       </View>
 
       <View style={styles.pricingSummaryContainer}>
         <Text style={styles.summaryTitle}>Pricing Summary</Text>
-        
+
         <View style={styles.pricingRow}>
           <Text style={styles.pricingLabel}>Sub total</Text>
           <Text style={styles.pricingValue}>{state.price} LE</Text>
         </View>
-        
+
         <View style={styles.pricingRow}>
           <Text style={styles.pricingLabel}>Tax</Text>
           <Text style={styles.pricingValue}>4.99 LE </Text>
         </View>
-        
+
         <View style={styles.divider} />
-        
+
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>Total</Text>
           <Text style={styles.totalValue}>{state.price + 4.99} LE</Text>
         </View>
       </View>
-      
+
       <View style={styles.bookButtonContainer}>
         <AppButton title="Book Now" onPress={handleBooking} />
       </View>

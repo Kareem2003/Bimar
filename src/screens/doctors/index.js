@@ -16,9 +16,17 @@ import { BASE_URL } from "../../helpers/constants/config";
 import Header from "../../components/Header";
 
 const Doctors = ({ navigation }) => {
-  const { state, filterDoctors, searchDoctors } = Logic(navigation);
+  const {
+    state,
+    filterDoctors,
+    searchDoctors,
+    sortDoctors,
+    sortType,
+    sortOrder,
+  } = Logic(navigation);
   const [showCityModal, setShowCityModal] = useState(false);
   const [showFieldModal, setShowFieldModal] = useState(false);
+  const [showSortModal, setShowSortModal] = useState(false);
 
   const cities = [
     "All",
@@ -31,6 +39,15 @@ const Doctors = ({ navigation }) => {
   const fields = [
     "All",
     ...new Set(state.doctors.map((doctor) => doctor.field).filter(Boolean)),
+  ];
+
+  const sortOptions = [
+    { label: "Name (A-Z)", type: "name", order: "asc" },
+    { label: "Name (Z-A)", type: "name", order: "desc" },
+    { label: "Rating (High-Low)", type: "rating", order: "desc" },
+    { label: "Rating (Low-High)", type: "rating", order: "asc" },
+    { label: "Experience (High-Low)", type: "experience", order: "desc" },
+    { label: "Experience (Low-High)", type: "experience", order: "asc" },
   ];
 
   const handleFilterSelect = (value, type) => {
@@ -71,20 +88,84 @@ const Doctors = ({ navigation }) => {
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>{title}</Text>
           <ScrollView>
-            {items.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.modalItem}
-                onPress={() => {
-                  handleFilterSelect(item, type);
-                  onClose();
-                }}
-              >
-                <Text style={styles.modalItemText}>{item}</Text>
-              </TouchableOpacity>
-            ))}
+            {items.map((item, index) => {
+              const isSelected =
+                (type === "city" && item === state.selectedCity) ||
+                (type === "field" && item === state.selectedField);
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.modalItem,
+                    isSelected && styles.modalItemSelected,
+                  ]}
+                  onPress={() => {
+                    handleFilterSelect(item, type);
+                    onClose();
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.modalItemText,
+                      isSelected && styles.modalItemTextSelected,
+                    ]}
+                  >
+                    {item}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
+  const renderSortModal = () => (
+    <Modal
+      visible={showSortModal}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={() => setShowSortModal(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Sort By</Text>
+          <ScrollView>
+            {sortOptions.map((option, idx) => {
+              const isSelected =
+                sortType === option.type && sortOrder === option.order;
+              return (
+                <TouchableOpacity
+                  key={idx}
+                  style={[
+                    styles.modalItem,
+                    isSelected && styles.modalItemSelected,
+                  ]}
+                  onPress={() => {
+                    sortDoctors(option.type, option.order);
+                    setShowSortModal(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.modalItemText,
+                      isSelected && styles.modalItemTextSelected,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setShowSortModal(false)}
+          >
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
         </View>
@@ -150,12 +231,15 @@ const Doctors = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.filterIconButton}
-          onPress={() => filterDoctors("", "")}
+          onPress={() => setShowSortModal(true)}
         >
           <Icon name="funnel" size={20} color="#FD9B63" />
+          {/* Dot indicator if sorting is applied */}
+          {(sortType !== "rating" || sortOrder !== "desc") && (
+            <View style={styles.sortDotIndicator} />
+          )}
         </TouchableOpacity>
       </View>
-
       {renderFilterModal(
         cities,
         showCityModal,
@@ -173,6 +257,8 @@ const Doctors = ({ navigation }) => {
         "Select Field",
         "field"
       )}
+
+      {renderSortModal()}
 
       {/* Doctors List */}
       <ScrollView style={styles.doctorsList}>
@@ -216,10 +302,15 @@ const Doctors = ({ navigation }) => {
               </View>
               <View style={styles.ratingContainer}>
                 <Text style={styles.ratingScore}>
-                  {doctor.averageRating ? doctor.averageRating.toFixed(1) : "N/A"} <Icon name="star" size={16} color="#FD9B63" />
+                  {doctor.averageRating
+                    ? doctor.averageRating.toFixed(1)
+                    : "N/A"}{" "}
+                  <Icon name="star" size={16} color="#FD9B63" />
                 </Text>
                 <Text style={styles.reviewCount}>
-                  {doctor.totalRatings ? `${doctor.totalRatings} Reviews` : "No Reviews"}
+                  {doctor.totalRatings
+                    ? `${doctor.totalRatings} Reviews`
+                    : "No Reviews"}
                 </Text>
               </View>
             </TouchableOpacity>
