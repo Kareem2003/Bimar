@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Animated } from 'react-native';
 import { ToastManager } from "../../helpers/ToastManager";
-import { appRate } from "../../service/rateServices";
+import { appRate, getUserRating, updateUserRating } from "../../service/rateServices";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { USERINFO, AUTHENTICATION_TOKEN } from "../../helpers/constants/staticKeys";
 
@@ -10,6 +10,8 @@ const Logic = (navigation) => {
   const [feedback, setFeedback] = useState('');
   const [userId, setUserId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasExistingRating, setHasExistingRating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const scaleAnim = new Animated.Value(1);
 
   useEffect(() => {
@@ -26,6 +28,46 @@ const Logic = (navigation) => {
       }
     };
     fetchUserInfo();
+  }, []);
+
+  useEffect(() => {
+    const fetchExistingRating = () => {
+      getUserRating(
+        (response) => {
+          // console.log('=== NEW getUserRating response ===');
+          // console.log('response.data:', response.data);
+          
+          // Based on the logs, the structure is: response.data.data contains {rating, comment}
+          if (response.data && response.data.data && response.data.data.rating !== undefined) {
+            const ratingData = response.data.data;
+            // console.log('✅ Found rating data:', ratingData);
+            
+            setRating(ratingData.rating);
+            setFeedback(ratingData.comment || '');
+            setHasExistingRating(true);
+            
+            // console.log('✅ Set rating to:', ratingData.rating);
+            // console.log('✅ Set feedback to:', ratingData.comment);
+            // console.log('✅ Set hasExistingRating to: true');
+          } else {
+            console.log('❌ No rating data found');
+            setHasExistingRating(false);
+          }
+          
+          setIsLoading(false);
+        },
+        (error) => {
+          console.log('❌ getUserRating error:', error);
+          setIsLoading(false);
+          setHasExistingRating(false);
+        },
+        () => {
+          // console.log('getUserRating completed');
+        }
+      );
+    };
+
+    fetchExistingRating();
   }, []);
 
   const getRatingEmoji = (rating) => {
@@ -83,20 +125,31 @@ const Logic = (navigation) => {
     try {
       setIsSubmitting(true);
 
-      appRate({
+      const ratingService = hasExistingRating ? updateUserRating : appRate;
+      const serviceType = hasExistingRating ? 'UPDATE (PUT)' : 'CREATE (POST)';
+      
+      // console.log(`🚀 Submitting rating using ${serviceType}`);
+      // console.log('📊 Rating data:', { rating, comment: feedback });
+      // console.log('🔄 hasExistingRating:', hasExistingRating);
+      
+      ratingService({
         rating: rating,
         comment: feedback
       }, 
-      () => {
+      (response) => {
+        // console.log('✅ Rating submission successful:', response);
         ToastManager.notify("Thank you for your feedback!", { type: "success" });
         navigation.goBack();
       },
       (error) => {
+        // console.log('❌ Rating submission error:', error);
+        // console.log('❌ Error type:', typeof error);
+        // console.log('❌ Error details:', JSON.stringify(error, null, 2));
         ToastManager.notify(error, { type: "error" });
         setIsSubmitting(false);
       });
     } catch (error) {
-      console.error('Error during rating submission:', error);
+      console.error('💥 Exception during rating submission:', error);
       ToastManager.notify("Error submitting rating", { type: "error" });
       setIsSubmitting(false);
     }
@@ -111,7 +164,9 @@ const Logic = (navigation) => {
     getRatingLabel,
     handleStarPress,
     handleSubmit,
-    isSubmitting
+    isSubmitting,
+    hasExistingRating,
+    isLoading
   };
 };
 

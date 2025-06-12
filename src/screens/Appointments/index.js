@@ -171,28 +171,28 @@ const Appointments = ({ navigation }) => {
           showsHorizontalScrollIndicator={false}
           style={styles.statusFiltersScroll}
         >
-          {["All", "Pending", "Completed", "Cancelled"].map((status) => (
-            <TouchableOpacity
-              key={status}
+        {["All", "Pending", "Completed", "Cancelled"].map((status) => (
+          <TouchableOpacity
+            key={status}
+            style={[
+              styles.filterButton,
+              state.selectedStatus === status && styles.activeFilterButton,
+            ]}
+            onPress={() => handleStatusFilter(status)}
+            activeOpacity={0.7}
+          >
+            <Text
               style={[
-                styles.filterButton,
-                state.selectedStatus === status && styles.activeFilterButton,
+                styles.filterButtonText,
+                state.selectedStatus === status &&
+                  styles.activeFilterButtonText,
               ]}
-              onPress={() => handleStatusFilter(status)}
-              activeOpacity={0.7}
             >
-              <Text
-                style={[
-                  styles.filterButtonText,
-                  state.selectedStatus === status &&
-                    styles.activeFilterButtonText,
-                ]}
-              >
-                {status}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+              {status}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
         {/* Type Filter */}
         <TouchableOpacity

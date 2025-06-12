@@ -1,5 +1,5 @@
 import React, { useContext, useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, TextInput, Animated, Platform, ScrollView, SafeAreaView, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { View, Text, TouchableOpacity, Image, TextInput, Animated, Platform, ScrollView, SafeAreaView, KeyboardAvoidingView, Keyboard, ActivityIndicator } from 'react-native';
 import { styles } from './style';
 import Header from "../../components/Header";
 import { primaryDark, primaryLight } from "../../styles/colors";
@@ -17,7 +17,9 @@ const RateApp = ({ navigation }) => {
     getRatingEmoji,
     getRatingLabel,
     handleStarPress,
-    handleSubmit
+    handleSubmit,
+    isLoading,
+    hasExistingRating
   } = Logic(navigation);
 
   React.useEffect(() => {
@@ -37,6 +39,22 @@ const RateApp = ({ navigation }) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: isDarkTheme ? primaryDark : primaryLight }}>
+        <Header
+          marginTop={40}
+          header={"Rate App"}
+          onPress={() => navigation.goBack()}
+        />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#FD9B63" />
+          <Text style={{ marginTop: 10, color: isDarkTheme ? '#fff' : '#000' }}>Loading your rating...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: isDarkTheme ? primaryDark : primaryLight }}>
@@ -130,7 +148,9 @@ const RateApp = ({ navigation }) => {
               style={[styles.submitButton, { marginBottom: 20 }]}
               onPress={handleSubmit}
             >
-              <Text style={styles.submitButtonText}>Submit Rating</Text>
+              <Text style={styles.submitButtonText}>
+                {hasExistingRating ? 'Update Rating' : 'Submit Rating'}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
