@@ -173,6 +173,7 @@ export const styles = {
   },
   doctorCard: {
     backgroundColor: "#FFF",
+    marginBottom: 10,
     marginRight: 15,
     borderRadius: 18,
     width: 260,
@@ -913,7 +914,7 @@ export const styles = {
   medicationCard: {
     backgroundColor: "#FFFFFF",
     marginHorizontal: 20,
-    marginVertical: 20,
+    // marginVertical: 20,
     borderRadius: 20,
     padding: 20,
     shadowColor: "#000",

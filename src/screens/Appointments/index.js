@@ -40,6 +40,7 @@ const Appointments = ({ navigation }) => {
   } = Logic(navigation);
 
   const [showTypeModal, setShowTypeModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
 
   const appointmentTypes = [
     "All",
@@ -96,33 +97,45 @@ const Appointments = ({ navigation }) => {
         </View>
 
         <View style={styles.cardContent}>
-          <View style={styles.doctorInfo}>
-            <Image
-              source={
-                appointment.doctorId?.doctorImage
-                  ? { uri: `${BASE_URL}/${appointment.doctorId.doctorImage}` }
-                  : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
-              }
-              style={styles.doctorImage}
-            />
-            <View style={styles.doctorDetails}>
-              <Text style={styles.doctorName}>
-                {appointment.doctorId?.doctorName || "Unknown Doctor"}
-              </Text>
-              <Text style={styles.specialty}>
-                {appointment.doctorId?.field || "Specialty not specified"}
-              </Text>
+          <View style={styles.doctorRowWithBookingNumber}>
+            <View style={styles.doctorInfoInline}>
+              <Image
+                source={
+                  appointment.doctorId?.doctorImage
+                    ? { uri: `${BASE_URL}/${appointment.doctorId.doctorImage}` }
+                    : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
+                }
+                style={styles.doctorImageSmall}
+              />
+              <View style={styles.doctorDetailsInline}>
+                <Text style={styles.doctorNameInline}>
+                  {appointment.doctorId?.doctorName || "Unknown Doctor"}
+                </Text>
+                <Text style={styles.specialtyInline}>
+                  {appointment.doctorId?.field || "Specialty not specified"}
+                </Text>
+              </View>
             </View>
+            {appointment.bookingNumber &&
+              appointment.status !== "Cancelled" && (
+                <View style={styles.bookingNumberBoxInline}>
+                  <Text style={styles.bookingNumberValue}>
+                    {appointment.bookingNumber}
+                  </Text>
+                  <Text style={styles.bookingNumberLabel}>Book No.</Text>
+                </View>
+              )}
           </View>
 
           <View style={styles.appointmentDetails}>
             <View style={styles.detailRow}>
               <Icon name="clock-o" size={14} color="#718096" />
               <Text style={styles.detailText}>
-                {appointment.appointmentStartTime 
-                  ? moment(appointment.appointmentStartTime, 'HH:mm').format("h:mm A")
-                  : "Time not set"
-                }
+                {appointment.appointmentStartTime
+                  ? moment(appointment.appointmentStartTime, "HH:mm").format(
+                      "h:mm A"
+                    )
+                  : "Time not set"}
               </Text>
             </View>
             <View style={styles.detailRow}>
@@ -165,38 +178,20 @@ const Appointments = ({ navigation }) => {
 
       {/* All Filters in One Row */}
       <View style={styles.allFiltersRow}>
-        {/* Status Filters */}
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          style={styles.statusFiltersScroll}
+        {/* Status Filter Button (opens modal) */}
+        <TouchableOpacity
+          style={[styles.typeFilterButton, styles.equalFilterButton]}
+          onPress={() => setShowStatusModal(true)}
         >
-        {["All", "Pending", "Completed", "Cancelled"].map((status) => (
-          <TouchableOpacity
-            key={status}
-            style={[
-              styles.filterButton,
-              state.selectedStatus === status && styles.activeFilterButton,
-            ]}
-            onPress={() => handleStatusFilter(status)}
-            activeOpacity={0.7}
-          >
-            <Text
-              style={[
-                styles.filterButtonText,
-                state.selectedStatus === status &&
-                  styles.activeFilterButtonText,
-              ]}
-            >
-              {status}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+          <Text style={styles.typeFilterButtonText}>
+            {state.selectedStatus || "Status"}
+          </Text>
+          <Ionicons name="chevron-down" size={16} color="#FD9B63" />
+        </TouchableOpacity>
 
         {/* Type Filter */}
         <TouchableOpacity
-          style={styles.typeFilterButton}
+          style={[styles.typeFilterButton, styles.equalFilterButton]}
           onPress={() => setShowTypeModal(true)}
         >
           <Text style={styles.typeFilterButtonText}>
@@ -219,7 +214,53 @@ const Appointments = ({ navigation }) => {
     </View>
   );
 
-  const renderStatusFilter = () => null;
+  const renderStatusFilterModal = () => (
+    <Modal
+      visible={showStatusModal}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={() => setShowStatusModal(false)}
+    >
+      <View style={styles.typeModalOverlay}>
+        <View style={styles.typeModalContent}>
+          <Text style={styles.typeModalTitle}>Select Status</Text>
+          <ScrollView>
+            {["All", "Pending", "Completed", "Cancelled"].map((status, idx) => {
+              const isSelected = state.selectedStatus === status;
+              return (
+                <TouchableOpacity
+                  key={idx}
+                  style={[
+                    styles.typeModalItem,
+                    isSelected && styles.typeModalItemSelected,
+                  ]}
+                  onPress={() => {
+                    handleStatusFilter(status);
+                    setShowStatusModal(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.typeModalItemText,
+                      isSelected && styles.typeModalItemTextSelected,
+                    ]}
+                  >
+                    {status}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+          <TouchableOpacity
+            style={styles.typeCloseButton}
+            onPress={() => setShowStatusModal(false)}
+          >
+            <Text style={styles.typeCloseButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
 
   const renderTypeFilterModal = () => (
     <Modal
@@ -233,7 +274,7 @@ const Appointments = ({ navigation }) => {
           <Text style={styles.typeModalTitle}>Select Appointment Type</Text>
           <ScrollView>
             {appointmentTypes.map((type, index) => {
-              const isSelected = 
+              const isSelected =
                 (type === "All" && !state.selectedAppointmentType) ||
                 type === state.selectedAppointmentType;
               return (
@@ -318,6 +359,7 @@ const Appointments = ({ navigation }) => {
   );
 
   const renderReceiptModal = () => {
+    const isCancelled = state.receiptData?.status === "Cancelled";
     return (
       <Modal
         visible={state.showReceiptModal}
@@ -328,7 +370,9 @@ const Appointments = ({ navigation }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Receipt</Text>
+              <Text style={styles.modalTitle}>
+                {isCancelled ? "Cancelled Receipt" : "Receipt"}
+              </Text>
               <TouchableOpacity
                 onPress={handleCloseReceipt}
                 style={{
@@ -352,7 +396,87 @@ const Appointments = ({ navigation }) => {
               ) : !state.receiptData ? (
                 <View style={styles.errorContainer}>
                   <Icon name="file-text-o" size={40} color="#DC2626" />
-                  <Text style={styles.errorText}>No receipt data available</Text>
+                  <Text style={styles.errorText}>
+                    No receipt data available
+                  </Text>
+                </View>
+              ) : isCancelled ? (
+                <View style={styles.receiptContainer}>
+                  <View style={styles.receiptSection}>
+                    <Text style={styles.sectionTitle}>
+                      This appointment has been cancelled.
+                    </Text>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Receipt Number</Text>
+                      <Text style={styles.receiptValue}>
+                        {state.receiptData?.receiptNumber || "Not Available"}
+                      </Text>
+                    </View>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>Cancelled On</Text>
+                      <Text style={styles.receiptValue}>
+                        {state.receiptData?.cancelledAt
+                          ? moment(state.receiptData.cancelledAt).format(
+                              "MMM D, YYYY h:mm A"
+                            )
+                          : moment(
+                              state.receiptData?.updatedAt ||
+                                state.receiptData?.issueDate
+                            ).format("MMM D, YYYY h:mm A")}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.receiptSection}>
+                    <Text style={styles.sectionTitle}>Sender</Text>
+                    <Text style={styles.receiptValue}>
+                      Dr. {state.receiptData?.doctor?.name || "Unknown"}
+                    </Text>
+                  </View>
+                  <View style={styles.receiptSection}>
+                    <Text style={styles.sectionTitle}>Receiver</Text>
+                    <Text style={styles.receiptValue}>
+                      {state.receiptData?.patient?.name ||
+                        state.receiptData?.patientName ||
+                        "Patient"}
+                    </Text>
+                  </View>
+                  <View style={styles.receiptSection}>
+                    <Text style={styles.sectionTitle}>Payment Details</Text>
+                    <View style={styles.paymentRow}>
+                      <Text style={styles.receiptLabel}>Amount Refunded</Text>
+                      <Text style={styles.receiptValue}>
+                        {state.receiptData?.payment?.basePrice ||
+                          state.receiptData?.Price ||
+                          0}{" "}
+                        LE
+                      </Text>
+                    </View>
+                    <View style={styles.paymentRow}>
+                      <Text style={styles.receiptLabel}>Tax Refunded</Text>
+                      <Text style={styles.receiptValue}>0 LE</Text>
+                    </View>
+                    <View style={[styles.paymentRow, { borderBottomWidth: 0 }]}>
+                      <Text
+                        style={[
+                          styles.receiptLabel,
+                          { fontWeight: "600", color: "#C62828" },
+                        ]}
+                      >
+                        Total Refunded
+                      </Text>
+                      <Text
+                        style={[
+                          styles.receiptValue,
+                          { color: "#C62828", fontSize: 18 },
+                        ]}
+                      >
+                        {state.receiptData?.payment?.basePrice ||
+                          state.receiptData?.Price ||
+                          0}{" "}
+                        LE
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               ) : (
                 <View style={styles.receiptContainer}>
@@ -473,8 +597,7 @@ const Appointments = ({ navigation }) => {
                       >
                         <Text style={{ color: "#2E7D32", fontSize: 14 }}>
                           Paid via{" "}
-                          {state.receiptData?.payment?.paymentMethod ||
-                            "Not Specified"}
+                          {state.receiptData?.payment?.paymentMethod || "APP"}
                         </Text>
                       </View>
                     </View>
@@ -508,6 +631,7 @@ const Appointments = ({ navigation }) => {
         ) : (
           <>
             {renderSearchAndFilters()}
+            {renderStatusFilterModal()}
             <View style={styles.appointmentsContainer}>
               {state.filteredAppointments.length > 0 ? (
                 state.filteredAppointments.map((appointment) => (

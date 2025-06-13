@@ -579,7 +579,7 @@ const Home = ({ navigation }) => {
               <Text style={styles.showMoreText}>Show More</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal={true} style={styles.cardScroll}>
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             {state.loading ? (
               <ActivityIndicator size="large" color="#FD9B63" />
             ) : state.error ? (
@@ -645,11 +645,19 @@ const Home = ({ navigation }) => {
                     <View style={styles.starContainer}>
                       <Icon name="star" size={10} color="#FD9B63" />
                       <Text style={styles.ratingText}>
-                        {doctor.averageRating ? doctor.averageRating.toFixed(1) : "N/A"}
+                        {doctor.averageRating
+                          ? doctor.averageRating.toFixed(1)
+                          : "0"}
                       </Text>
                     </View>
                     <Text style={styles.availableText}>
-                      {doctor.price || doctor.consultationFee || "500"}LE
+                      {(doctor.clinic &&
+                        doctor.clinic.length > 0 &&
+                        doctor.clinic[0].Price) ||
+                        doctor.consultationFee ||
+                        doctor.price ||
+                        "500"}
+                      LE
                     </Text>
                   </View>
                 </TouchableOpacity>

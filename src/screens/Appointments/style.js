@@ -37,6 +37,11 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     gap: 10,
   },
+  equalFilterButton: {
+    flex: 1,
+    marginRight: 10,
+    minWidth: 0,
+  },
   // Status filters scroll view
   statusFiltersScroll: {
     flex: 1,
@@ -473,5 +478,70 @@ export const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#E2E8F0",
+  },
+  bookingNumberRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
+    paddingHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 0,
+  },
+  bookingNumberBox: {
+    alignItems: "center",
+    justifyContent: "flex-end",
+    minWidth: 60,
+  },
+  bookingNumberValue: {
+    fontWeight: "bold",
+    color: "#16423C",
+    fontSize: 22,
+    lineHeight: 28,
+  },
+  bookingNumberLabel: {
+    fontSize: 11,
+    color: "#64748B",
+    fontWeight: "500",
+    marginTop: -2,
+  },
+  // New styles for single row layout with doctor image, name, field, and booking number
+  doctorRowWithBookingNumber: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+    gap: 8,
+  },
+  doctorInfoInline: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: 10,
+  },
+  doctorImageSmall: {
+    width: 60,
+    height: 60,
+    borderRadius: 20,
+    marginRight: 10,
+    backgroundColor: "#E8ECF1",
+  },
+  doctorDetailsInline: {
+    flexShrink: 1,
+  },
+  doctorNameInline: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1A202C",
+    marginBottom: 2,
+  },
+  specialtyInline: {
+    fontSize: 12,
+    color: "#718096",
+  },
+  bookingNumberBoxInline: {
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 60,
+    marginLeft: 10,
   },
 });

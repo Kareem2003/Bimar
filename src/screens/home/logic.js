@@ -97,7 +97,10 @@ const Logic = (navigation) => {
               }
             },
             (error) => {
-              console.log(`Failed to fetch rating for doctor ${doctorId}:`, error);
+              console.log(
+                `Failed to fetch rating for doctor ${doctorId}:`,
+                error
+              );
               resolve({
                 ...doctor,
                 averageRating: 0,
@@ -128,12 +131,17 @@ const Logic = (navigation) => {
     getDoctors(
       {},
       async (response) => {
+        console.log(
+          "Fetched doctor response:",
+          response.data.data
+          // JSON.stringify(response.data.data.doctor)
+        );
         if (response?.data?.data) {
           const doctors = response.data.data;
-          
+
           // Fetch ratings for all doctors
           const doctorsWithRatings = await fetchDoctorRatings(doctors);
-          
+
           updateState([
             {
               type: ACTION_TYPES.UPDATE_PROP,

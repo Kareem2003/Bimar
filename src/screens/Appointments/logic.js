@@ -57,7 +57,14 @@ const Logic = (navigation) => {
       },
     ]);
 
-    applyAllFilters(query, state.selectedStatus, state.selectedAppointmentType, sortType, sortOrder, state.allAppointments);
+    applyAllFilters(
+      query,
+      state.selectedStatus,
+      state.selectedAppointmentType,
+      sortType,
+      sortOrder,
+      state.allAppointments
+    );
   };
 
   // New: Filter by appointment type
@@ -70,7 +77,14 @@ const Logic = (navigation) => {
       },
     ]);
 
-    applyAllFilters(state.searchQuery, state.selectedStatus, type, sortType, sortOrder, state.allAppointments);
+    applyAllFilters(
+      state.searchQuery,
+      state.selectedStatus,
+      type,
+      sortType,
+      sortOrder,
+      state.allAppointments
+    );
   };
 
   // New: Sort appointments
@@ -91,34 +105,55 @@ const Logic = (navigation) => {
       },
     ]);
 
-    applyAllFilters(state.searchQuery, state.selectedStatus, state.selectedAppointmentType, type, order, state.allAppointments);
+    applyAllFilters(
+      state.searchQuery,
+      state.selectedStatus,
+      state.selectedAppointmentType,
+      type,
+      order,
+      state.allAppointments
+    );
   };
 
   // New: Combined filter function
-  const applyAllFilters = (searchQuery = "", statusFilter = "All", appointmentType = "", sortType = "date", sortOrder = "desc", appointmentsData = null) => {
+  const applyAllFilters = (
+    searchQuery = "",
+    statusFilter = "All",
+    appointmentType = "",
+    sortType = "date",
+    sortOrder = "desc",
+    appointmentsData = null
+  ) => {
     // Use provided data or fall back to state data
     const sourceData = appointmentsData || state.allAppointments;
     let filtered = [...sourceData];
 
     // Apply status filter
     if (statusFilter && statusFilter !== "All") {
-      filtered = filtered.filter(appointment => appointment.status === statusFilter);
+      filtered = filtered.filter(
+        (appointment) => appointment.status === statusFilter
+      );
     }
 
     // Apply appointment type filter
     if (appointmentType) {
-      filtered = filtered.filter(appointment => 
-        appointment.bookingType?.toLowerCase().includes(appointmentType.toLowerCase())
+      filtered = filtered.filter((appointment) =>
+        appointment.bookingType
+          ?.toLowerCase()
+          .includes(appointmentType.toLowerCase())
       );
     }
 
     // Apply search filter
     if (searchQuery) {
       const searchTerm = searchQuery.toLowerCase();
-      filtered = filtered.filter(appointment =>
-        appointment.doctorId?.doctorName?.toLowerCase().includes(searchTerm) ||
-        appointment.doctorId?.field?.toLowerCase().includes(searchTerm) ||
-        appointment.bookingType?.toLowerCase().includes(searchTerm)
+      filtered = filtered.filter(
+        (appointment) =>
+          appointment.doctorId?.doctorName
+            ?.toLowerCase()
+            .includes(searchTerm) ||
+          appointment.doctorId?.field?.toLowerCase().includes(searchTerm) ||
+          appointment.bookingType?.toLowerCase().includes(searchTerm)
       );
     }
 
@@ -182,25 +217,55 @@ const Logic = (navigation) => {
     allAppointments(
       {},
       (response) => {
+        if (!response?.data) {
+          updateState([
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "allAppointments",
+              value: [],
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "upcomingAppointments",
+              value: [],
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "pastAppointments",
+              value: [],
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "filteredAppointments",
+              value: [],
+            },
+          ]);
+          return;
+        }
         if (response?.data?.data) {
           const { upcoming, past } = categorizeAppointments(response.data.data);
           const appointmentsData = response.data.data;
-          
+
           // Apply initial sorting to the data
           let initialFiltered = [...appointmentsData];
-          
+
           // Apply default sorting (date desc)
           initialFiltered.sort((a, b) => {
             const dateA = moment(a.appointmentDate);
             const dateB = moment(b.appointmentDate);
             return dateB.diff(dateA); // desc order
           });
-          
+
           updateState([
             {
               type: ACTION_TYPES.UPDATE_PROP,
               prop: "allAppointments",
               value: appointmentsData,
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "allAppointmentsStatus",
+              value: appointmentsData.map((a) => ({ id: a._id, status: a.status })),
             },
             {
               type: ACTION_TYPES.UPDATE_PROP,
@@ -222,8 +287,23 @@ const Logic = (navigation) => {
           updateState([
             {
               type: ACTION_TYPES.UPDATE_PROP,
-              prop: "error",
-              value: "Invalid data format received",
+              prop: "allAppointments",
+              value: [],
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "upcomingAppointments",
+              value: [],
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "pastAppointments",
+              value: [],
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "filteredAppointments",
+              value: [],
             },
           ]);
         }
@@ -261,7 +341,14 @@ const Logic = (navigation) => {
       },
     ]);
 
-    applyAllFilters(state.searchQuery, status, state.selectedAppointmentType, sortType, sortOrder, state.allAppointments);
+    applyAllFilters(
+      state.searchQuery,
+      status,
+      state.selectedAppointmentType,
+      sortType,
+      sortOrder,
+      state.allAppointments
+    );
   };
 
   const handleCancelAppointment = (bookingId) => {

@@ -18,7 +18,6 @@ import Logic from "./logic";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import FontAwsome from "react-native-vector-icons/FontAwesome";
 import ProfilePicture from "../../components/ProfilePicture";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 import Header from "../../components/Header";
 import ToggleSwitch from "toggle-switch-react-native";
 import { Dropdown } from "react-native-element-dropdown";

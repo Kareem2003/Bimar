@@ -3,6 +3,7 @@ export const INITIAL_STATE = {
   upcomingAppointments: [],
   pastAppointments: [],
   filteredAppointments: [],
+  allAppointmentsStatus: [],
   selectedStatus: "All",
   selectedAppointmentType: "",
   searchQuery: "",
