@@ -991,4 +991,14 @@ export const styles = {
     marginLeft: 4,
     color: "#3A86FF",
   },
+  headerTop: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+},
+headerLogo: {
+  width: 55,
+  height: 55,
+  resizeMode: "contain",
+},
 };

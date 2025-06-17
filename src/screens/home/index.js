@@ -530,7 +530,12 @@ const Home = ({ navigation }) => {
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <MenuButton navigation={navigation} />
+            
             <Text style={styles.greeting}>Hi, {state.userName || "User"}</Text>
+            <Image
+              source={require("../../assets/images/Asset 10.png")}
+              style={styles.headerLogo}
+            />
           </View>
         </View>
 
