@@ -78,6 +78,7 @@ const Logic = (navigation, route) => {
         const processedDiagnosis = {
           id: diagnosisData.id || diagnosisData._id,
           doctorName: diagnosisData.doctorName,
+          doctorImage: diagnosisData.doctorImage || '',
           specialization: diagnosisData.specialization,
           date: diagnosisData.displayDate || new Date(diagnosisData.date).toLocaleDateString(),
           time: new Date(diagnosisData.date).toLocaleTimeString([], {

@@ -127,8 +127,8 @@ export const styles = StyleSheet.create({
   doctorImage: {
     width: 80,
     height: 80,
-    borderRadius: 40,
-    marginRight: 15,
+    borderRadius: 15,
+    marginRight: 0,
   },
   doctorInfo: {
     flex: 1,

@@ -34,6 +34,7 @@ const Home = ({ navigation }) => {
   const timeIndicatorPosition = useRef(new Animated.Value(0)).current;
   const [activeMedicationIndex, setActiveMedicationIndex] = useState(null);
   const [expandAnim, setExpandAnim] = useState(new Animated.Value(0));
+  const [medications, setMedications] = useState([]); // Add medications state
 
   const calculateMedicationTimes = (times, firstDose) => {
     const [hours, minutes] = firstDose.split(":").map(Number);
@@ -636,7 +637,9 @@ const Home = ({ navigation }) => {
 
                       <View style={styles.infoRow}>
                         <MaterialIcons name="history" size={12} color="#666" />
-                        <Text style={styles.infoText}>8+ years experience</Text>
+                        <Text style={styles.infoText}>
+                          {doctor.yearsOfExprience}+ years experience
+                        </Text>
                       </View>
                     </View>
                   </View>

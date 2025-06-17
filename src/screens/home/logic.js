@@ -300,6 +300,7 @@ const Logic = (navigation) => {
     fetchDoctors();
     fetchUserInfo();
     loadSavedMedicines();
+    // fetchMedications();
   }, []);
 
   useEffect(() => {

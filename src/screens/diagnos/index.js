@@ -342,14 +342,11 @@ const Diagnos = ({ navigation, route }) => {
           <View style={styles.imageModalContainer}>
             <View style={styles.imageModalHeader}>
               <Text style={styles.imageModalTitle}>{selectedTitle}</Text>
-              <TouchableOpacity 
-                onPress={closeModal}
-                style={styles.closeButton}
-              >
+              <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                 <Icon name="close" size={24} color="#000" />
               </TouchableOpacity>
             </View>
-            
+
             {/* Display additional details if available */}
             {selectedImageData && (
               <View style={styles.imageDetailsContainer}>
@@ -373,15 +370,12 @@ const Diagnos = ({ navigation, route }) => {
                 )}
               </View>
             )}
-            
+
             <View style={styles.imageContainer} {...panResponder.panHandlers}>
               {selectedImage && (
-                <Image 
-                  source={selectedImage} 
-                  style={[
-                    styles.modalImage,
-                    { transform: [{ scale: scale }] }
-                  ]}
+                <Image
+                  source={selectedImage}
+                  style={[styles.modalImage, { transform: [{ scale: scale }] }]}
                   resizeMode="contain"
                   onError={(e) => {
                     console.log("Error loading image:", e.nativeEvent.error);
@@ -400,7 +394,7 @@ const Diagnos = ({ navigation, route }) => {
             </View>
             {/* Zoom controls */}
             <View style={styles.zoomControls}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.zoomButton}
                 onPress={() => {
                   const newScale = Math.max(0.5, scale - 0.2);
@@ -410,7 +404,7 @@ const Diagnos = ({ navigation, route }) => {
               >
                 <Icon name="remove-outline" size={24} color="#16423C" />
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.zoomButton}
                 onPress={() => {
                   const newScale = Math.min(3, scale + 0.2);
@@ -424,21 +418,26 @@ const Diagnos = ({ navigation, route }) => {
           </View>
         </View>
       </Modal>
-      
-      <ScrollView 
-        style={styles.scrollContainer} 
-        contentContainerStyle={{paddingBottom: 120}}
+
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={{ paddingBottom: 120 }}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={refreshDiagnosisData}
-            colors={['#16423C']}
+            colors={["#16423C"]}
             tintColor="#16423C"
           />
         }
       >
         {/* Header with back button */}
-        <View style={[styles.header, { flexDirection: "row", alignItems: "center" }]}>
+        <View
+          style={[
+            styles.header,
+            { flexDirection: "row", alignItems: "center" },
+          ]}
+        >
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={{ padding: 10 }}
@@ -449,22 +448,29 @@ const Diagnos = ({ navigation, route }) => {
             {currentDiagnosis.diagnosis || "Diagnosis Details"}
           </Text>
           {isRefreshing && (
-            <ActivityIndicator size="small" color="#16423C" style={{ marginLeft: 10 }} />
+            <ActivityIndicator
+              size="small"
+              color="#16423C"
+              style={{ marginLeft: 10 }}
+            />
           )}
         </View>
 
         {/* Doctor Card */}
         <View style={styles.doctorSection}>
-          <TouchableOpacity 
-            style={styles.DiagnosCard}
-            onPress={handleBooking}
-          >
-            <Image 
-              source={currentDiagnosis.image} 
+          <TouchableOpacity style={styles.DiagnosCard} onPress={handleBooking}>
+            <Image
+              source={
+                currentDiagnosis.image
+                  ? { uri: `${BASE_URL}/${currentDiagnosis.image}` }
+                  : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
+              }
               style={styles.doctorImage}
             />
             <View style={styles.doctorInfo}>
-              <Text style={styles.doctorName}>{currentDiagnosis.doctorName}</Text>
+              <Text style={styles.doctorName}>
+                {currentDiagnosis.doctorName}
+              </Text>
               <Text style={styles.doctorSpecialization}>
                 {currentDiagnosis.specialization}
               </Text>
@@ -478,10 +484,7 @@ const Diagnos = ({ navigation, route }) => {
         {/* Treatment Plan */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Treatment Plan</Text>
-          <ScrollView 
-            style={styles.notesContainer}
-            nestedScrollEnabled={true}
-          >
+          <ScrollView style={styles.notesContainer} nestedScrollEnabled={true}>
             <Text style={styles.notesText}>
               {currentDiagnosis.treatmentPlan || "No treatment plan available"}
             </Text>
@@ -494,57 +497,69 @@ const Diagnos = ({ navigation, route }) => {
             Attachments ({currentDiagnosis.attachments?.length || 0})
           </Text>
           {currentDiagnosis.attachments?.map((attachment) => (
-            <TouchableOpacity 
+            <TouchableOpacity
               key={attachment.id}
               style={styles.attachmentCard}
               onPress={() => {
                 if (attachment.type === "X-ray") {
                   // Open X-ray in modal
-                  openImageModal(attachment.imageSource || attachment.image, "X-ray Results", attachment.rawData);
+                  openImageModal(
+                    attachment.imageSource || attachment.image,
+                    "X-ray Results",
+                    attachment.rawData
+                  );
                 } else if (attachment.type === "Lab Results") {
                   if (attachment.isPdf && attachment.fileUrl) {
                     // Open PDF lab results externally
-                    Linking.openURL(attachment.fileUrl).catch(err => 
-                      Alert.alert("Error", "Could not open PDF. Please ensure you have a PDF viewer installed.")
+                    Linking.openURL(attachment.fileUrl).catch((err) =>
+                      Alert.alert(
+                        "Error",
+                        "Could not open PDF. Please ensure you have a PDF viewer installed."
+                      )
                     );
                   } else {
                     // Open image lab results in modal
-                    openImageModal(attachment.imageSource || attachment.image, "Laboratory Test Results", attachment.rawData);
+                    openImageModal(
+                      attachment.imageSource || attachment.image,
+                      "Laboratory Test Results",
+                      attachment.rawData
+                    );
                   }
                 } else if (attachment.type === "Prescription") {
                   // For prescriptions, also check for PDF and open externally if fileUrl exists
                   if (attachment.isPdf && attachment.fileUrl) {
-                    Linking.openURL(attachment.fileUrl).catch(err => 
-                      Alert.alert("Error", "Could not open Prescription PDF. Please ensure you have a PDF viewer installed.")
+                    Linking.openURL(attachment.fileUrl).catch((err) =>
+                      Alert.alert(
+                        "Error",
+                        "Could not open Prescription PDF. Please ensure you have a PDF viewer installed."
+                      )
                     );
                   } else if (hasPrescription) {
-                    console.log("Navigating to prescription screen with:", currentDiagnosis.prescription);
+                    console.log(
+                      "Navigating to prescription screen with:",
+                      currentDiagnosis.prescription
+                    );
                     navigation.navigate("PrescriptionScreen", {
-                      prescription: currentDiagnosis.prescription
+                      prescription: currentDiagnosis.prescription,
                     });
                   } else {
                     // Alert user that no prescription data exists
                     Alert.alert(
                       "No Prescription Data",
                       "No prescription has been issued for this diagnosis yet.",
-                      [
-                        { text: "OK", onPress: () => console.log("OK Pressed") }
-                      ]
+                      [{ text: "OK", onPress: () => console.log("OK Pressed") }]
                     );
                   }
                 } else {
-                  navigation.navigate("PrescriptionScreen", { 
+                  navigation.navigate("PrescriptionScreen", {
                     title: attachment.type,
                     time: attachment.time,
-                    attachmentId: attachment.id 
+                    attachmentId: attachment.id,
                   });
                 }
               }}
             >
-              <Image 
-                source={attachment.image}
-                style={styles.attachmentIcon}
-              />
+              <Image source={attachment.image} style={styles.attachmentIcon} />
               <View style={styles.attachmentInfo}>
                 <Text style={styles.attachmentType}>{attachment.type}</Text>
                 <Text style={styles.attachmentName}>
@@ -556,21 +571,17 @@ const Diagnos = ({ navigation, route }) => {
             </TouchableOpacity>
           ))}
         </View>
-        
+
         {/* Add extra padding at bottom for buttons */}
         <View style={{ height: 100 }} />
       </ScrollView>
 
       {/* Bottom Buttons - Side by side */}
       <View style={styles.bottomButtonsRow}>
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={handleUpload}
-        >
+        <TouchableOpacity style={styles.actionButton} onPress={handleUpload}>
           <Icon name="cloud-upload-outline" size={20} color="#FFF" />
           <Text style={styles.actionButtonText}>Upload Files</Text>
         </TouchableOpacity>
-        
       </View>
     </View>
   );

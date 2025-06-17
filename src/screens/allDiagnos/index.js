@@ -12,7 +12,8 @@ import {
   RefreshControl,
 } from "react-native";
 import Logic from "./logic";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
+import { BASE_URL } from "../../helpers/constants/config";
 
 const MyDiagnoses = ({ navigation }) => {
   const { state, actions } = Logic(navigation);
@@ -33,9 +34,12 @@ const MyDiagnoses = ({ navigation }) => {
 
   const filterDiagnoses = (diagnoses) => {
     if (!searchQuery) return diagnoses;
-    return diagnoses.filter(diagnosis => 
-      diagnosis.doctorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      diagnosis.diagnosis.toLowerCase().includes(searchQuery.toLowerCase())
+    return diagnoses.filter(
+      (diagnosis) =>
+        diagnosis.doctorName
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        diagnosis.diagnosis.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
@@ -58,7 +62,11 @@ const MyDiagnoses = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Diagnoses</Text>
         {isRefreshing && (
-          <ActivityIndicator size="small" color="#16423C" style={{ marginLeft: 10 }} />
+          <ActivityIndicator
+            size="small"
+            color="#16423C"
+            style={{ marginLeft: 10 }}
+          />
         )}
       </View>
 
@@ -75,13 +83,13 @@ const MyDiagnoses = ({ navigation }) => {
         </View>
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.diagnosesList}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={handleRefresh}
-            colors={['#16423C']}
+            colors={["#16423C"]}
             tintColor="#16423C"
           />
         }
@@ -93,45 +101,55 @@ const MyDiagnoses = ({ navigation }) => {
             {filterDiagnoses(state.upcomingAppointments).length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Recent Diagnoses</Text>
-                {filterDiagnoses(state.upcomingAppointments).map((diagnosis) => (
-                  <TouchableOpacity
-                    key={diagnosis.id}
-                    style={styles.diagnosisCard}
-                    onPress={() => actions.navigateToDiagnosis(diagnosis)}
-                  >
-                    <Image
-                      source={require("../../assets/images/portrait-hansome-young-male-doctor-man.png")}
-                      style={styles.doctorImage}
-                    />
-                    <View style={styles.diagnosisInfo}>
-                      <Text style={styles.doctorName}>{diagnosis.doctorName}</Text>
-                      <Text style={styles.diagnosis}>{diagnosis.diagnosis}</Text>
-                      <Text style={styles.dateTime}>
-                        {diagnosis.displayDate}
-                      </Text>
-                      <View style={styles.indicatorsRow}>
-                        {diagnosis.hasXray && (
-                          <View style={styles.indicator}>
-                            <Icon name="document" size={16} color="#FD9B63" />
-                            <Text style={styles.indicatorText}>X-ray</Text>
-                          </View>
-                        )}
-                        {diagnosis.hasLabResults && (
-                          <View style={styles.indicator}>
-                            <Icon name="flask" size={16} color="#FD9B63" />
-                            <Text style={styles.indicatorText}>Lab Results</Text>
-                          </View>
-                        )}
-                        {diagnosis.hasPrescription && (
-                          <View style={styles.indicator}>
-                            <Icon name="medical" size={16} color="#FD9B63" />
-                            <Text style={styles.indicatorText}>Prescription</Text>
-                          </View>
-                        )}
+                {filterDiagnoses(state.upcomingAppointments).map(
+                  (diagnosis) => (
+                    <TouchableOpacity
+                      key={diagnosis.id}
+                      style={styles.diagnosisCard}
+                      onPress={() => actions.navigateToDiagnosis(diagnosis)}
+                    >
+                      <Image
+                        source={{ uri: `${diagnosis.doctorImage}` }}
+                        style={styles.doctorImage}
+                      />
+                      <View style={styles.diagnosisInfo}>
+                        <Text style={styles.doctorName}>
+                          {diagnosis.doctorName}
+                        </Text>
+                        <Text style={styles.diagnosis}>
+                          {diagnosis.diagnosis}
+                        </Text>
+                        <Text style={styles.dateTime}>
+                          {diagnosis.displayDate}
+                        </Text>
+                        <View style={styles.indicatorsRow}>
+                          {diagnosis.hasXray && (
+                            <View style={styles.indicator}>
+                              <Icon name="document" size={16} color="#FD9B63" />
+                              <Text style={styles.indicatorText}>X-ray</Text>
+                            </View>
+                          )}
+                          {diagnosis.hasLabResults && (
+                            <View style={styles.indicator}>
+                              <Icon name="flask" size={16} color="#FD9B63" />
+                              <Text style={styles.indicatorText}>
+                                Lab Results
+                              </Text>
+                            </View>
+                          )}
+                          {diagnosis.hasPrescription && (
+                            <View style={styles.indicator}>
+                              <Icon name="medical" size={16} color="#FD9B63" />
+                              <Text style={styles.indicatorText}>
+                                Prescription
+                              </Text>
+                            </View>
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                    </TouchableOpacity>
+                  )
+                )}
               </View>
             )}
 
@@ -145,12 +163,20 @@ const MyDiagnoses = ({ navigation }) => {
                     onPress={() => actions.navigateToDiagnosis(diagnosis)}
                   >
                     <Image
-                      source={require("../../assets/images/portrait-hansome-young-male-doctor-man.png")}
+                      source={
+                        diagnosis.doctorImage
+                          ? { uri: `${diagnosis.doctorImage}` }
+                          : require("../../assets/images/portrait-hansome-young-male-doctor-man.png")
+                      }
                       style={styles.doctorImage}
                     />
                     <View style={styles.diagnosisInfo}>
-                      <Text style={styles.doctorName}>{diagnosis.doctorName}</Text>
-                      <Text style={styles.diagnosis}>{diagnosis.diagnosis}</Text>
+                      <Text style={styles.doctorName}>
+                        {diagnosis.doctorName}
+                      </Text>
+                      <Text style={styles.diagnosis}>
+                        {diagnosis.diagnosis}
+                      </Text>
                       <Text style={styles.dateTime}>
                         {diagnosis.displayDate}
                       </Text>
@@ -164,13 +190,17 @@ const MyDiagnoses = ({ navigation }) => {
                         {diagnosis.hasLabResults && (
                           <View style={styles.indicator}>
                             <Icon name="flask" size={16} color="#FD9B63" />
-                            <Text style={styles.indicatorText}>Lab Results</Text>
+                            <Text style={styles.indicatorText}>
+                              Lab Results
+                            </Text>
                           </View>
                         )}
                         {diagnosis.hasPrescription && (
                           <View style={styles.indicator}>
                             <Icon name="medical" size={16} color="#FD9B63" />
-                            <Text style={styles.indicatorText}>Prescription</Text>
+                            <Text style={styles.indicatorText}>
+                              Prescription
+                            </Text>
                           </View>
                         )}
                       </View>
