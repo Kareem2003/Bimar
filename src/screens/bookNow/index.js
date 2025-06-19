@@ -102,7 +102,7 @@ const BookNow = ({ navigation, route }) => {
               }}
             >
               <Text style={{ color: "#2E7D32", fontSize: 14 }}>
-                Paid via {state.receipt?.paymentMethod || "APP"}
+                Paid via {state.receipt?.paymentMethod || "Cash"}
               </Text>
             </View>
           </View>
