@@ -28,9 +28,11 @@ const DoctorProfile = ({ navigation, route }) => {
     bookDoctorAppointment,
     getNextMonthAvailableDates,
     handleDateSelection,
+    rateDoctor,
+    userRating,
   } = Logic(navigation, route);
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
+  const [localRating, setLocalRating] = useState(0);
+  const [localComment, setLocalComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -39,6 +41,18 @@ const DoctorProfile = ({ navigation, route }) => {
   const [showClinicModal, setShowClinicModal] = useState(false);
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [calendarDates, setCalendarDates] = useState([]);
+
+  // Sync local state with logic state when userRating changes
+  useEffect(() => {
+    if (userRating) {
+      setLocalRating(userRating.rating);
+      setLocalComment(userRating.comment);
+    } else if (state.rating === 0 && state.comment === "") {
+      // Reset local state when logic state is reset
+      setLocalRating(0);
+      setLocalComment("");
+    }
+  }, [userRating, state.rating, state.comment]);
 
   return (
     <ScrollView style={styles.container}>
@@ -827,14 +841,14 @@ const DoctorProfile = ({ navigation, route }) => {
       {/* All Ratings Section */}
       <View style={[styles.section, { marginTop: 0 }]}>
         <Text style={styles.sectionTitle}>What others say</Text>
-        {Array.isArray(state.doctor?.ratings) &&
-        state.doctor.ratings.length > 0 ? (
+        {Array.isArray(state.ratings) &&
+        state.ratings.length > 0 ? (
           <ScrollView
             style={{ maxHeight: 220 }}
             nestedScrollEnabled
             showsVerticalScrollIndicator={false}
           >
-            {state.doctor.ratings
+            {state.ratings
               .slice() // copy array
               .reverse() // show latest first
               .map((r, idx) => (
@@ -868,7 +882,7 @@ const DoctorProfile = ({ navigation, route }) => {
                     <Text
                       style={{ marginLeft: 8, color: "#64748B", fontSize: 12 }}
                     >
-                      {r.userName || "Anonymous"}
+                      {r.patient?.name || "Anonymous"}
                     </Text>
                     {r.createdAt && (
                       <Text
@@ -895,7 +909,9 @@ const DoctorProfile = ({ navigation, route }) => {
 
       {/* Rating Section */}
       <View style={[styles.section, { marginBottom: 20 }]}>
-        <Text style={styles.sectionTitle}>Rate this Doctor</Text>
+        <Text style={styles.sectionTitle}>
+          {userRating ? "Edit Your Rating" : "Rate this Doctor"}
+        </Text>
         <View
           style={{
             flexDirection: "row",
@@ -904,9 +920,9 @@ const DoctorProfile = ({ navigation, route }) => {
           }}
         >
           {[1, 2, 3, 4, 5].map((star) => (
-            <TouchableOpacity key={star} onPress={() => setRating(star)}>
+            <TouchableOpacity key={star} onPress={() => setLocalRating(star)}>
               <FontAwesome
-                name={star <= rating ? "star" : "star-o"}
+                name={star <= localRating ? "star" : "star-o"}
                 size={32}
                 color="#FD9B63"
                 style={{ marginHorizontal: 3 }}
@@ -917,8 +933,8 @@ const DoctorProfile = ({ navigation, route }) => {
         <TextInput
           style={styles.ratingInput}
           placeholder="Leave a comment..."
-          value={comment}
-          onChangeText={setComment}
+          value={localComment}
+          onChangeText={setLocalComment}
           multiline
         />
         {error ? (
@@ -928,7 +944,13 @@ const DoctorProfile = ({ navigation, route }) => {
           <Text style={{ color: "#2E7D32", marginBottom: 4 }}>{success}</Text>
         ) : null}
         <AppButton
-          title={submitting ? "Submitting..." : "Submit Rating"}
+          title={
+            submitting 
+              ? "Submitting..." 
+              : userRating 
+                ? "Update Rating" 
+                : "Submit Rating"
+          }
           buttonStyle={{
             backgroundColor: "#FD9B63",
             borderRadius: 12,
@@ -936,7 +958,20 @@ const DoctorProfile = ({ navigation, route }) => {
             paddingVertical: 12,
           }}
           textStyle={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}
-          disabled={submitting || rating === 0}
+          disabled={submitting || localRating === 0}
+          onPress={() => {
+            setSubmitting(true);
+            setError("");
+            setSuccess("");
+            
+            // Call the rateDoctor function with local values directly
+            rateDoctor(localRating, localComment);
+            
+            // Reset submitting state after a delay
+            setTimeout(() => {
+              setSubmitting(false);
+            }, 2000);
+          }}
         />
       </View>
     </ScrollView>

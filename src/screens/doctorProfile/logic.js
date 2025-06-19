@@ -1,4 +1,4 @@
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useState } from "react";
 import { reducer } from "../../reducers/reducer";
 import { bookDate } from "../../service/HomeServices";
 import { INITIAL_STATE } from "./constant";
@@ -7,10 +7,13 @@ import ACTION_TYPES from "../../reducers/actionTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AUTHENTICATION_TOKEN } from "../../helpers/constants/staticKeys";
 import { ToastManager } from "../../helpers/ToastManager";
-import { addDoctorRate, getDoctorRate } from "../../service/rateServices";
+import { addDoctorRate, getDoctorRate, updateDoctorRate } from "../../service/rateServices";
+import { USERINFO } from "../../helpers/constants/staticKeys";
 
 const Logic = (navigation, route) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  const [hasFetchedRatings, setHasFetchedRatings] = useState(false);
+  const [userRating, setUserRating] = useState(null);
 
   const updateState = (payload) => {
     dispatch({ payload });
@@ -33,51 +36,153 @@ const Logic = (navigation, route) => {
     ]);
   }, []);
 
-  const rateDoctor = () => {
-    addDoctorRate(
-      {
-        doctorId: state.doctor.id,
-        rating: state.rating,
-        comment: state.comment,
-      },
-      (response) => {
-        ToastManager.showToast("Rating added successfully", "success");
-        updateState([
-          {
-            type: ACTION_TYPES.UPDATE_PROP,
-            prop: "rating",
-            value: response.data.rating,
-          },
-        ]);
-      },
-      (error) => {
-        ToastManager.showToast(error, "error");
-      },
-      () => {}
-    );
-  };
+  // Fetch ratings when doctor data is available (only once)
+  useEffect(() => {
+    if ((state.doctor?._id || state.doctor?.id) && !hasFetchedRatings) {
+      setHasFetchedRatings(true);
+      fetchRates();
+    }
+  }, [state.doctor?._id, hasFetchedRatings]);
 
-  const fetchRates = () => {
-    getDoctorRate(
-      { doctorId: state.doctor.id },
-      (response) => {
-        if (response.data.length > 0) {
+  const rateDoctor = (rating, comment) => {
+    if (userRating) {
+      // Update existing rating
+      updateDoctorRate(
+        {
+          ratingId: userRating.id,
+          rating: rating,
+          comment: comment,
+        },
+        (response) => {
+          ToastManager.notify("Rating updated successfully", { type: "success" });
+          // Reset form immediately
           updateState([
             {
               type: ACTION_TYPES.UPDATE_PROP,
               prop: "rating",
-              value: response.data[0].rating,
+              value: 0,
             },
             {
               type: ACTION_TYPES.UPDATE_PROP,
               prop: "comment",
-              value: response.data[0].comment,
+              value: "",
+            },
+          ]);
+          setUserRating(null);
+          // Refresh ratings after updating
+          setTimeout(() => {
+            fetchRates();
+          }, 500);
+        },
+        (error) => {
+          ToastManager.notify(error, { type: "error" });
+        },
+        () => {}
+      );
+    } else {
+      // Add new rating
+      addDoctorRate(
+        {
+          doctorId: state.doctor._id || state.doctor.id,
+          rating: rating,
+          comment: comment,
+        },
+        (response) => {
+          ToastManager.notify("Rating added successfully", { type: "success" });
+          // Reset form immediately
+          updateState([
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "rating",
+              value: 0,
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "comment",
+              value: "",
+            },
+          ]);
+          // Refresh ratings after adding a new one
+          setTimeout(() => {
+            fetchRates();
+          }, 500);
+        },
+        (error) => {
+          ToastManager.notify(error, { type: "error" });
+        },
+        () => {}
+      );
+    }
+  };
+
+  const fetchRates = () => {
+    const doctorId = state.doctor._id || state.doctor.id;
+    getDoctorRate(
+      { doctorId: doctorId },
+      async (response) => {
+        // Fix: Access the nested data structure
+        const ratingsData = response.data?.data;
+        
+        if (ratingsData) {
+          // Update doctor info with latest rating stats
+          const updatedDoctor = {
+            ...state.doctor,
+            averageRating: ratingsData.doctor.averageRating,
+            totalRatings: ratingsData.doctor.totalRatings,
+          };
+          
+          // Get current user data to check if they've already rated
+          try {
+            const currentUserData = await AsyncStorage.getItem(USERINFO);
+            const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
+            
+            // Check if current user has already rated this doctor
+            const currentUserRating = ratingsData.ratings?.find(rating => 
+              rating.patient?.id === currentUser?.id
+            );
+            
+            if (currentUserRating) {
+              setUserRating(currentUserRating);
+              updateState([
+                {
+                  type: ACTION_TYPES.UPDATE_PROP,
+                  prop: "rating",
+                  value: currentUserRating.rating,
+                },
+                {
+                  type: ACTION_TYPES.UPDATE_PROP,
+                  prop: "comment",
+                  value: currentUserRating.comment,
+                },
+              ]);
+            } else {
+              setUserRating(null);
+            }
+          } catch (error) {
+            console.error("Error getting current user data:", error);
+          }
+          
+          updateState([
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "doctor",
+              value: updatedDoctor,
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "ratings",
+              value: ratingsData.ratings || [],
+            },
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "ratingStats",
+              value: ratingsData.ratingStats || {},
             },
           ]);
         }
       },
       (error) => {
-        ToastManager.showToast(error, "error");
+        ToastManager.notify(error, { type: "error" });
       },
       () => {}
     );
@@ -144,6 +249,7 @@ const Logic = (navigation, route) => {
     fetchRates,
     handleDateSelection,
     getNextMonthAvailableDates,
+    userRating,
   };
 };
 

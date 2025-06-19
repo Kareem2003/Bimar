@@ -1,9 +1,10 @@
-import { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { reducer } from "../../reducers/reducer";
 import { getDoctors, getDoctorRating } from "../../service/HomeServices";
 import { Context } from "../../contexts/appContext";
 import ACTION_TYPES from "../../reducers/actionTypes";
 import { INITIAL_STATE } from "./constant";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -59,6 +60,70 @@ const Logic = (navigation) => {
       return doctors; // Return original doctors if rating fetch fails
     }
   };
+
+  const fetchDoctors = () => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "loading",
+        value: true,
+      },
+    ]);
+
+    getDoctors(
+      {},
+      async (response) => {
+        if (response?.data?.data) {
+          const doctors = response.data.data;
+
+          // Fetch ratings for all doctors
+          const doctorsWithRatings = await fetchDoctorRatings(doctors);
+
+          updateState([
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "doctors",
+              value: doctorsWithRatings,
+            },
+          ]);
+        } else {
+          updateState([
+            {
+              type: ACTION_TYPES.UPDATE_PROP,
+              prop: "error",
+              value: "Invalid data format received",
+            },
+          ]);
+        }
+      },
+      (error) => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "error",
+            value: error?.message || "Failed to fetch doctors",
+          },
+        ]);
+      },
+      () => {
+        updateState([
+          {
+            type: ACTION_TYPES.UPDATE_PROP,
+            prop: "loading",
+            value: false,
+          },
+        ]);
+      }
+    );
+  };
+
+  // Use focus effect to refresh data when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      // Refresh doctor data when screen comes into focus
+      fetchDoctors();
+    }, [])
+  );
 
   const filterDoctors = (city, field) => {
     let filtered = [...state.doctors];
@@ -167,66 +232,6 @@ const Logic = (navigation) => {
     setSortType(type);
     setSortOrder(order);
   };
-
-  useEffect(() => {
-    const fetchDoctors = () => {
-      updateState([
-        {
-          type: ACTION_TYPES.UPDATE_PROP,
-          prop: "loading",
-          value: true,
-        },
-      ]);
-
-      getDoctors(
-        {},
-        async (response) => {
-          if (response?.data?.data) {
-            const doctors = response.data.data;
-
-            // Fetch ratings for all doctors
-            const doctorsWithRatings = await fetchDoctorRatings(doctors);
-
-            updateState([
-              {
-                type: ACTION_TYPES.UPDATE_PROP,
-                prop: "doctors",
-                value: doctorsWithRatings,
-              },
-            ]);
-          } else {
-            updateState([
-              {
-                type: ACTION_TYPES.UPDATE_PROP,
-                prop: "error",
-                value: "Invalid data format received",
-              },
-            ]);
-          }
-        },
-        (error) => {
-          updateState([
-            {
-              type: ACTION_TYPES.UPDATE_PROP,
-              prop: "error",
-              value: error?.message || "Failed to fetch doctors",
-            },
-          ]);
-        },
-        () => {
-          updateState([
-            {
-              type: ACTION_TYPES.UPDATE_PROP,
-              prop: "loading",
-              value: false,
-            },
-          ]);
-        }
-      );
-    };
-
-    fetchDoctors();
-  }, []);
 
   return {
     state,

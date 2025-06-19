@@ -1,4 +1,4 @@
-import { useContext, useEffect, useReducer } from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { reducer } from "../../reducers/reducer";
 import { INITIAL_STATE } from "./constant";
 import {
@@ -15,6 +15,7 @@ import {
   subscribeToUserData,
   USER_DATA_EVENTS,
 } from "../../helpers/UserDataManager";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -131,11 +132,11 @@ const Logic = (navigation) => {
     getDoctors(
       {},
       async (response) => {
-        console.log(
-          "Fetched doctor response:",
-          response.data.data
-          // JSON.stringify(response.data.data.doctor)
-        );
+        // console.log(
+        //   "Fetched doctor response:",
+        //   response.data.data
+        //   // JSON.stringify(response.data.data.doctor)
+        // );
         if (response?.data?.data) {
           const doctors = response.data.data;
 
@@ -183,42 +184,24 @@ const Logic = (navigation) => {
     );
   };
 
-  // Update the fetchMedicean function in Logic.js
-  const fetchMedications = () => {
-    updateState([
-      {
-        type: ACTION_TYPES.UPDATE_PROP,
-        prop: "loading",
-        value: true,
-      },
-    ]);
+  // Use focus effect to refresh data when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      // Refresh doctor data when screen comes into focus
+      fetchDoctors();
+    }, [])
+  );
 
+  const fetchMedication = () => {
     getMedication(
       {},
       (response) => {
         if (response?.data?.data) {
-          console.log(response.data.data);
-          // Transform API data to match component structure
-          const initialMedications = response.data.data.map((med, index) => ({
-            id: med._id || med.id || `${med.medication}-${Date.now()}`,
-            name: med.medication,
-            times: med.frequency,
-            dose: med.dosage,
-            doseTimes: med.times,
-            takenCount: 0,
-            takenTimes: [],
-          }));
-
           updateState([
             {
               type: ACTION_TYPES.UPDATE_PROP,
-              prop: "initialMedications",
-              value: initialMedications,
-            },
-            {
-              type: ACTION_TYPES.UPDATE_PROP,
-              prop: "loading",
-              value: false,
+              prop: "medications",
+              value: response.data.data,
             },
           ]);
         }
@@ -227,89 +210,30 @@ const Logic = (navigation) => {
         ToastManager.notify("Error fetching medications", {
           type: "error",
         });
-        updateState([
-          {
-            type: ACTION_TYPES.UPDATE_PROP,
-            prop: "error",
-            value: error?.message || "Failed to fetch medications",
-          },
-          {
-            type: ACTION_TYPES.UPDATE_PROP,
-            prop: "loading",
-            value: false,
-          },
-        ]);
       }
     );
   };
 
-  const saveMedicines = async (medicines) => {
-    try {
-      const dataToSave = {
-        date: new Date().toISOString().split("T")[0], // Save only "YYYY-MM-DD"
-        medicines: medicines,
-      };
-      const jsonValue = JSON.stringify(dataToSave);
-      await AsyncStorage.setItem("medicines", jsonValue);
-    } catch (e) {
-      console.error("Error saving medicines:", e);
-    }
-  };
-
-  const loadSavedMedicines = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem("medicines");
-      if (jsonValue != null) {
-        const savedData = JSON.parse(jsonValue);
-        const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
-
-        let medicinesToUse = savedData.medicines;
-
-        if (savedData.date !== today) {
-          // New day: reset takenCount and takenTimes
-          medicinesToUse = savedData.medicines.map((med) => ({
-            ...med,
-            takenCount: 0,
-            takenTimes: [],
-          }));
-        }
-
-        updateState([
-          {
-            type: ACTION_TYPES.UPDATE_PROP,
-            prop: "initialMedications",
-            value: medicinesToUse,
-          },
-        ]);
-
-        // After reset, save new clean medicines
-        if (savedData.date !== today) {
-          saveMedicines(medicinesToUse);
-        }
-      } else {
-        // No saved medicines, so fetch from API
-        fetchMedications();
-      }
-    } catch (e) {
-      console.error("Error loading medicines:", e);
-      fetchMedications();
-    }
+  const saveMedicines = (medicines) => {
+    updateState([
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "medications",
+        value: medicines,
+      },
+    ]);
   };
 
   useEffect(() => {
-    fetchDoctors();
     fetchUserInfo();
-    loadSavedMedicines();
-    // fetchMedications();
+    fetchMedication();
   }, []);
 
-  useEffect(() => {
-    if (state.initialMedications.length > 0) {
-      saveMedicines(state.initialMedications);
-    }
-  }, [state.initialMedications]);
-
-  return { state, updateState, saveMedicines };
+  return {
+    state,
+    updateState,
+    saveMedicines,
+  };
 };
 
 export default Logic;
