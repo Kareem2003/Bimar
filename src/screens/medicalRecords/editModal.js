@@ -11,6 +11,8 @@ import {
   TextInput,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { USERINFO } from '../../helpers/constants/staticKeys';
 import { styles } from './style';
 import AppInput from '../../components/AppInput';
 import AppSelect from '../../components/AppSelect';
@@ -26,12 +28,25 @@ const EditRecordModal = ({
 }) => {
   const [formData, setFormData] = useState({});
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [userGender, setUserGender] = useState(null);
 
   useEffect(() => {
     if (record && visible) {
       initializeFormData();
+      fetchUserGender();
     }
   }, [record, visible]);
+
+  const fetchUserGender = async () => {
+    try {
+      const userInfo = JSON.parse(await AsyncStorage.getItem(USERINFO));
+      if (userInfo) {
+        setUserGender(userInfo.Gender);
+      }
+    } catch (error) {
+      console.error('Error fetching user gender:', error);
+    }
+  };
 
   const initializeFormData = () => {
     const data = {};
@@ -151,10 +166,15 @@ const EditRecordModal = ({
             birthDateOfFirstChild: formData.birthDateOfFirstChild || undefined,
             smoking: formData.smoking || undefined,
             alcohol: formData.alcohol || undefined,
-            wifesNumber: formData.wifesNumber ? parseInt(formData.wifesNumber) : undefined,
             petsTypes: petsFiltered.length > 0 ? petsFiltered : undefined,
             familyStatus: formData.familyStatus || undefined
           };
+          
+          // Only include wife's number if user is not female
+          if (userGender !== 'Female') {
+            updatePayload.personalRecords.wifesNumber = formData.wifesNumber ? parseInt(formData.wifesNumber) : undefined;
+          }
+          
           // Remove undefined values
           Object.keys(updatePayload.personalRecords).forEach(key => {
             if (updatePayload.personalRecords[key] === undefined) {
@@ -192,6 +212,21 @@ const EditRecordModal = ({
       return new Date(formData.birthDateOfFirstChild);
     }
     return new Date();
+  };
+
+  const getProcessedCurrentData = () => {
+    if (!record || record.name !== 'Personal Information') {
+      return record.info;
+    }
+
+    // For Personal Information, filter out wife's number if user is female
+    if (userGender === 'Female') {
+      const lines = record.info.split('\n');
+      const filteredLines = lines.filter(line => !line.includes('Wives Number:'));
+      return filteredLines.join('\n');
+    }
+
+    return record.info;
   };
 
   const renderArrayField = (fieldName, title, placeholder) => {
@@ -317,16 +352,18 @@ const EditRecordModal = ({
                 inputWrapperStyle={styles.personalInput}
               />
             </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Wives Number</Text>
-              <AppInput
-                term={formData.wifesNumber || ''}
-                placeholder="Enter number of wives"
-                onChangeText={(value) => handleInputChange('wifesNumber', value)}
-                keyboardType="numeric"
-                inputWrapperStyle={styles.personalInput}
-              />
-            </View>
+            {userGender !== 'Female' && (
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Wives Number</Text>
+                <AppInput
+                  term={formData.wifesNumber || ''}
+                  placeholder="Enter number of wives"
+                  onChangeText={(value) => handleInputChange('wifesNumber', value)}
+                  keyboardType="numeric"
+                  inputWrapperStyle={styles.personalInput}
+                />
+              </View>
+            )}
             {renderArrayField('petsTypes', 'Pets Types', 'e.g., Dog')}
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Family Status</Text>
@@ -379,7 +416,7 @@ const EditRecordModal = ({
             >
               <View style={styles.currentDataSection}>
                 <Text style={styles.sectionTitle}>Current Data:</Text>
-                <Text style={styles.currentDataText}>{record.info}</Text>
+                <Text style={styles.currentDataText}>{getProcessedCurrentData()}</Text>
               </View>
 
               <View style={styles.editSection}>

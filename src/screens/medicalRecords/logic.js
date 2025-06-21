@@ -4,6 +4,8 @@ import { INITIAL_STATE } from "./constant";
 import { Context } from "../../contexts/appContext";
 import { allRecords, updateRecords } from "../../service/records";
 import ACTION_TYPES from "../../reducers/actionTypes";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { USERINFO } from "../../helpers/constants/staticKeys";
 
 const Logic = (navigation) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
@@ -84,11 +86,20 @@ const Logic = (navigation) => {
 
     allRecords(
       {},
-      (response) => {
+      async (response) => {
         console.log("Medical Records API Response:", response.data);
         const data = response.data?.data || {};
         const medicalRecord = data.medicalRecord || {};
         const personalRecords = data.personalRecords || {};
+
+        // Get user gender to conditionally show wife's number
+        let userGender = null;
+        try {
+          const userInfo = JSON.parse(await AsyncStorage.getItem(USERINFO));
+          userGender = userInfo?.Gender;
+        } catch (error) {
+          console.error('Error fetching user gender:', error);
+        }
 
         // Transform API data to UI format
         const transformedRecords = [];
@@ -179,8 +190,10 @@ const Logic = (navigation) => {
         // Alcohol
         personalInfo.push(`Alcohol: ${personalRecords.alcohol || "Not specified"}`);
         
-        // Wives Number
-        personalInfo.push(`Wives Number: ${personalRecords.wifesNumber !== undefined ? personalRecords.wifesNumber : "Not specified"}`);
+        // Wives Number - Only show if user is not female
+        if (userGender !== 'Female') {
+          personalInfo.push(`Wives Number: ${personalRecords.wifesNumber !== undefined ? personalRecords.wifesNumber : "Not specified"}`);
+        }
         
         // Pets Types
         const petsText = personalRecords.petsTypes && personalRecords.petsTypes.length > 0 
