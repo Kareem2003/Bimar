@@ -25,10 +25,44 @@ const Logic = (navigation, route) => {
   };
 
   const handleBooking = () => {
+    // Validate all required data
+    if (!state.doctor) {
+      ToastManager.notify("Doctor information not available", { type: "error" });
+      return;
+    }
+
+    if (!state.selectedClinic) {
+      ToastManager.notify("No clinic selected", { type: "error" });
+      return;
+    }
+
+    if (!state.selectedDate) {
+      ToastManager.notify("No date selected", { type: "error" });
+      return;
+    }
+
+    if (!state.doctor._id) {
+      ToastManager.notify("Doctor ID not available", { type: "error" });
+      return;
+    }
+
+    if (!state.selectedClinic._id) {
+      ToastManager.notify("Clinic ID not available", { type: "error" });
+      return;
+    }
+
+    console.log("Booking with data:", {
+      doctorId: state.doctor._id,
+      clinicId: state.selectedClinic._id,
+      appointmentDate: state.selectedDate,
+      clinicName: state.selectedClinic.clinicName,
+      clinicAddress: state.selectedClinic.clinicAddress
+    });
+
     bookDate(
       {
         doctorId: state.doctor._id,
-        clinicId: state.doctor.clinic[0]._id,
+        clinicId: state.selectedClinic._id,
         appointmentDate: state.selectedDate,
       },
       (res) => {
@@ -60,12 +94,17 @@ const Logic = (navigation, route) => {
       {
         type: ACTION_TYPES.UPDATE_PROP,
         prop: "price",
-        value: route.params.doctor.clinic[0].Price,
+        value: route.params.selectedClinic?.Price || route.params.doctor.clinic[0].Price,
       },
       {
         type: ACTION_TYPES.UPDATE_PROP,
         prop: "selectedDate",
         value: route.params.selectedDate,
+      },
+      {
+        type: ACTION_TYPES.UPDATE_PROP,
+        prop: "selectedClinic",
+        value: route.params.selectedClinic,
       },
     ]);
   }, []);

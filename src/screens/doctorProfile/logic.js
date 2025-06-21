@@ -23,10 +23,31 @@ const Logic = (navigation, route) => {
     dispatch({ payload });
   };
   const bookDoctorAppointment = () => {
+    // Validate that both clinic and date are selected
+    if (!state.selectedClinic) {
+      ToastManager.notify("Please select a clinic first", { type: "error" });
+      return;
+    }
+
+    if (!state.selectedDate) {
+      ToastManager.notify("Please select a date first", { type: "error" });
+      return;
+    }
+
+    // Find the selected clinic object based on selectedClinic address
+    const selectedClinicObject = state.doctor?.clinic?.find(
+      clinic => clinic.clinicAddress === state.selectedClinic
+    );
+
+    if (!selectedClinicObject) {
+      ToastManager.notify("Selected clinic not found", { type: "error" });
+      return;
+    }
+
     navigation.navigate("BookNow", {
       doctor: state.doctor,
       selectedDate: state.selectedDate,
-      clinicId: state.doctor?.clinicId || state.doctor?.clinic_id,
+      selectedClinic: selectedClinicObject,
     });
   };
 

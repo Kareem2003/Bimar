@@ -66,6 +66,24 @@ const BookNow = ({ navigation, route }) => {
               {state.doctor?.field || "Not Available"}
             </Text>
           </View>
+          <View style={styles.receiptRow}>
+            <Text style={styles.receiptLabel}>Clinic Name</Text>
+            <Text style={styles.receiptValue}>
+              {state.selectedClinic?.clinicName || "Not Available"}
+            </Text>
+          </View>
+          <View style={styles.receiptRow}>
+            <Text style={styles.receiptLabel}>Address</Text>
+            <Text style={styles.receiptValue}>
+              {state.selectedClinic?.clinicAddress || "Not Available"}
+            </Text>
+          </View>
+          <View style={styles.receiptRow}>
+            <Text style={styles.receiptLabel}>Date</Text>
+            <Text style={styles.receiptValue}>
+              {state.selectedDate || "Not Available"}
+            </Text>
+          </View>
         </View>
         <View style={styles.receiptSection}>
           <Text style={styles.sectionTitle}>Payment Details</Text>
