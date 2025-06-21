@@ -42,7 +42,7 @@ const RateApp = ({ navigation }) => {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: isDarkTheme ? primaryDark : primaryLight }}>
+      <KeyboardAvoidingView style={{ flex: 1, backgroundColor: isDarkTheme ? primaryDark : primaryLight }}>
         <Header
           marginTop={40}
           header={"Rate App"}
@@ -52,7 +52,7 @@ const RateApp = ({ navigation }) => {
           <ActivityIndicator size="large" color="#FD9B63" />
           <Text style={{ marginTop: 10, color: isDarkTheme ? '#fff' : '#000' }}>Loading your rating...</Text>
         </View>
-      </SafeAreaView>
+      </KeyboardAvoidingView>
     );
   }
 

@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { ThemeContext } from "../../contexts/themeContext";
 import { styles } from "./style";
@@ -64,11 +66,13 @@ const ForgetPassword = ({ navigation }) => {
   };
 
   return (
-    <View
+    <KeyboardAvoidingView
       style={[
         styles.container,
         { backgroundColor: isDarkTheme ? primaryDark : primaryLight },
       ]}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      enabled
     >
       {state.currentStep === 1 && (
         <View style={{ marginBottom: 150, alignItems: "center" }}>
@@ -200,7 +204,7 @@ const ForgetPassword = ({ navigation }) => {
           </View>
         </View>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

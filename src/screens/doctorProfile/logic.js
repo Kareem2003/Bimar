@@ -7,7 +7,11 @@ import ACTION_TYPES from "../../reducers/actionTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AUTHENTICATION_TOKEN } from "../../helpers/constants/staticKeys";
 import { ToastManager } from "../../helpers/ToastManager";
-import { addDoctorRate, getDoctorRate, updateDoctorRate } from "../../service/rateServices";
+import {
+  addDoctorRate,
+  getDoctorRate,
+  updateDoctorRate,
+} from "../../service/rateServices";
 import { USERINFO } from "../../helpers/constants/staticKeys";
 
 const Logic = (navigation, route) => {
@@ -18,11 +22,11 @@ const Logic = (navigation, route) => {
   const updateState = (payload) => {
     dispatch({ payload });
   };
-
   const bookDoctorAppointment = () => {
     navigation.navigate("BookNow", {
       doctor: state.doctor,
       selectedDate: state.selectedDate,
+      clinicId: state.doctor?.clinicId || state.doctor?.clinic_id,
     });
   };
 
@@ -54,7 +58,9 @@ const Logic = (navigation, route) => {
           comment: comment,
         },
         (response) => {
-          ToastManager.notify("Rating updated successfully", { type: "success" });
+          ToastManager.notify("Rating updated successfully", {
+            type: "success",
+          });
           // Reset form immediately
           updateState([
             {
@@ -122,7 +128,7 @@ const Logic = (navigation, route) => {
       async (response) => {
         // Fix: Access the nested data structure
         const ratingsData = response.data?.data;
-        
+
         if (ratingsData) {
           // Update doctor info with latest rating stats
           const updatedDoctor = {
@@ -130,17 +136,19 @@ const Logic = (navigation, route) => {
             averageRating: ratingsData.doctor.averageRating,
             totalRatings: ratingsData.doctor.totalRatings,
           };
-          
+
           // Get current user data to check if they've already rated
           try {
             const currentUserData = await AsyncStorage.getItem(USERINFO);
-            const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
-            
+            const currentUser = currentUserData
+              ? JSON.parse(currentUserData)
+              : null;
+
             // Check if current user has already rated this doctor
-            const currentUserRating = ratingsData.ratings?.find(rating => 
-              rating.patient?.id === currentUser?.id
+            const currentUserRating = ratingsData.ratings?.find(
+              (rating) => rating.patient?.id === currentUser?.id
             );
-            
+
             if (currentUserRating) {
               setUserRating(currentUserRating);
               updateState([
@@ -161,7 +169,7 @@ const Logic = (navigation, route) => {
           } catch (error) {
             console.error("Error getting current user data:", error);
           }
-          
+
           updateState([
             {
               type: ACTION_TYPES.UPDATE_PROP,
@@ -188,58 +196,57 @@ const Logic = (navigation, route) => {
     );
   };
 
-    const handleDateSelection = (date, clinic) => {
-      if (
-        state.selectedDate === date &&
-        state.selectedClinic === clinic?.clinicAddress
-      ) {
-        // Deselect if clicking the selected date again
-        updateState([
-          { type: ACTION_TYPES.UPDATE_PROP, prop: "selectedDate", value: null },
-          { type: ACTION_TYPES.UPDATE_PROP, prop: "selectedClinic", value: null },
-          { type: ACTION_TYPES.UPDATE_PROP, prop: "selectedTime", value: null }, // Also clear selectedTime
-        ]);
-      } else {
-        updateState([
-          { type: ACTION_TYPES.UPDATE_PROP, prop: "selectedDate", value: date },
-          {
-            type: ACTION_TYPES.UPDATE_PROP,
-            prop: "selectedClinic",
-            value: clinic?.clinicAddress,
-          },
-          { type: ACTION_TYPES.UPDATE_PROP, prop: "selectedTime", value: null }, // Reset time when new date/clinic is selected
-        ]);
+  const handleDateSelection = (date, clinic) => {
+    if (
+      state.selectedDate === date &&
+      state.selectedClinic === clinic?.clinicAddress
+    ) {
+      // Deselect if clicking the selected date again
+      updateState([
+        { type: ACTION_TYPES.UPDATE_PROP, prop: "selectedDate", value: null },
+        { type: ACTION_TYPES.UPDATE_PROP, prop: "selectedClinic", value: null },
+        { type: ACTION_TYPES.UPDATE_PROP, prop: "selectedTime", value: null }, // Also clear selectedTime
+      ]);
+    } else {
+      updateState([
+        { type: ACTION_TYPES.UPDATE_PROP, prop: "selectedDate", value: date },
+        {
+          type: ACTION_TYPES.UPDATE_PROP,
+          prop: "selectedClinic",
+          value: clinic?.clinicAddress,
+        },
+        { type: ACTION_TYPES.UPDATE_PROP, prop: "selectedTime", value: null }, // Reset time when new date/clinic is selected
+      ]);
+    }
+  };
+
+  const getNextMonthAvailableDates = (clinic) => {
+    const today = new Date();
+    const daysOfWeek = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    let dates = [];
+    for (let i = 0; i < 28; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      const dayName = daysOfWeek[date.getDay()];
+      const workDay = clinic.clinicWorkDays?.find((wd) => wd.day === dayName);
+      if (workDay) {
+        dates.push({
+          date: new Date(date),
+          formatted: date.toISOString().split("T")[0],
+          workDay,
+        });
       }
-    };
-  
-    const getNextMonthAvailableDates = (clinic) => {
-      const today = new Date();
-      const daysOfWeek = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-      ];
-      let dates = [];
-      for (let i = 0; i < 28; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
-        const dayName = daysOfWeek[date.getDay()];
-        const workDay = clinic.clinicWorkDays?.find((wd) => wd.day === dayName);
-        if (workDay) {
-          dates.push({
-            date: new Date(date),
-            formatted: date.toISOString().split("T")[0],
-            workDay,
-          });
-        }
-      }
-      return dates;
-    };
-  
+    }
+    return dates;
+  };
 
   return {
     state,
