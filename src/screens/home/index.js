@@ -167,6 +167,13 @@ const Home = ({ navigation }) => {
     return `${displayHour}:${displayMinute} ${period}`;
   };
 
+  // Helper function to get first two names from doctor name
+  const getFirstTwoNames = (fullName) => {
+    if (!fullName || typeof fullName !== 'string') return "Unknown";
+    const names = fullName.trim().split(' ').filter(name => name.length > 0);
+    return names.slice(0, 2).join(' ');
+  };
+
   useEffect(() => {
     // Up and down animation
     const upDownAnimation = Animated.loop(
@@ -620,8 +627,12 @@ const Home = ({ navigation }) => {
 
                   <View style={styles.doctorContent}>
                     <View style={styles.doctorInfo}>
-                      <Text style={styles.doctorName}>
-                        {doctor.doctorName || "UnKnown"}
+                      <Text 
+                        style={styles.doctorName}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                      >
+                        {getFirstTwoNames(doctor.doctorName)}
                       </Text>
                       <Text style={styles.doctorSpecialty}>
                         {doctor.field || "Internal Medicine"}

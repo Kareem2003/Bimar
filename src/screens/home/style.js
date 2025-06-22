@@ -176,7 +176,7 @@ export const styles = {
     marginBottom: 10,
     marginRight: 15,
     borderRadius: 18,
-    width: 260,
+    width: 280,
     height: 135,
     padding: 0,
     shadowColor: "#000",
@@ -236,6 +236,7 @@ export const styles = {
     right: 15,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 2,
   },
   doctorImageContainer: {
     width: 65,
@@ -253,6 +254,7 @@ export const styles = {
   doctorContent: {
     padding: 15,
     paddingLeft: 35,
+    paddingRight: 100, // Add right padding to prevent text overlap with image
   },
   doctorName: {
     fontSize: 16,
@@ -260,9 +262,13 @@ export const styles = {
     color: "#333",
     marginTop: 5,
     marginBottom: 5,
+    flexWrap: 'wrap',
+    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   doctorInfo: {
-    width: "65%",
+    width: "100%", // Changed from 65% to 100% for better responsiveness
   },
   doctorSpecialty: {
     fontSize: 13,
