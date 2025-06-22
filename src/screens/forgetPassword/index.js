@@ -115,7 +115,7 @@ const ForgetPassword = ({ navigation }) => {
           <View style={{ marginTop: 80, alignItems: "center" }}>
             <OTPInput onVerify={handleVerifyOTP} />
 
-            <Text>{state.otpAsync}</Text>
+            {/* <Text>{state.otpAsync}</Text> */}
 
             <AppButton
               title="VERIFY CODE"
